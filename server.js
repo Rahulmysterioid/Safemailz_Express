@@ -76,16 +76,8 @@ app.use('/api/projects', projectsRoutes);
 const autoCcRoutes = require('./routes/autoCc');
 app.use('/api/auto-cc', autoCcRoutes);
 
-// Serve static files from the root directory (so index.html, signup.html etc. work)
-app.use(express.static(path.join(__dirname), {
-    setHeaders: (res, path, stat) => {
-        if (path.endsWith('.html') || path.endsWith('.css')) {
-            res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-            res.set('Pragma', 'no-cache');
-            res.set('Expires', '0');
-        }
-    }
-}));
+// Serve static files from the React app (Frontend)
+app.use(express.static(path.join(__dirname, 'client/dist')));
 
 // Lightweight ping endpoint (excluded from block-check above)
 app.get('/api/status', (req, res) => {
@@ -99,18 +91,10 @@ app.get('/api/status', (req, res) => {
     });
 });
 
-// Clean URL routes (so /signin works the same as /signin.html)
-app.use((req, res, next) => {
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
-    next();
+// The "catchall" handler: for any request that doesn't match API routes, send back React's index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
-app.get('/signin', (req, res) => res.sendFile(path.join(__dirname, 'signin.html')));
-app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'signup.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
-app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'verify.html')));
-app.get('/success', (req, res) => res.sendFile(path.join(__dirname, 'success.html')));
 
 // Start server
 app.listen(PORT, () => {
