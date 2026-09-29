@@ -1,0 +1,524 @@
+[
+  {
+    "id": "testimonials_section",
+    "category": "💬 Testimonials",
+    "name": "Full Testimonials Section",
+    "selector": ".landing-page-root .testimonials, .testimonials",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "5.5rem",
+      "paddingBottom": "5.5rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "testimonials_intro",
+    "category": "💬 Testimonials",
+    "name": "Intro Column ('What others are saying')",
+    "selector": ".testimonials-intro",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "0rem",
+      "paddingBottom": "0rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem"
+    }
+  },
+  {
+    "id": "testimonials_cards",
+    "category": "💬 Testimonials",
+    "name": "Testimonial Cards (Oliver & James)",
+    "selector": ".testimonial-card",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "1.75rem",
+      "paddingBottom": "1.75rem",
+      "paddingLeft": "1.75rem",
+      "paddingRight": "1.75rem",
+      "bgColor": "#FFFFFF",
+      "borderRadius": "14px",
+      "borderWidth": "1px",
+      "borderColor": "rgba(226, 232, 240, 0.6)",
+      "gap": "1.25rem"
+    }
+  },
+  {
+    "id": "testimonials_avatar",
+    "category": "💬 Testimonials",
+    "name": "Avatar Images (Oliver / James Photo)",
+    "selector": ".testimonial-avatar",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "0rem",
+      "paddingBottom": "0rem",
+      "borderRadius": "12px"
+    }
+  },
+  {
+    "id": "testimonials_quote",
+    "category": "💬 Testimonials",
+    "name": "Testimonial Review Quote Text",
+    "selector": ".testimonial-content p",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0.6rem",
+      "fontSize": "0.88rem",
+      "textColor": ""
+    }
+  },
+  {
+    "id": "testimonials_grid",
+    "category": "💬 Testimonials",
+    "name": "Cards Row / Grid Gap",
+    "selector": ".testimonials-grid",
+    "defaultStyles": {
+      "gap": "1.5rem"
+    }
+  },
+
+  {
+    "id": "faq_section",
+    "category": "❓ FAQs",
+    "name": "Full FAQ Section",
+    "selector": ".landing-page-root .faq, .faq",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "5.5rem",
+      "paddingBottom": "5.5rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "faq_intro",
+    "category": "❓ FAQs",
+    "name": "FAQ Left Column (Title & See All)",
+    "selector": ".faq-intro",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "0rem",
+      "paddingBottom": "0rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem"
+    }
+  },
+  {
+    "id": "faq_item",
+    "category": "❓ FAQs",
+    "name": "Question Bar (Accordion Item)",
+    "selector": ".faq-item",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "1rem",
+      "paddingTop": "0rem",
+      "paddingBottom": "0rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": "#FFFFFF",
+      "borderRadius": "8px",
+      "borderWidth": "1px",
+      "borderColor": "#E2E8F0"
+    }
+  },
+  {
+    "id": "faq_question",
+    "category": "❓ FAQs",
+    "name": "Question Text Clickable Row",
+    "selector": ".faq-question",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "1.25rem",
+      "paddingBottom": "1.25rem",
+      "paddingLeft": "1.5rem",
+      "paddingRight": "1.5rem",
+      "fontSize": "1.05rem",
+      "textColor": ""
+    }
+  },
+  {
+    "id": "faq_answer",
+    "category": "❓ FAQs",
+    "name": "Answer Dropdown Content Box",
+    "selector": ".faq-answer",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "1rem",
+      "paddingBottom": "1.5rem",
+      "paddingLeft": "1.5rem",
+      "paddingRight": "1.5rem",
+      "fontSize": "0.95rem",
+      "textColor": ""
+    }
+  },
+  {
+    "id": "faq_icon",
+    "category": "❓ FAQs",
+    "name": "FAQ Expand/Collapse Icon (+ / -)",
+    "selector": ".faq-icon",
+    "defaultStyles": {
+      "fontSize": "1.25rem",
+      "textColor": "#2563EB"
+    }
+  },
+  {
+    "id": "faq_see_all_btn",
+    "category": "❓ FAQs",
+    "name": "FAQ 'See All' Button",
+    "selector": ".faq-intro .btn",
+    "defaultStyles": {
+      "marginTop": "1.5rem",
+      "marginBottom": "0rem",
+      "paddingTop": "0.75rem",
+      "paddingBottom": "0.75rem",
+      "paddingLeft": "1.5rem",
+      "paddingRight": "1.5rem",
+      "borderRadius": "8px"
+    }
+  },
+
+  {
+    "id": "pricing_section",
+    "category": "💳 Pricing",
+    "name": "Full Pricing Section",
+    "selector": ".pricing-section, section.pricing",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "4rem",
+      "paddingBottom": "4rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "pricing_toggle",
+    "category": "💳 Pricing",
+    "name": "Monthly / Yearly Toggle Pill",
+    "selector": ".pricing-toggle",
+    "defaultStyles": {
+      "marginTop": "1.5rem",
+      "marginBottom": "2.5rem",
+      "paddingTop": "4px",
+      "paddingBottom": "4px",
+      "paddingLeft": "4px",
+      "paddingRight": "4px",
+      "borderRadius": "30px"
+    }
+  },
+  {
+    "id": "pricing_cards",
+    "category": "💳 Pricing",
+    "name": "Pricing Cards (Basic, Pro, Enterprise)",
+    "selector": ".pricing-card",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "2.75rem",
+      "paddingBottom": "2.5rem",
+      "paddingLeft": "2rem",
+      "paddingRight": "2rem",
+      "bgColor": "#FFFFFF",
+      "borderRadius": "16px",
+      "borderWidth": "1px",
+      "borderColor": "rgba(226, 232, 240, 0.8)"
+    }
+  },
+  {
+    "id": "pricing_popular_badge",
+    "category": "💳 Pricing",
+    "name": "Most Popular Badge",
+    "selector": ".pricing-badge",
+    "defaultStyles": {
+      "paddingTop": "0.3rem",
+      "paddingBottom": "0.3rem",
+      "paddingLeft": "1rem",
+      "paddingRight": "1rem",
+      "borderRadius": "20px",
+      "fontSize": "0.7rem"
+    }
+  },
+  {
+    "id": "pricing_price",
+    "category": "💳 Pricing",
+    "name": "Price Amount & Currency (₹300 / ₹600)",
+    "selector": ".pricing-price",
+    "defaultStyles": {
+      "marginTop": "0.5rem",
+      "marginBottom": "1.5rem",
+      "fontSize": "2.5rem"
+    }
+  },
+  {
+    "id": "pricing_features_list",
+    "category": "💳 Pricing",
+    "name": "Features Checklist Items",
+    "selector": ".pricing-features li",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0.75rem",
+      "fontSize": "0.9rem"
+    }
+  },
+  {
+    "id": "pricing_cta_btn",
+    "category": "💳 Pricing",
+    "name": "Pricing 'Get Started' Button",
+    "selector": ".pricing-card .btn",
+    "defaultStyles": {
+      "marginTop": "auto",
+      "marginBottom": "0rem",
+      "paddingTop": "0.8rem",
+      "paddingBottom": "0.8rem",
+      "borderRadius": "8px"
+    }
+  },
+
+  {
+    "id": "table_wrapper",
+    "category": "📊 Comparison Table",
+    "name": "Comparison Table Wrapper",
+    "selector": ".comparison-table-wrapper",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "4rem",
+      "paddingTop": "0rem",
+      "paddingBottom": "0rem",
+      "borderRadius": "14px",
+      "borderWidth": "1px",
+      "borderColor": "#E2E8F0"
+    }
+  },
+  {
+    "id": "table_th",
+    "category": "📊 Comparison Table",
+    "name": "Table Column Headers (TH)",
+    "selector": ".comparison-table th",
+    "defaultStyles": {
+      "paddingTop": "1rem",
+      "paddingBottom": "1rem",
+      "paddingLeft": "1.25rem",
+      "paddingRight": "1.25rem",
+      "bgColor": "#F8FAFC",
+      "fontSize": "0.9rem"
+    }
+  },
+  {
+    "id": "table_td",
+    "category": "📊 Comparison Table",
+    "name": "Table Row Cells (TD)",
+    "selector": ".comparison-table td",
+    "defaultStyles": {
+      "paddingTop": "1rem",
+      "paddingBottom": "1rem",
+      "paddingLeft": "1.25rem",
+      "paddingRight": "1.25rem",
+      "fontSize": "0.9rem"
+    }
+  },
+
+  {
+    "id": "hero_section",
+    "category": "🚀 Hero Banner",
+    "name": "Full Hero Section",
+    "selector": ".hero, .page-hero",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "6rem",
+      "paddingBottom": "5rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "hero_title",
+    "category": "🚀 Hero Banner",
+    "name": "Hero Main Heading (H1)",
+    "selector": ".hero-title, .page-hero h1",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "1.5rem",
+      "fontSize": "3.75rem",
+      "textColor": ""
+    }
+  },
+  {
+    "id": "hero_subtitle",
+    "category": "🚀 Hero Banner",
+    "name": "Hero Subtitle (P)",
+    "selector": ".hero-subtitle, .page-hero p",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "2.5rem",
+      "fontSize": "1.2rem",
+      "textColor": ""
+    }
+  },
+  {
+    "id": "hero_actions",
+    "category": "🚀 Hero Banner",
+    "name": "Hero Action Buttons Row",
+    "selector": ".hero-actions",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem"
+    }
+  },
+
+  {
+    "id": "features_section",
+    "category": "🛡️ Features",
+    "name": "Full Features Section",
+    "selector": ".features, #features",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "5rem",
+      "paddingBottom": "5rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "features_cards",
+    "category": "🛡️ Features",
+    "name": "Individual Feature Cards",
+    "selector": ".feature-card",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "2.5rem",
+      "paddingBottom": "2rem",
+      "paddingLeft": "2rem",
+      "paddingRight": "2rem",
+      "bgColor": "#FFFFFF",
+      "borderRadius": "16px",
+      "borderWidth": "1px",
+      "borderColor": "#E2E8F0"
+    }
+  },
+  {
+    "id": "features_icon",
+    "category": "🛡️ Features",
+    "name": "Feature Icon Box",
+    "selector": ".feature-icon",
+    "defaultStyles": {
+      "marginBottom": "1rem",
+      "fontSize": "1.75rem"
+    }
+  },
+
+  {
+    "id": "how_to_use_section",
+    "category": "🏢 How to Use",
+    "name": "Full How to Use Section",
+    "selector": ".how-to, #how-to-use",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "4.5rem",
+      "paddingBottom": "4.5rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "how_to_use_card",
+    "category": "🏢 How to Use",
+    "name": "Step Cards (1, 2, 3)",
+    "selector": ".step-card",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "2.25rem",
+      "paddingBottom": "2.25rem",
+      "paddingLeft": "2.25rem",
+      "paddingRight": "2.25rem",
+      "bgColor": "#FFFFFF",
+      "borderRadius": "12px",
+      "borderWidth": "1px",
+      "borderColor": "#E2E8F0"
+    }
+  },
+  {
+    "id": "how_to_use_number",
+    "category": "🏢 How to Use",
+    "name": "Step Number Circle Badge (1, 2, 3)",
+    "selector": ".step-number",
+    "defaultStyles": {
+      "fontSize": "1.3rem"
+    }
+  },
+
+  {
+    "id": "dark_section",
+    "category": "🌙 Know More Banner",
+    "name": "Dark Security / Overview Section",
+    "selector": ".dark-section",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "5rem",
+      "paddingBottom": "5rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": "#1F2228"
+    }
+  },
+  {
+    "id": "dark_stats",
+    "category": "🌙 Know More Banner",
+    "name": "Stats Grid Box (4.5/5, 425+)",
+    "selector": ".stats-grid",
+    "defaultStyles": {
+      "marginTop": "1.5rem",
+      "marginBottom": "2rem"
+    }
+  },
+
+  {
+    "id": "header_bar",
+    "category": "🔝 Header & Footer",
+    "name": "Top Navigation Header Bar",
+    "selector": "header, .landing-page-root header",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "1.25rem",
+      "paddingBottom": "1.25rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  },
+  {
+    "id": "footer_bar",
+    "category": "🔝 Header & Footer",
+    "name": "Bottom Footer Section",
+    "selector": "footer, .landing-footer",
+    "defaultStyles": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "4rem",
+      "paddingBottom": "3rem",
+      "paddingLeft": "0rem",
+      "paddingRight": "0rem",
+      "bgColor": ""
+    }
+  }
+]

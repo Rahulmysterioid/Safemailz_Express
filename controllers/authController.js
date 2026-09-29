@@ -1,0 +1,293 @@
+const { db } = require('../db');
+const bcrypt = require('bcrypt');
+
+const signup = async (req, res) => {
+    const {
+        organization_name,
+        admin_name,
+        email,
+        password,
+        organization_size,
+        backup_email,
+        terms_accepted,
+        marketing_opt_in
+    } = req.body;
+
+    // 1. Basic validation
+    if (!organization_name || !admin_name || !email || !password || !organization_size) {
+        return res.status(400).json({ error: 'Please fill in all required fields.' });
+    }
+
+    if (!terms_accepted) {
+        return res.status(400).json({ error: 'You must accept the Terms of Service and Privacy Policy.' });
+    }
+
+    // 2. Validate email format (simple regex)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+    if (backup_email && !emailRegex.test(backup_email)) {
+        return res.status(400).json({ error: 'Please enter a valid backup email address.' });
+    }
+
+    try {
+        const util = require('util');
+        const dbGet = util.promisify(db.get.bind(db));
+        const dbRun = (query, params = []) => new Promise((resolve, reject) => {
+            db.run(query, params, function (err) {
+                if (err) reject(err);
+                else resolve(this);
+            });
+        });
+
+        // 3. Check if email already exists
+        const row = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
+        if (row) {
+            return res.status(400).json({ error: 'An account with this email already exists.' });
+        }
+
+        // 4. Hash the password
+        const saltRounds = 10;
+        const password_hash = await bcrypt.hash(password, saltRounds);
+
+        // 5. Insert organization and user within a transaction-like approach
+        try {
+            await dbRun('BEGIN TRANSACTION');
+
+            const orgResult = await dbRun(
+                `INSERT INTO organizations (organization_name, organization_size, backup_email) VALUES (?, ?, ?)`,
+                [organization_name, organization_size, backup_email || null]
+            );
+            const organization_id = orgResult.lastID;
+
+            const syncController = require('./syncController');
+            const pending = syncController.pendingAuth.get(email);
+            
+            let sync_provider = null;
+            let sync_access_token = null;
+            let sync_refresh_token = null;
+            let sync_token_expires_at = null;
+            
+            if (pending) {
+                sync_provider = pending.provider;
+                sync_access_token = pending.access_token;
+                sync_refresh_token = pending.refresh_token;
+                sync_token_expires_at = pending.expires_at;
+                syncController.pendingAuth.delete(email);
+            }
+
+            await dbRun(
+                `INSERT INTO users (organization_id, admin_name, email, password_hash, marketing_opt_in, terms_accepted, role, perm_add_employees, perm_create_projects, perm_manage_projects, perm_make_admin, perm_delete_project, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, 'org_owner', 1, 1, 1, 1, 1, ?, ?, ?, ?)`,
+                [organization_id, admin_name, email, password_hash, marketing_opt_in ? 1 : 0, terms_accepted ? 1 : 0, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at]
+            );
+
+            await dbRun('COMMIT');
+
+            return res.status(201).json({
+                message: 'Account created successfully.',
+                redirectUrl: 'success.html'
+            });
+        } catch (txnError) {
+            console.error('Transaction error:', txnError);
+            await dbRun('ROLLBACK').catch(e => console.error('Rollback failed:', e));
+            if (txnError.message && txnError.message.includes('UNIQUE constraint failed')) {
+                return res.status(400).json({ error: 'An account with this email already exists.' });
+            }
+            return res.status(500).json({ error: 'Failed to create account.' });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal server error.' });
+    }
+};
+
+const signin = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    try {
+        const util = require('util');
+        const dbGet = util.promisify(db.get.bind(db));
+        
+        const user = await dbGet('SELECT * FROM users WHERE email = ? OR admin_name = ?', [email, email]);
+        
+        if (!user) {
+            return res.status(400).json({ error: 'Invalid email or password.' });
+        }
+
+        if (user.is_blocked) {
+            return res.status(403).json({ success: false, message: 'You are blocked. Please contact your admin.', error: 'You are blocked. Please contact your admin.' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid email or password.' });
+        }
+
+        return res.status(200).json({
+            message: 'Login successful.',
+            redirectUrl: 'dashboard.html',
+            user: {
+                id: user.id,
+                organization_id: user.organization_id,
+                email: user.email,
+                admin_name: user.admin_name,
+                role: user.role,
+                subscription_status: user.subscription_status || 'active',
+                permissions: {
+                    addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
+                    createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
+                    manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
+                    makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
+                    deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true'
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Signin error:', error);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Internal server error.' });
+        }
+    }
+};
+
+
+const signinGoogle = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required.' });
+    }
+
+    try {
+        const util = require('util');
+        const dbGet = util.promisify(db.get.bind(db));
+        
+        const user = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
+        
+        if (!user) {
+            return res.status(404).json({ error: 'No account found with this Google email. Please sign up first.' });
+        }
+
+        if (user.is_blocked) {
+            return res.status(403).json({ success: false, message: 'You are blocked. Please contact your admin.', error: 'You are blocked. Please contact your admin.' });
+        }
+
+        const syncController = require('./syncController');
+        const pending = syncController.pendingAuth.get(email);
+        
+        if (pending) {
+            const dbRun = util.promisify(db.run.bind(db));
+            await dbRun(
+                `UPDATE users SET sync_provider = ?, sync_access_token = ?, sync_refresh_token = ?, sync_token_expires_at = ? WHERE id = ?`,
+                [pending.provider, pending.access_token, pending.refresh_token, pending.expires_at, user.id]
+            );
+            syncController.pendingAuth.delete(email);
+            
+            // Trigger a background sync now that we have tokens
+            if (typeof syncController.performSync === 'function') {
+                syncController.performSync(user.id).catch(err => console.error('Background sync failed:', err));
+            }
+        }
+
+        return res.status(200).json({
+            message: 'Login successful.',
+            redirectUrl: 'dashboard.html',
+            user: {
+                id: user.id,
+                organization_id: user.organization_id,
+                email: user.email,
+                admin_name: user.admin_name,
+                role: user.role,
+                permissions: {
+                    addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
+                    createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
+                    manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
+                    makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
+                    deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true'
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Google Signin error:', error);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Internal server error.' });
+        }
+    }
+};
+
+const signinMicrosoft = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required.' });
+    }
+
+    try {
+        const util = require('util');
+        const dbGet = util.promisify(db.get.bind(db));
+        
+        const user = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
+        
+        if (!user) {
+            return res.status(404).json({ error: 'No account found with this Microsoft email. Please sign up first.' });
+        }
+
+        if (user.is_blocked) {
+            return res.status(403).json({ success: false, message: 'You are blocked. Please contact your admin.', error: 'You are blocked. Please contact your admin.' });
+        }
+
+        const syncController = require('./syncController');
+        const pending = syncController.pendingAuth.get(email);
+        
+        if (pending) {
+            const dbRun = util.promisify(db.run.bind(db));
+            await dbRun(
+                `UPDATE users SET sync_provider = ?, sync_access_token = ?, sync_refresh_token = ?, sync_token_expires_at = ? WHERE id = ?`,
+                [pending.provider, pending.access_token, pending.refresh_token, pending.expires_at, user.id]
+            );
+            syncController.pendingAuth.delete(email);
+            
+            // Trigger a background sync now that we have tokens
+            if (typeof syncController.performSync === 'function') {
+                syncController.performSync(user.id).catch(err => console.error('Background sync failed:', err));
+            }
+        }
+
+        return res.status(200).json({
+            message: 'Login successful.',
+            redirectUrl: 'dashboard.html',
+            user: {
+                id: user.id,
+                organization_id: user.organization_id,
+                email: user.email,
+                admin_name: user.admin_name,
+                role: user.role,
+                permissions: {
+                    addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
+                    createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
+                    manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
+                    makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
+                    deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true'
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Microsoft Signin error:', error);
+        if (!res.headersSent) {
+            return res.status(500).json({ error: 'Internal server error.' });
+        }
+    }
+};
+
+module.exports = {
+
+    signup,
+    signin,
+    signinGoogle,
+    signinMicrosoft
+};

@@ -1,0 +1,139 @@
+{
+  "sectionPaddingY": "4.5rem",
+  "sectionMarginY": "0rem",
+  "containerMaxWidth": "1320px",
+  "containerPaddingX": "2.25rem",
+  "cardPadding": "2.5rem",
+  "cardGap": "2rem",
+  "buttonPaddingY": "0.75rem",
+  "buttonPaddingX": "1.5rem",
+  "heroPaddingY": "5rem",
+  "sections": {
+    "testimonials": {
+      "marginTop": "3rem",
+      "marginBottom": "3.5rem",
+      "paddingTop": "5rem",
+      "paddingBottom": "5.5rem",
+      "paddingX": "4rem",
+      "bgColor": "",
+      "cardPadding": "1.75rem",
+      "cardGap": "2.25rem"
+    },
+    "faq": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "5.25rem",
+      "paddingBottom": "5.5rem",
+      "paddingX": "3rem",
+      "bgColor": "",
+      "cardPadding": "0.75rem",
+      "cardGap": "1.25rem"
+    },
+    "pricing": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "4rem",
+      "paddingBottom": "4rem",
+      "paddingX": "1.5rem",
+      "bgColor": "",
+      "cardPadding": "2.75rem",
+      "cardGap": "1.75rem"
+    },
+    "hero": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "6rem",
+      "paddingBottom": "5rem",
+      "paddingX": "1.5rem",
+      "bgColor": "",
+      "cardPadding": "2rem",
+      "cardGap": "1.5rem"
+    },
+    "features": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "5rem",
+      "paddingBottom": "5rem",
+      "paddingX": "1.5rem",
+      "bgColor": "",
+      "cardPadding": "2.5rem",
+      "cardGap": "1.75rem"
+    },
+    "howToUse": {
+      "marginTop": "0rem",
+      "marginBottom": "0rem",
+      "paddingTop": "4.5rem",
+      "paddingBottom": "4.5rem",
+      "paddingX": "1.5rem",
+      "bgColor": "",
+      "cardPadding": "2.25rem",
+      "cardGap": "2rem"
+    }
+  },
+  "components": {
+    "testimonials_cards": {
+      "marginTop": "1.5rem",
+      "marginBottom": "2rem",
+      "paddingTop": "2rem",
+      "paddingBottom": "2rem",
+      "paddingLeft": "2.5rem",
+      "paddingRight": "2.5rem",
+      "bgColor": "#FFFFFF",
+      "borderRadius": "20px",
+      "borderColor": "#3B82F6"
+    },
+    "faq_question": {
+      "paddingTop": "1.5rem",
+      "paddingBottom": "1.5rem",
+      "paddingLeft": "2rem",
+      "paddingRight": "2rem",
+      "fontSize": "1.15rem"
+    },
+    "hero_section": {
+      "marginBottom": "0rem",
+      "marginRight": "2rem"
+    },
+    "footer_bar": {
+      "marginTop": "0rem",
+      "paddingTop": "0rem",
+      "paddingBottom": "3.25rem",
+      "gap": "0.25rem"
+    },
+    "faq_section": {
+      "marginTop": "0.5rem",
+      "marginLeft": "4rem",
+      "marginRight": "0.25rem",
+      "paddingBottom": "1.5rem",
+      "paddingLeft": "0rem",
+      "paddingTop": "0rem",
+      "gap": "0rem",
+      "paddingRight": "6rem"
+    },
+    "header_bar": {
+      "marginTop": "0rem",
+      "paddingTop": "0.5rem",
+      "paddingBottom": "0.5rem",
+      "gap": "0rem",
+      "borderRadius": "0px"
+    }
+  },
+  "primaryColor": "#45AEF1",
+  "primaryGradientEnd": "#2B8CE6",
+  "pageBg": "#FFFFFF",
+  "cardBg": "#FFFFFF",
+  "textDark": "#1F2228",
+  "textGray": "#667085",
+  "borderColor": "#E2E8F0",
+  "fontFamily": "'Inter', sans-serif",
+  "fontSizeBase": "16px",
+  "heroTitleSize": "3.5rem",
+  "headingFontWeight": "700",
+  "lineHeightBase": "1.6",
+  "cardBorderRadius": "16px",
+  "buttonBorderRadius": "8px",
+  "cardBorderWidth": "1px",
+  "shadowIntensity": "medium",
+  "backdropBlur": "16px",
+  "cardHoverLift": "-6px",
+  "customCss": ""
+}

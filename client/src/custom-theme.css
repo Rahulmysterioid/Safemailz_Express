@@ -1,0 +1,261 @@
+/* ==========================================================================
+   SAFEMAILZ AUTO-GENERATED THEME OVERRIDES (SAVED FROM VISUAL STYLER)
+   ========================================================================== */
+
+:root {
+  /* Spacing: Margins & Paddings */
+  --section-padding-y: 4.5rem;
+  --section-margin-y: 0rem;
+  --container-max-width: 1320px;
+  --container-padding-x: 2.25rem;
+  --card-padding: 2.5rem;
+  --card-gap: 2rem;
+  --button-padding-y: 0.75rem;
+  --button-padding-x: 1.5rem;
+  --hero-padding-y: 5rem;
+
+  /* Colors */
+  --primary-color: #45AEF1;
+  --primary-gradient: linear-gradient(135deg, #45AEF1 0%, #2B8CE6 100%);
+  --bg-page: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --text-dark: #1F2228;
+  --text-gray: #667085;
+  --border-color: #E2E8F0;
+
+  /* Typography */
+  --font-main: 'Inter', sans-serif;
+  --font-size-base: 16px;
+  --hero-title-size: 3.5rem;
+  --heading-font-weight: 700;
+  --line-height-base: 1.6;
+
+  /* Borders & Radii */
+  --card-border-radius: 16px;
+  --button-border-radius: 8px;
+  --card-border-width: 1px;
+
+  /* Effects */
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --backdrop-blur: 16px;
+  --card-hover-lift: -6px;
+}
+
+/* Page Root & Body Styling */
+body, .landing-page-root {
+  background-color: var(--bg-page) !important;
+  color: var(--text-dark);
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+/* Container & Spacing Utilities */
+.landing-page-root .container, .container {
+  max-width: var(--container-max-width) !important;
+  padding-left: var(--container-padding-x) !important;
+  padding-right: var(--container-padding-x) !important;
+}
+
+/* Section Margins & Paddings */
+.hero, .page-hero {
+  padding-top: var(--hero-padding-y) !important;
+  padding-bottom: var(--hero-padding-y) !important;
+  margin-top: var(--section-margin-y) !important;
+  margin-bottom: var(--section-margin-y) !important;
+}
+
+.hero-title, .page-hero h1 {
+  font-size: var(--hero-title-size) !important;
+  font-weight: var(--heading-font-weight) !important;
+  color: var(--text-dark) !important;
+}
+
+section.container, .landing-page-root section:not(.hero):not(.page-hero) {
+  padding-top: var(--section-padding-y) !important;
+  padding-bottom: var(--section-padding-y) !important;
+  margin-top: var(--section-margin-y) !important;
+  margin-bottom: var(--section-margin-y) !important;
+}
+
+/* Cards (Pricing, Features, How to use, Testimonials) */
+.pricing-card, .feature-card, .how-card, .testimonial-card, .stat-card {
+  padding: var(--card-padding) !important;
+  border-radius: var(--card-border-radius) !important;
+  background: var(--card-bg) !important;
+  border: var(--card-border-width) solid var(--border-color) !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+}
+
+.pricing-card:hover, .feature-card:hover, .how-card:hover, .testimonial-card:hover {
+  transform: translateY(var(--card-hover-lift)) !important;
+}
+
+.pricing-card.popular:hover {
+  transform: scale(1.03) translateY(var(--card-hover-lift)) !important;
+}
+
+/* Buttons */
+.landing-page-root .btn-primary, .btn.btn-primary {
+  padding: var(--button-padding-y) var(--button-padding-x) !important;
+  border-radius: var(--button-border-radius) !important;
+  background: var(--primary-gradient) !important;
+  color: #ffffff !important;
+}
+
+.landing-page-root .btn-outline, .btn.btn-outline {
+  padding: var(--button-padding-y) var(--button-padding-x) !important;
+  border-radius: var(--button-border-radius) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+}
+
+/* Grids & Gaps */
+.pricing-grid, .features-grid, .steps-grid {
+  gap: var(--card-gap) !important;
+}
+
+/* ── TARGETED SECTION-SPECIFIC OVERRIDES ─────────────────────────────── */
+
+/* Testimonials ("What others are saying about Us") */
+.landing-page-root .testimonials, .testimonials {
+  margin-top: 3rem !important;
+  margin-bottom: 3.5rem !important;
+  padding-top: 5rem !important;
+  padding-bottom: 5.5rem !important;
+  padding-left: 4rem !important;
+  padding-right: 4rem !important;
+  
+}
+.testimonials .testimonial-card {
+  padding: 1.75rem !important;
+}
+.testimonials-grid {
+  gap: 2.25rem !important;
+}
+
+/* FAQs ("Frequently Asked Questions") */
+.landing-page-root .faq, .faq {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+  padding-top: 5.25rem !important;
+  padding-bottom: 5.5rem !important;
+  padding-left: 3rem !important;
+  padding-right: 3rem !important;
+  
+}
+.faq .faq-item {
+  padding: 0.75rem !important;
+}
+
+/* Pricing Section */
+.pricing-section, section.pricing, .pricing-grid {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+  gap: 1.75rem !important;
+  
+}
+.pricing-card {
+  padding: 2.75rem !important;
+}
+
+/* Hero Banner */
+.hero, .page-hero {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+  padding-top: 6rem !important;
+  padding-bottom: 5rem !important;
+  
+}
+
+/* Features Section */
+.features, #features {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+  padding-top: 5rem !important;
+  padding-bottom: 5rem !important;
+  
+}
+.feature-card {
+  padding: 2.5rem !important;
+}
+.features-grid {
+  gap: 1.75rem !important;
+}
+
+/* How to Use Steps */
+.steps-grid, .step-card {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+}
+.step-card {
+  padding: 2.25rem !important;
+}
+.steps-grid {
+  gap: 2rem !important;
+}
+
+
+/* ── INDIVIDUAL SUB-COMPONENT OVERRIDES (EVERY DIVIDED PART) ────────── */
+
+/* Part: Testimonial Cards (Oliver & James) (testimonials_cards) */
+.testimonial-card {
+  margin-top: 1.5rem !important;
+  margin-bottom: 2rem !important;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+  background: #FFFFFF !important;
+  border-radius: 20px !important;
+  border-color: #3B82F6 !important; border-style: solid !important;
+}
+
+/* Part: Question Text Clickable Row (faq_question) */
+.faq-question {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  font-size: 1.15rem !important;
+}
+
+/* Part: Full Hero Section (hero_section) */
+.hero, .page-hero {
+  margin-bottom: 0rem !important;
+  margin-right: 2rem !important;
+}
+
+/* Part: Bottom Footer Section (footer_bar) */
+footer, .landing-footer {
+  margin-top: 0rem !important;
+  padding-top: 0rem !important;
+  padding-bottom: 3.25rem !important;
+  gap: 0.25rem !important;
+}
+
+/* Part: Full FAQ Section (faq_section) */
+.landing-page-root .faq, .faq {
+  margin-top: 0.5rem !important;
+  margin-left: 4rem !important;
+  margin-right: 0.25rem !important;
+  padding-top: 0rem !important;
+  padding-bottom: 1.5rem !important;
+  padding-left: 0rem !important;
+  padding-right: 6rem !important;
+  gap: 0rem !important;
+}
+
+/* Part: Top Navigation Header Bar (header_bar) */
+header, .landing-page-root header {
+  margin-top: 0rem !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  border-radius: 0px !important;
+  gap: 0rem !important;
+}
+
+
+/* Custom User CSS */
+
