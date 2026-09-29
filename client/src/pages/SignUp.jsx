@@ -267,18 +267,18 @@ export default function SignUp() {
                             <form noValidate onSubmit={handleOAuthSubmit}>
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="googleOrgName">Organization Name *</label>
-                                    <input type="text" className="form-control" id="googleOrgName" required value={oauthForm.orgName} onChange={handleOauthChange} />
+                                    <input type="text" className="form-control" id="googleOrgName" required value={oauthForm.orgName} onChange={(e) => { setOauthForm(prev => ({ ...prev, orgName: e.target.value })); if(oauthErrors.orgName) setOauthErrors(prev => ({ ...prev, orgName: '' })); }} />
                                     <div className="form-error" style={{ display: oauthErrors.orgName ? 'block' : 'none' }}>{oauthErrors.orgName}</div>
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="googleAdminName">Admin Name *</label>
-                                    <input type="text" className="form-control" id="googleAdminName" required value={oauthForm.adminName} onChange={handleOauthChange} />
+                                    <input type="text" className="form-control" id="googleAdminName" required value={oauthForm.adminName} onChange={(e) => { setOauthForm(prev => ({ ...prev, adminName: e.target.value })); if(oauthErrors.adminName) setOauthErrors(prev => ({ ...prev, adminName: '' })); }} />
                                     <div className="form-error" style={{ display: oauthErrors.adminName ? 'block' : 'none' }}>{oauthErrors.adminName}</div>
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="googleOrgSize">Organization Size *</label>
                                     <div className="select-wrapper">
-                                        <select className="form-control" id="googleOrgSize" required value={oauthForm.orgSize} onChange={handleOauthChange}>
+                                        <select className="form-control" id="googleOrgSize" required value={oauthForm.orgSize} onChange={(e) => { setOauthForm(prev => ({ ...prev, orgSize: e.target.value })); if(oauthErrors.orgSize) setOauthErrors(prev => ({ ...prev, orgSize: '' })); }}>
                                             <option value="" disabled>Select size</option>
                                             <option value="1-10">1-10</option>
                                             <option value="11-50">11-50</option>
@@ -289,7 +289,7 @@ export default function SignUp() {
                                     <div className="form-error" style={{ display: oauthErrors.orgSize ? 'block' : 'none' }}>{oauthErrors.orgSize}</div>
                                 </div>
                                 <div className="checkbox-group">
-                                    <input type="checkbox" id="googleTerms" required checked={oauthForm.terms} onChange={handleOauthChange} />
+                                    <input type="checkbox" id="googleTerms" required checked={oauthForm.terms} onChange={(e) => { setOauthForm(prev => ({ ...prev, terms: e.target.checked })); if(oauthErrors.terms) setOauthErrors(prev => ({ ...prev, terms: '' })); }} />
                                     <label htmlFor="googleTerms">I agree to Terms</label>
                                 </div>
                                 <div className="form-error" style={{ display: oauthErrors.terms ? 'block' : 'none', marginBottom: '1rem' }}>{oauthErrors.terms}</div>
