@@ -66,6 +66,8 @@ function extractGoogleAttachments(payload) {
 const pendingAuth = new Map();
 exports.pendingAuth = pendingAuth;
 
+const frontendUrl = process.env.FRONTEND_URL || (process.env.RENDER ? '' : 'http://localhost:5173');
+
 exports.googleCallback = async (req, res) => {
     const code = req.query.code;
     const userId = req.query.state;
@@ -112,14 +114,14 @@ exports.googleCallback = async (req, res) => {
                         });
                         
                         if (userId === 'signup') {
-                            return res.redirect(`http://localhost:5173/signup?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
+                            return res.redirect(`${frontendUrl}/signup?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
                         } else {
-                            return res.redirect(`http://localhost:5173/signin?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
+                            return res.redirect(`${frontendUrl}/signin?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
                         }
                     }
                 } catch (err) {
                     console.error("Failed to fetch user info", err);
-                    return res.redirect(userId === 'signup' ? 'http://localhost:5173/signup?error=google_auth_failed' : 'http://localhost:5173/signin?error=google_auth_failed');
+                    return res.redirect(userId === 'signup' ? `${frontendUrl}/signup?error=google_auth_failed` : `${frontendUrl}/signin?error=google_auth_failed`);
                 }
             }
 
@@ -195,14 +197,14 @@ exports.microsoftCallback = async (req, res) => {
                         });
                         
                         if (userId === 'signup') {
-                            return res.redirect(`http://localhost:5173/signup?ms_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
+                            return res.redirect(`${frontendUrl}/signup?ms_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
                         } else {
-                            return res.redirect(`http://localhost:5173/signin?ms_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
+                            return res.redirect(`${frontendUrl}/signin?ms_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
                         }
                     }
                 } catch (err) {
                     console.error("Failed to fetch MS user info", err);
-                    return res.redirect(userId === 'signup' ? 'http://localhost:5173/signup?error=ms_auth_failed' : 'http://localhost:5173/signin?error=ms_auth_failed');
+                    return res.redirect(userId === 'signup' ? `${frontendUrl}/signup?error=ms_auth_failed` : `${frontendUrl}/signin?error=ms_auth_failed`);
                 }
             }
 
