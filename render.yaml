@@ -2,8 +2,9 @@ services:
   - type: web
     name: safemailz-app
     env: node
+    plan: free
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
