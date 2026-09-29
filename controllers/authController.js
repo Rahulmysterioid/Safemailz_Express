@@ -284,10 +284,94 @@ const signinMicrosoft = async (req, res) => {
     }
 };
 
+const signupGoogle = async (req, res) => {
+    const { email, orgName, adminName, orgSize } = req.body;
+    if (!email || !orgName || !adminName || !orgSize) {
+        return res.status(400).json({ error: 'Please fill in all required fields.' });
+    }
+    try {
+        const util = require('util');
+        const dbGet = util.promisify(db.get.bind(db));
+        const dbRun = (query, params = []) => new Promise((resolve, reject) => {
+            db.run(query, params, function (err) { if (err) reject(err); else resolve(this); });
+        });
+        const existing = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
+        if (existing) return res.status(400).json({ error: 'An account with this email already exists.' });
+
+        const syncController = require('./syncController');
+        const pending = syncController.pendingAuth.get(email);
+        let sync_provider = 'google', sync_access_token = null, sync_refresh_token = null, sync_token_expires_at = null;
+        if (pending) {
+            sync_provider = pending.provider;
+            sync_access_token = pending.access_token;
+            sync_refresh_token = pending.refresh_token;
+            sync_token_expires_at = pending.expires_at;
+            syncController.pendingAuth.delete(email);
+        }
+
+        const orgResult = await dbRun('INSERT INTO organizations (organization_name, organization_size) VALUES (?, ?)', [orgName, orgSize]);
+        const orgId = orgResult.lastID;
+        const userResult = await dbRun(
+            `INSERT INTO users (organization_id, admin_name, email, password_hash, marketing_opt_in, terms_accepted, role, perm_add_employees, perm_create_projects, perm_manage_projects, perm_make_admin, perm_delete_project, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at) VALUES (?, ?, ?, '', 0, 1, 'org_owner', 1, 1, 1, 1, 1, ?, ?, ?, ?)`,
+            [orgId, adminName, email, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at]
+        );
+        return res.status(201).json({
+            message: 'Account created successfully.',
+            user: { id: userResult.lastID, organization_id: orgId, email, admin_name: adminName, role: 'org_owner', permissions: { addEmployees: true, createProjects: true, manageProjects: true, makeAdmin: true, deleteProject: true } }
+        });
+    } catch (error) {
+        console.error('Google Signup error:', error);
+        return res.status(500).json({ error: 'Internal server error.' });
+    }
+};
+
+const signupMicrosoft = async (req, res) => {
+    const { email, orgName, adminName, orgSize } = req.body;
+    if (!email || !orgName || !adminName || !orgSize) {
+        return res.status(400).json({ error: 'Please fill in all required fields.' });
+    }
+    try {
+        const util = require('util');
+        const dbGet = util.promisify(db.get.bind(db));
+        const dbRun = (query, params = []) => new Promise((resolve, reject) => {
+            db.run(query, params, function (err) { if (err) reject(err); else resolve(this); });
+        });
+        const existing = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
+        if (existing) return res.status(400).json({ error: 'An account with this email already exists.' });
+
+        const syncController = require('./syncController');
+        const pending = syncController.pendingAuth.get(email);
+        let sync_provider = 'microsoft', sync_access_token = null, sync_refresh_token = null, sync_token_expires_at = null;
+        if (pending) {
+            sync_provider = pending.provider;
+            sync_access_token = pending.access_token;
+            sync_refresh_token = pending.refresh_token;
+            sync_token_expires_at = pending.expires_at;
+            syncController.pendingAuth.delete(email);
+        }
+
+        const orgResult = await dbRun('INSERT INTO organizations (organization_name, organization_size) VALUES (?, ?)', [orgName, orgSize]);
+        const orgId = orgResult.lastID;
+        const userResult = await dbRun(
+            `INSERT INTO users (organization_id, admin_name, email, password_hash, marketing_opt_in, terms_accepted, role, perm_add_employees, perm_create_projects, perm_manage_projects, perm_make_admin, perm_delete_project, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at) VALUES (?, ?, ?, '', 0, 1, 'org_owner', 1, 1, 1, 1, 1, ?, ?, ?, ?)`,
+            [orgId, adminName, email, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at]
+        );
+        return res.status(201).json({
+            message: 'Account created successfully.',
+            user: { id: userResult.lastID, organization_id: orgId, email, admin_name: adminName, role: 'org_owner', permissions: { addEmployees: true, createProjects: true, manageProjects: true, makeAdmin: true, deleteProject: true } }
+        });
+    } catch (error) {
+        console.error('Microsoft Signup error:', error);
+        return res.status(500).json({ error: 'Internal server error.' });
+    }
+};
+
 module.exports = {
 
     signup,
     signin,
     signinGoogle,
-    signinMicrosoft
+    signinMicrosoft,
+    signupGoogle,
+    signupMicrosoft
 };
