@@ -6,6 +6,7 @@ import Features from './pages/Features'
 import Pricing from './pages/Pricing'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
+import ForceChangePassword from './pages/ForceChangePassword'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import AdminRoute from './components/auth/AdminRoute'
 import './index.css'
@@ -15,6 +16,7 @@ import './dashboard.css'
 import './dashboard-external.css'
 import './custom-theme.css'
 import './email-ui-fix.css'
+import './unified-design-system.css'
 
 import DashboardLayout from './components/layout/DashboardLayout'
 import EmailView from './pages/dashboard/EmailView'
@@ -27,11 +29,15 @@ import TasksView from './pages/dashboard/TasksView'
 import SubscriptionView from './pages/dashboard/SubscriptionView'
 
 import { UIProvider } from './context/UIContext'
+import { GeneralSettingsProvider } from './context/GeneralSettingsContext'
+import { SidebarUIProvider } from './context/SidebarUIContext'
 
 function App() {
   return (
     <UIProvider>
-      <Router>
+      <GeneralSettingsProvider>
+        <SidebarUIProvider>
+        <Router>
         <Routes>
           {/* Marketing / Public Landing Pages */}
           <Route path="/" element={<Home />} />
@@ -43,6 +49,7 @@ function App() {
           {/* Auth Pages */}
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/force-change-password" element={<ForceChangePassword />} />
 
           {/* Protected Dashboard Routes */}
           <Route
@@ -68,6 +75,8 @@ function App() {
           <Route path="*" element={<Navigate to="/signin" replace />} />
         </Routes>
       </Router>
+        </SidebarUIProvider>
+      </GeneralSettingsProvider>
     </UIProvider>
   )
 }

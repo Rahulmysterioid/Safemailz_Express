@@ -1,0 +1,40 @@
+/* Employee light surfaces aligned with the rest of the workspace. */
+html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]){
+ #employeesView{background:#f5f8fc!important;color:#24364d}
+ #employeesView .profile-subnav{background:#fff!important;border-bottom:1px solid #dce5ef!important;padding:8px 16px!important;gap:5px;overflow-x:auto}
+ #employeesView .profile-tab{color:#526982!important;border-radius:7px 7px 0 0!important;min-height:38px;padding:9px 13px!important;white-space:nowrap}
+ #employeesView .profile-tab:hover{background:#f0f5fc!important;color:#0967ba!important}
+ #employeesView .profile-tab.active{background:#eaf3ff!important;color:#0967ba!important;border-bottom-color:#0875d1!important;font-weight:600}
+ #employeesView .profile-details-section{background:#f5f8fc!important;padding:24px 28px!important}
+ #employeesView .profile-identity-name{color:#20344e!important;font-size:24px!important;line-height:1.3}
+ #employeesView .profile-identity-email{color:#61748c!important;font-size:14px!important}
+ #employeesView .profile-role-pill{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
+ #employeesView :is(.profile-status-pill.is-active,.profile-autosave-badge){background:#e1f6ed!important;color:#13734f!important;border-color:#bce6d4!important}
+ #employeesView .profile-details-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:14px!important;box-shadow:0 3px 12px #243b5308!important;padding:24px!important}
+ #employeesView .profile-card-header{border-color:#e7edf5!important;padding-bottom:18px!important;margin-bottom:22px!important;gap:16px;flex-wrap:wrap}
+ #employeesView .profile-card-header h3{color:#20344e!important;font-size:18px!important}
+ #employeesView .profile-subtitle{color:#61748c!important;font-size:13px!important;line-height:1.5}
+ #employeesView .profile-form label{color:#526982!important;font-size:12px!important;font-weight:600!important}
+ #employeesView .profile-form :is(input,select,textarea){background:#f7f9fc!important;border:1px solid #d4dfec!important;color:#24364d!important;border-radius:9px!important;min-height:44px}
+ #employeesView .profile-form :is(input,select,textarea):focus{background:#fff!important;border-color:#0875d1!important}
+ #employeesView .input-with-icon svg{color:#70829a!important}
+ #employeesView .work-day{background:#f2f6fc!important;color:#526982!important;border-color:#dce5ef!important;border-radius:7px!important}
+ #employeesView .work-day.active{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
+ #employeesView .char-count{color:#70829a!important}
+ #employeesView .btn-edit-cover{background:#fff!important;color:#344b64!important;border:1px solid #d4dfec!important;border-radius:8px!important;box-shadow:0 2px 8px #243b5314!important}
+ #employeesView :is(.mail-summary-card,.email-management-card){background:#fff!important;border:1px solid #dce5ef!important;border-radius:12px!important;box-shadow:0 3px 12px #243b5308!important}
+ #employeesView .mail-summary-card.active{background:#eaf3ff!important;border-color:#a8cbef!important}
+ #employeesView .permission-copy{color:#425a76!important}
+ #employeesView .permission-copy p{color:#61748c!important}
+ #employeesView .btn-outline-blue{background:#fff!important;border:1px solid #bdd8f5!important;color:#0964b5!important;border-radius:8px!important;min-height:36px}
+ #employeesSidebar{background:#f7f9fc!important;border-color:#dce5ef!important}
+ #employeesSidebar :is(.sidebar-stats,.sidebar-action-btn,#sidebarSearch){background:#fff!important;border:1px solid #d4dfec!important;color:#425a76!important;border-radius:9px!important;min-height:36px}
+ #employeesSidebar #sidebarSearch{min-height:40px}
+ #employeesSidebar #btnAddEmployee{background:#0875d1!important;color:#fff!important;border-radius:9px!important;min-height:40px}
+ /* Both pages intentionally share the exact employee card appearance. */
+ :is(#employeesSidebar,#emailIdsSidebar.subscription-sidebar) .sidebar-emp-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:10px!important;box-shadow:0 2px 6px #243b5306!important}
+ :is(#employeesSidebar,#emailIdsSidebar.subscription-sidebar) .sidebar-emp-card:is(.active,.selected,[aria-pressed="true"]){background:#e8f2ff!important;border-color:#9fc8f0!important;box-shadow:inset 3px 0 #0875d1!important}
+ :is(#employeesSidebar,#emailIdsSidebar.subscription-sidebar) .sidebar-emp-card:hover{border-color:#b5d1f0!important}
+ :is(#employeesView,#employeesSidebar) :is(button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid #0875d1!important;outline-offset:3px!important}
+}
+@media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #employeesView .profile-details-section{padding:18px 14px!important}}

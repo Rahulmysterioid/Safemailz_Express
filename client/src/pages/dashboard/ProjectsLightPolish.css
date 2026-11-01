@@ -1,0 +1,37 @@
+/* Project light theme, aligned with the client directory. */
+html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]){
+ #projectsView{background:#f5f8fc!important;color:#24364d;padding:28px!important}
+ #projectsView #projectsHeaderTitle{color:#20344e!important;font-size:24px!important;line-height:1.3}
+ #projectsView .projects-header-subtitle{color:#61748c!important;font-size:13px!important;line-height:1.6}
+ #projectsView .projects-count-pill{background:#e7f2ff!important;color:#0964b5!important;border:1px solid #bdd8f5}
+ #projectsView .project-kpi-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:12px!important;padding:18px!important;box-shadow:0 3px 12px #243b5308!important;min-height:96px}
+ #projectsView .project-kpi-card:hover{border-color:#a8cbef!important;box-shadow:0 4px 16px #243b5310!important}
+ #projectsView .project-kpi-value{color:#20344e!important}
+ #projectsView .project-kpi-label{color:#61748c!important;white-space:normal!important}
+ #projectsView .percent-active{background:#e7f2ff!important;color:#0964b5!important}
+ #projectsView .percent-completed{background:#e1f6ed!important;color:#13734f!important}
+ #projectsView .percent-onhold{background:#fff2d9!important;color:#8c5900!important}
+ #projectsView .percent-closed{background:#edf1f6!important;color:#52657c!important}
+ #projectsView .project-directory-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:14px!important;box-shadow:0 3px 12px #243b5308!important}
+ #projectsView .project-card-topbar{background:#fff!important;border-color:#e7edf5!important;padding:20px!important;gap:16px;flex-wrap:wrap}
+ #projectsView .project-card-title{color:#20344e!important;font-size:17px!important}
+ #projectsView .project-meta-grid{padding:20px!important;gap:16px!important}
+ #projectsView .project-meta-box{background:#f7f9fc!important;border:1px solid #e1e8f1!important;border-radius:9px!important;padding:13px!important;gap:7px!important}
+ #projectsView .project-meta-label{color:#61748c!important;font-size:11px!important;letter-spacing:.05em}
+ #projectsView .project-meta-value{color:#2e425b!important;font-weight:500!important;line-height:1.5}
+ #projectsView .project-meta-email{color:#0967ba!important;font-weight:500!important}
+ #projectsView :is(.project-quick-edit-btn,.project-kebab-btn,.project-clear-filter-btn){background:#fff!important;border:1px solid #d4dfec!important;color:#4e637c!important;min-height:34px;min-width:34px}
+ #projectsView :is(.project-quick-edit-btn,.project-kebab-btn,.project-meta-copy-btn):hover{background:#eaf3ff!important;color:#0967ba!important}
+ #projectsView .project-action-dropdown{background:#fff!important;border-color:#d6e0ec!important;box-shadow:0 10px 28px #243b5320!important}
+ #projectsSidebar{background:#f7f9fc!important;border-color:#dce5ef!important}
+ #projectsSidebar :is(.sidebar-stats,#projectsImportBtn,#projectsExportBtn,#projectsSidebarSearch){background:#fff!important;border:1px solid #d4dfec!important;color:#425a76!important;border-radius:9px!important;min-height:36px}
+ #projectsSidebar #projectsSidebarSearch{min-height:40px}
+ #projectsSidebar .sidebar-project-card{background:#fff!important;border:1px solid #dce5ef!important;box-shadow:0 2px 6px #243b5306!important;border-radius:10px!important;padding:14px 12px!important}
+ #projectsSidebar .sidebar-project-card:hover{background:#f0f6ff!important;border-color:#b5d1f0!important}
+ #projectsSidebar .sidebar-project-card:is(.active,.selected,[aria-pressed="true"]){background:#e8f2ff!important;border-color:#9fc8f0!important;box-shadow:inset 3px 0 #0875d1!important}
+ #projectsSidebar .sidebar-project-title{color:#243b55!important}
+ #projectsSidebar :is(.sidebar-project-email,.sidebar-project-leader-tag){color:#61748c!important}
+ #projectsSidebar #btnAddProject{background:#0875d1!important;color:#fff!important;border-radius:9px!important;min-height:40px}
+ :is(#projectsView,#projectsSidebar) :is(button,input,[tabindex]):focus-visible{outline:2px solid #0875d1!important;outline-offset:3px!important}
+}
+@media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #projectsView{padding:16px!important}}

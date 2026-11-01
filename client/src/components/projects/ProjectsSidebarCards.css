@@ -1,0 +1,18 @@
+/* Only project list cards: keep the employee sidebar's palette and card rhythm. */
+#projectsSidebar #sidebarProjectList{--pc-surface:#fff;--pc-selected:#eff6ff;--pc-hover:#f8fafc;--pc-border:#e2e8f0;--pc-accent:#3b82f6;--pc-text:#0f172a;--pc-muted:#64748b;padding:14px 12px}
+:is(html.dark,body.dark,[data-theme="dark"]) #projectsSidebar #sidebarProjectList{--pc-surface:#141821;--pc-selected:#19263b;--pc-hover:#191f2b;--pc-border:#2b3443;--pc-accent:#38bdf8;--pc-text:#f8fafc;--pc-muted:#a1aec1}
+#projectsSidebar #sidebarProjectList .sidebar-project-card{display:flex;flex-direction:column;gap:12px;padding:14px!important;border:1px solid var(--pc-border)!important;border-radius:12px;background:var(--pc-surface)!important;box-shadow:0 1px 3px #00000008!important;transition:background-color .15s,border-color .15s;overflow:hidden;text-align:left;min-width:0}
+#projectsSidebar #sidebarProjectList .sidebar-project-card:hover{background:var(--pc-hover)!important;border-color:var(--pc-accent)!important;transform:none}
+#projectsSidebar #sidebarProjectList .sidebar-project-card.selected{background:var(--pc-selected)!important;border:1px solid var(--pc-accent)!important;box-shadow:inset 3px 0 0 var(--pc-accent)!important}
+#projectsSidebar #sidebarProjectList .sidebar-project-card:focus-visible{outline:2px solid var(--pc-accent);outline-offset:3px}
+#projectsSidebar #sidebarProjectList .sidebar-project-header{order:0;display:flex;align-items:center;gap:10px;margin:0;width:100%;min-width:0}
+#projectsSidebar #sidebarProjectList .sidebar-project-avatar{width:34px;height:34px;flex:0 0 34px;font-size:11px;border-radius:50%;box-shadow:none}
+#projectsSidebar #sidebarProjectList .sidebar-project-name-wrap{flex:1;min-width:0;gap:4px}
+#projectsSidebar #sidebarProjectList .sidebar-project-title{font-size:13px;font-weight:600;line-height:1.5;color:var(--pc-text)!important;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#projectsSidebar #sidebarProjectList .sidebar-project-index{color:var(--pc-muted)!important;font-weight:400;margin-right:3px}
+#projectsSidebar #sidebarProjectList .sidebar-project-email{font-size:11px;line-height:1.5;color:var(--pc-muted)!important;margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#projectsSidebar #sidebarProjectList .sidebar-project-badges{order:1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding-top:10px;border-top:1px solid var(--pc-border);min-width:0}
+#projectsSidebar #sidebarProjectList .sidebar-project-leader-tag{font-size:11px;font-weight:400;line-height:1.5;color:var(--pc-muted)!important;min-width:0;max-width:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#projectsSidebar #sidebarProjectList .sidebar-project-status-badge{font-size:10px;font-weight:600;line-height:1.4;padding:4px 8px;gap:5px;border-radius:6px;margin:0;box-shadow:none;flex-shrink:0;max-width:65%;overflow:hidden}
+#projectsSidebar #sidebarProjectList .sidebar-project-status-dot{width:5px;height:5px;box-shadow:none}
+@media(prefers-reduced-motion:reduce){#projectsSidebar #sidebarProjectList .sidebar-project-card{transition:none}}

@@ -1,6 +1,8 @@
+import './SidebarCollapse.css';
 import React, { useEffect, useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import Topbar from './Topbar';
+import { TaskProvider } from '../../context/TaskContext';
 import Sidebar from './Sidebar';
 import { EmployeeProvider } from '../../context/EmployeeContext';
 import { ClientProvider } from '../../context/ClientContext';
@@ -9,10 +11,34 @@ import { AdminProvider } from '../../context/AdminContext';
 import AddClientModal from '../dashboard/AddClientModal';
 import AddProjectModal from '../dashboard/AddProjectModal';
 import AddAdminModal from '../dashboard/AddAdminModal';
-import UICustomizer from './UICustomizer';
+import { useSidebarUI } from '../../context/SidebarUIContext';
 
 export default function DashboardLayout() {
+    const { pathname } = useLocation();
+    const [employeeSidebarCollapsed, setEmployeeSidebarCollapsed] = useState(false);
+    const isEmployeePage = pathname.replace(/\/$/, '') === '/dashboard/employees';
+    const sidebarCollapsed = isEmployeePage && employeeSidebarCollapsed;
+    useEffect(() => { setEmployeeSidebarCollapsed(false); }, [pathname]);
+    const toggleSidebar = () => {
+        const sidebar = document.getElementById('employeesSidebar');
+        const wrapper = sidebar?.closest('.dashboard-wrapper');
+        if (sidebar && wrapper) {
+            wrapper.style.setProperty('--collapsed-sidebar-width', `${sidebar.offsetWidth}px`);
+            wrapper.style.setProperty('--collapsed-sidebar-height', `${sidebar.offsetHeight}px`);
+        }
+        setEmployeeSidebarCollapsed(value => !value);
+    };
+
     const [searchQuery, setSearchQuery] = useState('');
+    const { sidebarSettings } = useSidebarUI();
+
+    const getWrapperDirection = () => {
+        const pos = sidebarSettings?.position;
+        if (pos === 'right') return 'row-reverse';
+        if (pos === 'top') return 'column';
+        if (pos === 'bottom') return 'column-reverse';
+        return 'row';
+    };
 
     useEffect(() => {
         document.body.classList.add('dashboard-body');
@@ -59,14 +85,25 @@ export default function DashboardLayout() {
     }, []);
 
     return (
-        <EmployeeProvider>
+        <TaskProvider><EmployeeProvider>
             <ClientProvider>
                 <ProjectProvider>
                     <AdminProvider>
-                        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+                        {/* overflow: 'clip' (not 'hidden') so programmatic scrolls (e.g. scrollIntoView in sidebars) can never shift the Topbar out of view */}
+                        {/* height: 100% (not 100vh) because html has zoom: 1.1 — 100vh would overflow the viewport and push the Topbar off-screen */}
+                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1, minHeight: 0, overflow: 'clip' }}>
                             <Topbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                            <div className="dashboard-wrapper" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-                                <Sidebar />
+                            <div
+                                className={`dashboard-wrapper ${sidebarCollapsed ? 'employee-sidebar-collapsed' : ''}`}
+                                data-sidebar-position={sidebarSettings?.position || 'left'}
+                                style={{
+                                    display: 'flex',
+                                    flex: 1,
+                                    overflow: 'hidden',
+                                    flexDirection: getWrapperDirection()
+                                }}
+                            >
+                                <Sidebar collapsed={sidebarCollapsed} />
                                 <main className="main-content" style={{ minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1 }}>
                                     {/* Top Level Tabs */}
                                     <div className="tabs-container" role="tablist">
@@ -81,7 +118,7 @@ export default function DashboardLayout() {
                                         {!isEmployee && (
                                             <>
                                                 <NavLink to="/dashboard/admins" className={({ isActive }) => isActive ? 'tab active' : 'tab'}>Admins</NavLink>
-                                                <NavLink to="/dashboard/emailIds" className={({ isActive }) => isActive ? 'tab active' : 'tab'}>Email ids</NavLink>
+                                                <NavLink to="/dashboard/emailIds" className={({ isActive }) => isActive ? 'tab active' : 'tab'}>Email IDs</NavLink>
                                             </>
                                         )}
                                         <NavLink to="/dashboard/tasks" className={({ isActive }) => isActive ? 'tab active' : 'tab'}>Tasks</NavLink>
@@ -91,17 +128,16 @@ export default function DashboardLayout() {
                                         <NavLink to="/dashboard/email/support" className={({ isActive }) => isActive ? 'tab active' : 'tab'}>Support</NavLink>
                                     </div>
                                     {/* Child Views (Email, Employees, etc) */}
-                                    <Outlet context={{ searchQuery }} />
+                                    <Outlet context={{ searchQuery, sidebarCollapsed, toggleSidebar }} />
                                 </main>
                             </div>
                         </div>
                         <AddClientModal />
                         <AddProjectModal />
                         <AddAdminModal />
-                        <UICustomizer />
                     </AdminProvider>
                 </ProjectProvider>
             </ClientProvider>
-        </EmployeeProvider>
+        </EmployeeProvider></TaskProvider>
     );
 }

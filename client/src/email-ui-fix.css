@@ -804,3 +804,2233 @@
 .tab.active {
   background: var(--primary, #45AEF1) !important;
 }
+
+/* ==========================================================================
+   Responsive Email Body Viewer & Scoped Media Reset
+   ========================================================================== */
+.reading-body,
+#readingBody {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 20px 24px !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+.threaded-container,
+.threaded-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+.threaded-body,
+.email-html-content,
+.email-rendered-body {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  box-sizing: border-box !important;
+}
+
+/* Scoped reset & responsive styles for HTML email elements */
+.reading-body img,
+.threaded-body img,
+.email-html-content img,
+.email-rendered-body img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+.reading-body table,
+.threaded-body table,
+.email-html-content table,
+.email-rendered-body table {
+  max-width: 100% !important;
+  table-layout: auto !important;
+}
+
+.reading-body td,
+.reading-body th,
+.threaded-body td,
+.threaded-body th,
+.email-rendered-body td,
+.email-rendered-body th {
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+.reading-body pre,
+.threaded-body pre,
+.email-rendered-body pre,
+.reading-body code,
+.threaded-body code,
+.email-rendered-body code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+.reading-body iframe,
+.threaded-body iframe,
+.email-rendered-body iframe,
+.reading-body video,
+.threaded-body video,
+.email-rendered-body video {
+  max-width: 100% !important;
+}
+
+/* ==========================================================================
+   Modernized Employee Emails Tab (Scoped to .emp-emails-wrapper)
+   ========================================================================== */
+.emp-emails-wrapper .emp-emails-search-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
+  outline: none !important;
+}
+
+.emp-emails-wrapper .emp-email-row {
+  transition: background-color 0.15s ease-in-out;
+}
+
+.emp-emails-wrapper .emp-email-row:hover {
+  background-color: rgba(248, 250, 252, 0.85) !important;
+}
+
+.emp-emails-wrapper .emp-email-row:last-child {
+  border-bottom: none !important;
+}
+
+.emp-emails-modern-table th {
+  text-align: left;
+}
+
+.emp-emails-modern-table td {
+  text-align: left;
+}
+
+/* ==========================================================================
+   Outlook-Identical Avatar / Checkbox Conditional Slot Swap (Zero Layout Shift)
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.mail-avatar-slot {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  user-select: none !important;
+}
+
+.mail-list-column .mail-avatar-slot .mail-avatar,
+.mail-avatar-slot .mail-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 50% !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: none !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+}
+
+.mail-list-column .mail-avatar-slot .email-select-cb,
+.mail-avatar-slot .email-select-cb,
+.mail-avatar-slot input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  accent-color: var(--accent-primary, #0078d4) !important;
+}
+
+/* ==========================================================================
+   Outlook 365 Authentic Dark Mode Overrides for Email UI
+   ========================================================================== */
+
+/* Light mode defaults for project items & adjust spacing button in Email Sidebar */
+.email-project-list li.email-project-item {
+  background-color: transparent;
+  border-left: 3px solid transparent;
+}
+.email-project-list li.email-project-item .email-project-name {
+  color: #334155;
+}
+.email-project-list li.email-project-item:hover {
+  background-color: #f1f5f9;
+}
+.email-project-list li.email-project-item.active {
+  background-color: rgba(239, 246, 255, 0.95);
+  border-left: 3px solid #2563eb;
+}
+.email-project-list li.email-project-item.active .email-project-name {
+  color: #1e40af;
+}
+.btn-sidebar-adjust-spacing:hover:not(.is-open) {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+/* ==========================================================================
+   Enterprise Dark Slate Overhaul for Email Workspace (Sidebar, List, Reading, Composer)
+   Palette:
+   - Canvas / Deep bg: #0b0e14
+   - Sidebar / Secondary surface: #0e121a
+   - Header / Toolbar surface: #11151f
+   - Elevated Card / Row surface: #141821
+   - Hover / Input surface: #1a1f2c
+   - Subtle borders: rgba(255, 255, 255, 0.08)
+   - Accent: #38bdf8 / #3b82f6
+   ========================================================================== */
+
+/* ── 1. EMAIL SIDEBAR (#emailSidebar) ────────────────────────────────────── */
+html.dark #emailSidebar,
+html.dark .email-sidebar,
+[data-theme="dark"] #emailSidebar,
+[data-theme="dark"] .email-sidebar,
+body.dark #emailSidebar,
+body.dark .email-sidebar,
+.dark #emailSidebar,
+.dark .email-sidebar {
+  background: #0e121a !important;
+  background-color: #0e121a !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .email-admin-panel,
+[data-theme="dark"] .email-admin-panel,
+body.dark .email-admin-panel,
+.dark .email-admin-panel {
+  padding: 4px 14px 16px 14px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  margin-bottom: 14px !important;
+}
+
+html.dark .email-admin-info,
+[data-theme="dark"] .email-admin-info,
+body.dark .email-admin-info,
+.dark .email-admin-info {
+  background: linear-gradient(145deg, rgba(30, 58, 138, 0.28) 0%, #141821 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  margin-bottom: 10px !important;
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+html.dark #sidebarAdminName,
+html.dark .email-admin-info strong,
+html.dark .email-admin-name,
+[data-theme="dark"] #sidebarAdminName,
+[data-theme="dark"] .email-admin-info strong,
+[data-theme="dark"] .email-admin-name,
+body.dark #sidebarAdminName,
+body.dark .email-admin-info strong,
+.dark #sidebarAdminName,
+.dark .email-admin-info strong {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+  font-size: 0.92rem !important;
+  letter-spacing: -0.01em !important;
+  max-width: 100% !important;
+}
+
+html.dark #sidebarAdminEmail,
+html.dark .email-admin-info .email-admin-email,
+[data-theme="dark"] #sidebarAdminEmail,
+[data-theme="dark"] .email-admin-info .email-admin-email,
+body.dark #sidebarAdminEmail,
+body.dark .email-admin-info .email-admin-email,
+.dark #sidebarAdminEmail,
+.dark .email-admin-info .email-admin-email {
+  color: #94a3b8 !important;
+  font-size: 0.78rem !important;
+  max-width: 100% !important;
+}
+
+html.dark #sidebarAdminRoleBadge,
+[data-theme="dark"] #sidebarAdminRoleBadge,
+body.dark #sidebarAdminRoleBadge,
+.dark #sidebarAdminRoleBadge {
+  background: rgba(56, 189, 248, 0.16) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  border-radius: 6px !important;
+  padding: 2px 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  margin-top: 6px !important;
+}
+
+html.dark .btn-switch-account,
+[data-theme="dark"] .btn-switch-account,
+body.dark .btn-switch-account,
+.dark .btn-switch-account {
+  background: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+  border-radius: 9px !important;
+  padding: 8px 12px !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  transition: all 0.18s ease !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+html.dark .btn-switch-account:hover,
+[data-theme="dark"] .btn-switch-account:hover,
+body.dark .btn-switch-account:hover,
+.dark .btn-switch-account:hover {
+  background: #1a202e !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark .email-sidebar-title,
+[data-theme="dark"] .email-sidebar-title,
+body.dark .email-sidebar-title,
+.dark .email-sidebar-title {
+  color: #64748b !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 4px 16px !important;
+  margin-bottom: 6px !important;
+}
+
+html.dark .email-sidebar-title:hover,
+[data-theme="dark"] .email-sidebar-title:hover,
+body.dark .email-sidebar-title:hover,
+.dark .email-sidebar-title:hover {
+  color: #cbd5e1 !important;
+}
+
+html.dark .email-folder-list li,
+html.dark .email-project-list li,
+html.dark .email-quick-settings li,
+[data-theme="dark"] .email-folder-list li,
+[data-theme="dark"] .email-project-list li,
+[data-theme="dark"] .email-quick-settings li,
+body.dark .email-folder-list li,
+body.dark .email-project-list li,
+body.dark .email-quick-settings li,
+.dark .email-folder-list li,
+.dark .email-project-list li,
+.dark .email-quick-settings li {
+  color: #94a3b8 !important;
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
+  padding: 8px 12px !important;
+  border-left: 3px solid transparent !important;
+  transition: all 0.16s ease !important;
+}
+
+html.dark .email-folder-list li svg,
+html.dark .email-quick-settings li svg,
+[data-theme="dark"] .email-folder-list li svg,
+[data-theme="dark"] .email-quick-settings li svg,
+body.dark .email-folder-list li svg,
+body.dark .email-quick-settings li svg,
+.dark .email-folder-list li svg,
+.dark .email-quick-settings li svg {
+  color: #64748b !important;
+  stroke: currentColor !important;
+  transition: color 0.16s ease !important;
+}
+
+html.dark .email-folder-list li:hover,
+html.dark .email-project-list li:hover,
+html.dark .email-quick-settings li:hover,
+[data-theme="dark"] .email-folder-list li:hover,
+[data-theme="dark"] .email-project-list li:hover,
+[data-theme="dark"] .email-quick-settings li:hover,
+body.dark .email-folder-list li:hover,
+body.dark .email-project-list li:hover,
+body.dark .email-quick-settings li:hover,
+.dark .email-folder-list li:hover,
+.dark .email-project-list li:hover,
+.dark .email-quick-settings li:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .email-folder-list li:hover svg,
+html.dark .email-quick-settings li:hover svg,
+[data-theme="dark"] .email-folder-list li:hover svg,
+[data-theme="dark"] .email-quick-settings li:hover svg,
+body.dark .email-folder-list li:hover svg,
+body.dark .email-quick-settings li:hover svg,
+.dark .email-folder-list li:hover svg,
+.dark .email-quick-settings li:hover svg {
+  color: #cbd5e1 !important;
+}
+
+html.dark .email-folder-list li.active,
+html.dark .email-project-list li.active,
+html.dark .email-quick-settings li.active,
+[data-theme="dark"] .email-folder-list li.active,
+[data-theme="dark"] .email-project-list li.active,
+[data-theme="dark"] .email-quick-settings li.active,
+body.dark .email-folder-list li.active,
+body.dark .email-project-list li.active,
+body.dark .email-quick-settings li.active,
+.dark .email-folder-list li.active,
+.dark .email-project-list li.active,
+.dark .email-quick-settings li.active {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.14) 0%, rgba(56, 189, 248, 0.04) 100%) !important;
+  color: #38bdf8 !important;
+  border-left: 3px solid #38bdf8 !important;
+  font-weight: 600 !important;
+}
+
+html.dark .email-folder-list li.active svg,
+html.dark .email-quick-settings li.active svg,
+[data-theme="dark"] .email-folder-list li.active svg,
+[data-theme="dark"] .email-quick-settings li.active svg,
+body.dark .email-folder-list li.active svg,
+body.dark .email-quick-settings li.active svg,
+.dark .email-folder-list li.active svg,
+.dark .email-quick-settings li.active svg {
+  color: #38bdf8 !important;
+}
+
+html.dark .email-project-list li.email-project-item .email-project-name,
+[data-theme="dark"] .email-project-list li.email-project-item .email-project-name,
+body.dark .email-project-list li.email-project-item .email-project-name,
+.dark .email-project-list li.email-project-item .email-project-name {
+  color: #cbd5e1 !important;
+}
+
+html.dark .email-project-list li.email-project-item.active .email-project-name,
+[data-theme="dark"] .email-project-list li.email-project-item.active .email-project-name,
+body.dark .email-project-list li.email-project-item.active .email-project-name,
+.dark .email-project-list li.email-project-item.active .email-project-name {
+  color: #38bdf8 !important;
+}
+
+html.dark .email-project-group-badge,
+[data-theme="dark"] .email-project-group-badge,
+body.dark .email-project-group-badge,
+.dark .email-project-group-badge {
+  background: rgba(56, 189, 248, 0.12) !important;
+  color: #7dd3fc !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+}
+
+html.dark .folder-badge,
+[data-theme="dark"] .folder-badge,
+body.dark .folder-badge,
+.dark .folder-badge {
+  background: rgba(56, 189, 248, 0.16) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  padding: 1px 7px !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+}
+
+html.dark .email-quick-actions-header,
+[data-theme="dark"] .email-quick-actions-header,
+body.dark .email-quick-actions-header,
+.dark .email-quick-actions-header {
+  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+  padding-top: 12px !important;
+}
+
+html.dark .email-quick-actions-title,
+[data-theme="dark"] .email-quick-actions-title,
+body.dark .email-quick-actions-title,
+.dark .email-quick-actions-title {
+  color: #64748b !important;
+}
+
+html.dark #btnSidebarAdjustSpacing,
+html.dark .btn-sidebar-adjust-spacing,
+[data-theme="dark"] #btnSidebarAdjustSpacing,
+[data-theme="dark"] .btn-sidebar-adjust-spacing,
+body.dark #btnSidebarAdjustSpacing,
+.dark #btnSidebarAdjustSpacing {
+  background-color: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
+  box-shadow: none !important;
+}
+
+html.dark #btnSidebarAdjustSpacing:hover,
+html.dark #btnSidebarAdjustSpacing.is-open,
+[data-theme="dark"] #btnSidebarAdjustSpacing:hover,
+[data-theme="dark"] #btnSidebarAdjustSpacing.is-open,
+body.dark #btnSidebarAdjustSpacing:hover,
+.dark #btnSidebarAdjustSpacing:hover {
+  background-color: rgba(56, 189, 248, 0.14) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark .email-quick-badge-on,
+[data-theme="dark"] .email-quick-badge-on,
+body.dark .email-quick-badge-on,
+.dark .email-quick-badge-on {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark .email-quick-badge-paused,
+[data-theme="dark"] .email-quick-badge-paused,
+body.dark .email-quick-badge-paused,
+.dark .email-quick-badge-paused {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark #emailSidebar .sidebar-user-profile,
+[data-theme="dark"] #emailSidebar .sidebar-user-profile,
+body.dark #emailSidebar .sidebar-user-profile,
+.dark #emailSidebar .sidebar-user-profile {
+  background-color: #0b0e14 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark #emailSidebar #headerUserName,
+[data-theme="dark"] #emailSidebar #headerUserName,
+body.dark #emailSidebar #headerUserName,
+.dark #emailSidebar #headerUserName {
+  color: #f8fafc !important;
+}
+
+html.dark #emailSidebar #headerUserEmail,
+[data-theme="dark"] #emailSidebar #headerUserEmail,
+body.dark #emailSidebar #headerUserEmail,
+.dark #emailSidebar #headerUserEmail {
+  color: #94a3b8 !important;
+}
+
+/* ── 2. EMAIL WORKSPACE SHELL & TOP ACTION TOOLBAR ─────────────────────── */
+html.dark #mailListPanel,
+[data-theme="dark"] #mailListPanel,
+html.dark .mail-list-panel,
+[data-theme="dark"] .mail-list-panel,
+body.dark #mailListPanel,
+.dark #mailListPanel {
+  background: #0b0e14 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .mail-toolbar-container,
+[data-theme="dark"] .mail-toolbar-container,
+body.dark .mail-toolbar-container,
+.dark .mail-toolbar-container {
+  background: #11151f !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+html.dark .mail-hamburger-toggle,
+[data-theme="dark"] .mail-hamburger-toggle,
+body.dark .mail-hamburger-toggle,
+.dark .mail-hamburger-toggle {
+  color: #94a3b8 !important;
+}
+
+html.dark .mail-hamburger-toggle:hover,
+[data-theme="dark"] .mail-hamburger-toggle:hover,
+body.dark .mail-hamburger-toggle:hover,
+.dark .mail-hamburger-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .mail-toolbar-btn,
+[data-theme="dark"] .mail-toolbar-btn,
+body.dark .mail-toolbar-btn,
+.dark .mail-toolbar-btn {
+  color: #cbd5e1 !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret),
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret),
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret),
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) {
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg,
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg,
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg,
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg {
+  color: #94a3b8 !important;
+  stroke: #94a3b8 !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg circle,
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg circle,
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg circle,
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret) svg circle {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled),
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled),
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled),
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled) {
+  background-color: #1a202e !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled) svg,
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled) svg,
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled) svg,
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):hover:not(:disabled) svg {
+  color: #38bdf8 !important;
+  stroke: #38bdf8 !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled),
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):active:not(:disabled),
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled),
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):active:not(:disabled),
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled),
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):active:not(:disabled),
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled),
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret):active:not(:disabled) {
+  background-color: rgba(56, 189, 248, 0.14) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled) svg,
+[data-theme="dark"] .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled) svg,
+body.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled) svg,
+.dark .mail-toolbar-btn:not(.btn-new-mail):not(.btn-new-mail-caret).is-active:not(:disabled) svg {
+  color: #38bdf8 !important;
+  stroke: #38bdf8 !important;
+}
+
+html.dark .mail-toolbar-btn:disabled,
+html.dark .mail-toolbar-btn[disabled],
+[data-theme="dark"] .mail-toolbar-btn:disabled,
+[data-theme="dark"] .mail-toolbar-btn[disabled],
+body.dark .mail-toolbar-btn:disabled,
+body.dark .mail-toolbar-btn[disabled],
+.dark .mail-toolbar-btn:disabled,
+.dark .mail-toolbar-btn[disabled] {
+  opacity: 0.42 !important;
+  color: #64748b !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  cursor: not-allowed !important;
+}
+
+html.dark .mail-toolbar-btn:disabled svg,
+html.dark .mail-toolbar-btn[disabled] svg,
+[data-theme="dark"] .mail-toolbar-btn:disabled svg,
+[data-theme="dark"] .mail-toolbar-btn[disabled] svg,
+body.dark .mail-toolbar-btn:disabled svg,
+body.dark .mail-toolbar-btn[disabled] svg,
+.dark .mail-toolbar-btn:disabled svg,
+.dark .mail-toolbar-btn[disabled] svg {
+  color: #64748b !important;
+  stroke: #64748b !important;
+}
+
+html.dark .mail-toolbar-btn:focus-visible,
+[data-theme="dark"] .mail-toolbar-btn:focus-visible,
+body.dark .mail-toolbar-btn:focus-visible,
+.dark .mail-toolbar-btn:focus-visible {
+  outline: 2px solid #38bdf8 !important;
+  outline-offset: 1px !important;
+}
+
+html.dark .toolbar-divider,
+[data-theme="dark"] .toolbar-divider,
+body.dark .toolbar-divider,
+.dark .toolbar-divider {
+  background: rgba(255, 255, 255, 0.09) !important;
+}
+
+html.dark .mail-toolbar-menu,
+[data-theme="dark"] .mail-toolbar-menu,
+body.dark .mail-toolbar-menu,
+.dark .mail-toolbar-menu {
+  background: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65) !important;
+}
+
+html.dark .mail-toolbar-menu button,
+[data-theme="dark"] .mail-toolbar-menu button,
+body.dark .mail-toolbar-menu button,
+.dark .mail-toolbar-menu button {
+  color: #cbd5e1 !important;
+}
+
+html.dark .mail-toolbar-menu button:hover:not(:disabled),
+[data-theme="dark"] .mail-toolbar-menu button:hover:not(:disabled),
+body.dark .mail-toolbar-menu button:hover:not(:disabled),
+.dark .mail-toolbar-menu button:hover:not(:disabled) {
+  background: #1e2536 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .mail-toolbar-menu button:disabled,
+[data-theme="dark"] .mail-toolbar-menu button:disabled,
+body.dark .mail-toolbar-menu button:disabled,
+.dark .mail-toolbar-menu button:disabled {
+  color: #64748b !important;
+  background: transparent !important;
+}
+
+/* ── 3. CONTEXT MENUS & POPOVERS ───────────────────────────────────────── */
+html.dark .email-context-menu,
+[data-theme="dark"] .email-context-menu,
+body.dark .email-context-menu,
+.dark .email-context-menu,
+html.dark .email-context-submenu,
+[data-theme="dark"] .email-context-submenu,
+body.dark .email-context-submenu,
+.dark .email-context-submenu {
+  background: #141821 !important;
+  background-color: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65) !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .email-context-menu-item,
+[data-theme="dark"] .email-context-menu-item,
+body.dark .email-context-menu-item,
+.dark .email-context-menu-item {
+  color: #cbd5e1 !important;
+  background-color: transparent !important;
+}
+
+html.dark .email-context-menu-item:hover,
+html.dark .email-context-menu-item.is-hovered,
+html.dark .email-context-menu-item.is-active,
+[data-theme="dark"] .email-context-menu-item:hover,
+[data-theme="dark"] .email-context-menu-item.is-hovered,
+[data-theme="dark"] .email-context-menu-item.is-active,
+body.dark .email-context-menu-item:hover,
+body.dark .email-context-menu-item.is-hovered,
+body.dark .email-context-menu-item.is-active,
+.dark .email-context-menu-item:hover,
+.dark .email-context-menu-item.is-hovered,
+.dark .email-context-menu-item.is-active {
+  background-color: #1e2536 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .email-context-menu-item:focus,
+html.dark .email-context-menu-item:focus-visible,
+[data-theme="dark"] .email-context-menu-item:focus,
+[data-theme="dark"] .email-context-menu-item:focus-visible,
+body.dark .email-context-menu-item:focus,
+body.dark .email-context-menu-item:focus-visible,
+.dark .email-context-menu-item:focus,
+.dark .email-context-menu-item:focus-visible {
+  outline: 2px solid #38bdf8 !important;
+  outline-offset: -2px !important;
+  background-color: #1e2536 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .email-context-menu svg,
+[data-theme="dark"] .email-context-menu svg,
+body.dark .email-context-menu svg,
+.dark .email-context-menu svg,
+html.dark .email-context-menu-item svg,
+[data-theme="dark"] .email-context-menu-item svg,
+body.dark .email-context-menu-item svg,
+.dark .email-context-menu-item svg {
+  color: #94a3b8 !important;
+}
+
+html.dark .email-context-menu-item:hover svg,
+[data-theme="dark"] .email-context-menu-item:hover svg,
+html.dark .email-context-menu-item.is-active svg,
+[data-theme="dark"] .email-context-menu-item.is-active svg,
+body.dark .email-context-menu-item:hover svg,
+body.dark .email-context-menu-item.is-active svg,
+.dark .email-context-menu-item:hover svg,
+.dark .email-context-menu-item.is-active svg {
+  color: #38bdf8 !important;
+}
+
+html.dark .email-context-submenu-item,
+[data-theme="dark"] .email-context-submenu-item,
+body.dark .email-context-submenu-item,
+.dark .email-context-submenu-item {
+  color: #cbd5e1 !important;
+  background-color: transparent !important;
+}
+
+html.dark .email-context-submenu-item:hover,
+[data-theme="dark"] .email-context-submenu-item:hover,
+body.dark .email-context-submenu-item:hover,
+.dark .email-context-submenu-item:hover {
+  background-color: #1e2536 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .email-context-subtext,
+[data-theme="dark"] .email-context-subtext,
+body.dark .email-context-subtext,
+.dark .email-context-subtext,
+html.dark .email-context-submenu-item span:last-child,
+[data-theme="dark"] .email-context-submenu-item span:last-child,
+body.dark .email-context-submenu-item span:last-child,
+.dark .email-context-submenu-item span:last-child {
+  color: #94a3b8 !important;
+}
+
+html.dark .email-context-divider,
+[data-theme="dark"] .email-context-divider,
+body.dark .email-context-divider,
+.dark .email-context-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .email-context-group-title,
+[data-theme="dark"] .email-context-group-title,
+body.dark .email-context-group-title,
+.dark .email-context-group-title {
+  color: #64748b !important;
+}
+
+/* ── 4. EMAIL LIST COLUMN, HEADER, TABS, OUTLOOK ICONS & FILTERS ──────── */
+html.dark .mail-list-column,
+[data-theme="dark"] .mail-list-column,
+body.dark .mail-list-column,
+.dark .mail-list-column {
+  background: #0b0e14 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .mail-top-header-row,
+[data-theme="dark"] .mail-top-header-row,
+body.dark .mail-top-header-row,
+.dark .mail-top-header-row {
+  background: #11151f !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Select-All & Row Checkboxes in Dark Mode */
+html.dark #selectAllEmails,
+html.dark .mail-select-all-header input[type="checkbox"],
+html.dark .email-select-cb,
+[data-theme="dark"] #selectAllEmails,
+[data-theme="dark"] .mail-select-all-header input[type="checkbox"],
+[data-theme="dark"] .email-select-cb,
+body.dark #selectAllEmails,
+body.dark .email-select-cb,
+.dark #selectAllEmails,
+.dark .email-select-cb {
+  color-scheme: dark !important;
+  accent-color: #38bdf8 !important;
+  background-color: #141821 !important;
+  border: 1.5px solid #475569 !important;
+  border-radius: 4px !important;
+}
+
+html.dark .mail-select-all-header:hover,
+[data-theme="dark"] .mail-select-all-header:hover,
+body.dark .mail-select-all-header:hover,
+.dark .mail-select-all-header:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Received / Sent Underline Tabs (No ugly gray box) */
+html.dark .mail-tabs,
+[data-theme="dark"] .mail-tabs,
+body.dark .mail-tabs,
+.dark .mail-tabs {
+  background: transparent !important;
+  border: none !important;
+}
+
+html.dark .mail-tab,
+[data-theme="dark"] .mail-tab,
+body.dark .mail-tab,
+.dark .mail-tab {
+  background: transparent !important;
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+}
+
+html.dark .mail-tab:hover,
+[data-theme="dark"] .mail-tab:hover,
+body.dark .mail-tab:hover,
+.dark .mail-tab:hover {
+  color: #f8fafc !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-radius: 6px 6px 0 0 !important;
+}
+
+html.dark .mail-tab.active,
+[data-theme="dark"] .mail-tab.active,
+body.dark .mail-tab.active,
+.dark .mail-tab.active {
+  background: transparent !important;
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
+html.dark .mail-tab.active::after,
+[data-theme="dark"] .mail-tab.active::after,
+body.dark .mail-tab.active::after,
+.dark .mail-tab.active::after {
+  background: #38bdf8 !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.45) !important;
+}
+
+html.dark .mail-list-count,
+[data-theme="dark"] .mail-list-count,
+body.dark .mail-list-count,
+.dark .mail-list-count {
+  color: #94a3b8 !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 1px 8px !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Right-side Outlook header action icons (#jumpToBtn, #mailFilterBtn, #mailSortBtn) */
+html.dark .mail-outlook-icon-btn,
+[data-theme="dark"] .mail-outlook-icon-btn,
+body.dark .mail-outlook-icon-btn,
+.dark .mail-outlook-icon-btn {
+  color: #94a3b8 !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+}
+
+html.dark .mail-outlook-icon-btn svg,
+[data-theme="dark"] .mail-outlook-icon-btn svg,
+body.dark .mail-outlook-icon-btn svg,
+.dark .mail-outlook-icon-btn svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
+}
+
+html.dark .mail-outlook-icon-btn:hover,
+[data-theme="dark"] .mail-outlook-icon-btn:hover,
+body.dark .mail-outlook-icon-btn:hover,
+.dark .mail-outlook-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .mail-outlook-icon-btn.is-active,
+[data-theme="dark"] .mail-outlook-icon-btn.is-active,
+body.dark .mail-outlook-icon-btn.is-active,
+.dark .mail-outlook-icon-btn.is-active {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+/* Filter Pills Bar */
+html.dark .mail-filters-bar,
+[data-theme="dark"] .mail-filters-bar,
+body.dark .mail-filters-bar,
+.dark .mail-filters-bar {
+  background: #11151f !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+html.dark .mail-filter-pill,
+[data-theme="dark"] .mail-filter-pill,
+body.dark .mail-filter-pill,
+.dark .mail-filter-pill {
+  background: #141821 !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  transition: all 0.16s ease !important;
+}
+
+html.dark .mail-filter-pill:hover,
+[data-theme="dark"] .mail-filter-pill:hover,
+body.dark .mail-filter-pill:hover,
+.dark .mail-filter-pill:hover {
+  background: #1a202e !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+html.dark .mail-filter-pill.active,
+[data-theme="dark"] .mail-filter-pill.active,
+body.dark .mail-filter-pill.active,
+.dark .mail-filter-pill.active {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  box-shadow: 0 0 12px -3px rgba(56, 189, 248, 0.3) !important;
+}
+
+/* ── 5. SPLITTER & SCROLLBARS (Fixes Bright White Vertical Bar) ────────── */
+html.dark .mail-splitter,
+[data-theme="dark"] .mail-splitter,
+body.dark .mail-splitter,
+.dark .mail-splitter {
+  background: #0b0e14 !important;
+}
+
+html.dark .mail-splitter::before,
+[data-theme="dark"] .mail-splitter::before,
+body.dark .mail-splitter::before,
+.dark .mail-splitter::before {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .mail-splitter:hover::before,
+html.dark .mail-splitter.dragging::before,
+[data-theme="dark"] .mail-splitter:hover::before,
+[data-theme="dark"] .mail-splitter.dragging::before,
+body.dark .mail-splitter:hover::before,
+body.dark .mail-splitter.dragging::before,
+.dark .mail-splitter:hover::before,
+.dark .mail-splitter.dragging::before {
+  background-color: #38bdf8 !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5) !important;
+}
+
+html.dark .mail-table-wrap,
+[data-theme="dark"] .mail-table-wrap,
+body.dark .mail-table-wrap,
+.dark .mail-table-wrap {
+  background: #0b0e14 !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #263042 #0b0e14 !important;
+}
+
+html.dark ::-webkit-scrollbar,
+[data-theme="dark"] ::-webkit-scrollbar,
+body.dark ::-webkit-scrollbar,
+.dark ::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+  background-color: #0b0e14 !important;
+}
+
+html.dark ::-webkit-scrollbar-track,
+[data-theme="dark"] ::-webkit-scrollbar-track,
+body.dark ::-webkit-scrollbar-track,
+.dark ::-webkit-scrollbar-track {
+  background: #0b0e14 !important;
+  background-color: #0b0e14 !important;
+}
+
+html.dark ::-webkit-scrollbar-corner,
+[data-theme="dark"] ::-webkit-scrollbar-corner,
+body.dark ::-webkit-scrollbar-corner,
+.dark ::-webkit-scrollbar-corner {
+  background: #0b0e14 !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb,
+[data-theme="dark"] ::-webkit-scrollbar-thumb,
+body.dark ::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.22) !important;
+  border-radius: 9999px !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+body.dark ::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(56, 189, 248, 0.45) !important;
+}
+
+/* ── 6. EMAIL LIST ROWS, AVATARS, CHIPS & HOVER ACTIONS ────────────────── */
+html.dark .mail-row,
+[data-theme="dark"] .mail-row,
+body.dark .mail-row,
+.dark .mail-row {
+  background: #0e121a !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #cbd5e1 !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+html.dark .mail-row.unread,
+[data-theme="dark"] .mail-row.unread,
+body.dark .mail-row.unread,
+.dark .mail-row.unread {
+  background: #121722 !important;
+  border-left: 3px solid #38bdf8 !important;
+}
+
+html.dark .mail-row.pinned-mail,
+[data-theme="dark"] .mail-row.pinned-mail,
+body.dark .mail-row.pinned-mail,
+.dark .mail-row.pinned-mail {
+  background: linear-gradient(90deg, rgba(30, 58, 138, 0.22) 0%, #131926 100%) !important;
+}
+
+html.dark .mail-row:hover,
+[data-theme="dark"] .mail-row:hover,
+body.dark .mail-row:hover,
+.dark .mail-row:hover {
+  background: #171d2b !important;
+}
+
+html.dark .mail-row.selected,
+[data-theme="dark"] .mail-row.selected,
+body.dark .mail-row.selected,
+.dark .mail-row.selected {
+  background: rgba(56, 189, 248, 0.1) !important;
+}
+
+html.dark .mail-row.active,
+[data-theme="dark"] .mail-row.active,
+body.dark .mail-row.active,
+.dark .mail-row.active {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.16) 0%, rgba(30, 41, 59, 0.65) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  border-left: 4px solid #38bdf8 !important;
+}
+
+/* Luminous Dark Mode Avatars using --avatar-h */
+html.dark .mail-avatar,
+[data-theme="dark"] .mail-avatar,
+body.dark .mail-avatar,
+.dark .mail-avatar {
+  background-color: hsl(var(--avatar-h, 210), 62%, 20%) !important;
+  color: hsl(var(--avatar-h, 210), 90%, 78%) !important;
+  border: 1px solid hsla(var(--avatar-h, 210), 80%, 65%, 0.28) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .mail-sender,
+[data-theme="dark"] .mail-sender,
+body.dark .mail-sender,
+.dark .mail-sender {
+  color: #f8fafc !important;
+}
+
+html.dark .mail-row.read .mail-sender,
+[data-theme="dark"] .mail-row.read .mail-sender,
+body.dark .mail-row.read .mail-sender,
+.dark .mail-row.read .mail-sender {
+  color: #e2e8f0 !important;
+}
+
+html.dark .mail-subject,
+[data-theme="dark"] .mail-subject,
+body.dark .mail-subject,
+.dark .mail-subject {
+  color: #cbd5e1 !important;
+}
+
+html.dark .mail-row.unread .mail-subject,
+html.dark .mail-row.unread .mail-subject-text,
+[data-theme="dark"] .mail-row.unread .mail-subject,
+[data-theme="dark"] .mail-row.unread .mail-subject-text,
+body.dark .mail-row.unread .mail-subject,
+.dark .mail-row.unread .mail-subject {
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+}
+
+html.dark .mail-preview,
+[data-theme="dark"] .mail-preview,
+body.dark .mail-preview,
+.dark .mail-preview {
+  color: #94a3b8 !important;
+}
+
+html.dark .mail-date,
+[data-theme="dark"] .mail-date,
+body.dark .mail-date,
+.dark .mail-date {
+  color: #64748b !important;
+}
+
+html.dark .mail-row.unread .mail-date,
+[data-theme="dark"] .mail-row.unread .mail-date,
+body.dark .mail-row.unread .mail-date,
+.dark .mail-row.unread .mail-date {
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+}
+
+html.dark .mail-thread-chevron-btn,
+[data-theme="dark"] .mail-thread-chevron-btn,
+body.dark .mail-thread-chevron-btn,
+.dark .mail-thread-chevron-btn {
+  color: #94a3b8 !important;
+}
+
+html.dark .mail-thread-chevron-btn:hover,
+[data-theme="dark"] .mail-thread-chevron-btn:hover,
+body.dark .mail-thread-chevron-btn:hover,
+.dark .mail-thread-chevron-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .mail-thread-count-badge,
+[data-theme="dark"] .mail-thread-count-badge,
+body.dark .mail-thread-count-badge,
+.dark .mail-thread-count-badge {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+/* Status Chips (Pinned, Flagged, Snoozed, Action, Replied, Category) */
+html.dark .mail-status-chip.pinned,
+[data-theme="dark"] .mail-status-chip.pinned,
+body.dark .mail-status-chip.pinned,
+.dark .mail-status-chip.pinned {
+  background: rgba(56, 189, 248, 0.14) !important;
+  color: #7dd3fc !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  padding: 1px 8px !important;
+  border-radius: 9999px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+html.dark .mail-status-chip.flagged,
+[data-theme="dark"] .mail-status-chip.flagged,
+body.dark .mail-status-chip.flagged,
+.dark .mail-status-chip.flagged {
+  background-color: rgba(239, 68, 68, 0.16) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+html.dark .mail-status-chip.snooze,
+[data-theme="dark"] .mail-status-chip.snooze,
+body.dark .mail-status-chip.snooze,
+.dark .mail-status-chip.snooze {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+  color: #fcd34d !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark .mail-status-chip.action,
+html.dark .mail-status-chip.replied,
+[data-theme="dark"] .mail-status-chip.action,
+[data-theme="dark"] .mail-status-chip.replied,
+body.dark .mail-status-chip.action,
+.dark .mail-status-chip.action {
+  background-color: rgba(148, 163, 184, 0.14) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+
+/* Hover Quick Actions on Email Row */
+html.dark .mail-hover-actions,
+[data-theme="dark"] .mail-hover-actions,
+body.dark .mail-hover-actions,
+.dark .mail-hover-actions {
+  background: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 2px 4px !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .hover-action-btn,
+[data-theme="dark"] .hover-action-btn,
+body.dark .hover-action-btn,
+.dark .hover-action-btn {
+  color: #94a3b8 !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+}
+
+html.dark .hover-action-btn:hover,
+[data-theme="dark"] .hover-action-btn:hover,
+body.dark .hover-action-btn:hover,
+.dark .hover-action-btn:hover {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+/* Snooze Dropdown inside Email Row */
+html.dark .mail-snooze-dropdown,
+[data-theme="dark"] .mail-snooze-dropdown,
+body.dark .mail-snooze-dropdown,
+.dark .mail-snooze-dropdown {
+  background-color: #141821 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.65) !important;
+}
+
+html.dark .mail-snooze-option,
+[data-theme="dark"] .mail-snooze-option,
+body.dark .mail-snooze-option,
+.dark .mail-snooze-option {
+  color: #e2e8f0 !important;
+}
+
+html.dark .mail-snooze-option:hover,
+[data-theme="dark"] .mail-snooze-option:hover,
+body.dark .mail-snooze-option:hover,
+.dark .mail-snooze-option:hover {
+  background-color: #1e2536 !important;
+  color: #38bdf8 !important;
+}
+
+/* ── 7. RIGHT-SIDE READING PANE & EMPTY STATE ──────────────────────────── */
+html.dark #mailReadingColumn,
+[data-theme="dark"] #mailReadingColumn,
+body.dark #mailReadingColumn,
+.dark #mailReadingColumn,
+html.dark .mail-reading-column,
+[data-theme="dark"] .mail-reading-column,
+body.dark .mail-reading-column,
+.dark .mail-reading-column {
+  background: #0b0e14 !important;
+  background-color: #0b0e14 !important;
+  color: #f1f5f9 !important;
+  box-shadow: none !important;
+}
+
+html.dark #readingPaneEmptyState,
+[data-theme="dark"] #readingPaneEmptyState,
+body.dark #readingPaneEmptyState,
+.dark #readingPaneEmptyState,
+html.dark .reading-pane-empty,
+[data-theme="dark"] .reading-pane-empty,
+body.dark .reading-pane-empty,
+.dark .reading-pane-empty {
+  background: radial-gradient(circle at 50% 42%, rgba(30, 58, 138, 0.14) 0%, #0b0e14 65%) !important;
+  background-color: #0b0e14 !important;
+  color: #94a3b8 !important;
+  border-left-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+html.dark #readingPaneEmptyState svg,
+[data-theme="dark"] #readingPaneEmptyState svg,
+body.dark #readingPaneEmptyState svg,
+.dark #readingPaneEmptyState svg,
+html.dark .reading-pane-empty svg,
+[data-theme="dark"] .reading-pane-empty svg,
+body.dark .reading-pane-empty svg,
+.dark .reading-pane-empty svg {
+  color: #38bdf8 !important;
+  stroke: #38bdf8 !important;
+  opacity: 0.75 !important;
+  filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.2)) !important;
+}
+
+html.dark #readingPaneEmptyState .reading-empty-title,
+[data-theme="dark"] #readingPaneEmptyState .reading-empty-title,
+body.dark #readingPaneEmptyState .reading-empty-title,
+.dark #readingPaneEmptyState .reading-empty-title,
+html.dark #readingPaneEmptyState p:first-of-type,
+[data-theme="dark"] #readingPaneEmptyState p:first-of-type,
+body.dark #readingPaneEmptyState p:first-of-type,
+.dark #readingPaneEmptyState p:first-of-type,
+html.dark .reading-pane-empty .reading-empty-title,
+[data-theme="dark"] .reading-pane-empty .reading-empty-title,
+body.dark .reading-pane-empty .reading-empty-title,
+.dark .reading-pane-empty .reading-empty-title {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
+html.dark #readingPaneEmptyState .reading-empty-sub,
+[data-theme="dark"] #readingPaneEmptyState .reading-empty-sub,
+body.dark #readingPaneEmptyState .reading-empty-sub,
+.dark #readingPaneEmptyState .reading-empty-sub,
+html.dark #readingPaneEmptyState p:last-of-type,
+[data-theme="dark"] #readingPaneEmptyState p:last-of-type,
+body.dark #readingPaneEmptyState p:last-of-type,
+.dark #readingPaneEmptyState p:last-of-type,
+html.dark .reading-pane-empty .reading-empty-sub,
+[data-theme="dark"] .reading-pane-empty .reading-empty-sub,
+body.dark .reading-pane-empty .reading-empty-sub,
+.dark .reading-pane-empty .reading-empty-sub {
+  color: #94a3b8 !important;
+}
+
+html.dark #readingPaneContent,
+[data-theme="dark"] #readingPaneContent,
+body.dark #readingPaneContent,
+.dark #readingPaneContent {
+  background: #0b0e14 !important;
+  background-color: #0b0e14 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .reading-header,
+[data-theme="dark"] .reading-header,
+body.dark .reading-header,
+.dark .reading-header,
+html.dark #readingHeaderWrapper,
+[data-theme="dark"] #readingHeaderWrapper,
+body.dark #readingHeaderWrapper,
+.dark #readingHeaderWrapper {
+  background: #11151f !important;
+  background-color: #11151f !important;
+  color: #f8fafc !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark #btnTweakBorderAccent,
+[data-theme="dark"] #btnTweakBorderAccent,
+body.dark #btnTweakBorderAccent,
+.dark #btnTweakBorderAccent {
+  background-color: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+html.dark #btnTweakBorderAccent:hover,
+[data-theme="dark"] #btnTweakBorderAccent:hover,
+body.dark #btnTweakBorderAccent:hover,
+.dark #btnTweakBorderAccent:hover {
+  background-color: #1a202e !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark #btnTweakBorderAccent svg,
+[data-theme="dark"] #btnTweakBorderAccent svg,
+body.dark #btnTweakBorderAccent svg,
+.dark #btnTweakBorderAccent svg {
+  stroke: currentColor !important;
+}
+
+html.dark #readingThreadHeader,
+[data-theme="dark"] #readingThreadHeader,
+body.dark #readingThreadHeader,
+.dark #readingThreadHeader {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark #readingSubjectLine,
+[data-theme="dark"] #readingSubjectLine,
+body.dark #readingSubjectLine,
+.dark #readingSubjectLine {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #readingEmailNo,
+[data-theme="dark"] #readingEmailNo,
+body.dark #readingEmailNo,
+.dark #readingEmailNo {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  color: #7dd3fc !important;
+}
+
+html.dark .reading-meta,
+[data-theme="dark"] .reading-meta,
+body.dark .reading-meta,
+.dark .reading-meta {
+  background: #11151f !important;
+  background-color: #11151f !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark #readingSenderName,
+[data-theme="dark"] #readingSenderName,
+body.dark #readingSenderName,
+.dark #readingSenderName {
+  color: #f8fafc !important;
+}
+
+html.dark #readingSenderEmail,
+html.dark #readingTo,
+html.dark #readingDate,
+[data-theme="dark"] #readingSenderEmail,
+[data-theme="dark"] #readingTo,
+[data-theme="dark"] #readingDate,
+body.dark #readingSenderEmail,
+body.dark #readingTo,
+body.dark #readingDate,
+.dark #readingSenderEmail,
+.dark #readingTo,
+.dark #readingDate {
+  color: #94a3b8 !important;
+}
+
+html.dark .reading-actions-top,
+[data-theme="dark"] .reading-actions-top,
+body.dark .reading-actions-top,
+.dark .reading-actions-top {
+  background: #141821 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .reading-actions-top .icon-btn svg,
+[data-theme="dark"] .reading-actions-top .icon-btn svg,
+body.dark .reading-actions-top .icon-btn svg,
+.dark .reading-actions-top .icon-btn svg {
+  stroke: #38bdf8 !important;
+}
+
+html.dark .reading-actions-top .icon-btn[title="Comments"] svg,
+[data-theme="dark"] .reading-actions-top .icon-btn[title="Comments"] svg,
+body.dark .reading-actions-top .icon-btn[title="Comments"] svg,
+.dark .reading-actions-top .icon-btn[title="Comments"] svg {
+  stroke: #f59e0b !important;
+}
+
+html.dark .reading-actions-top .icon-btn[title="Expand View"] svg,
+[data-theme="dark"] .reading-actions-top .icon-btn[title="Expand View"] svg,
+body.dark .reading-actions-top .icon-btn[title="Expand View"] svg,
+.dark .reading-actions-top .icon-btn[title="Expand View"] svg {
+  stroke: #94a3b8 !important;
+}
+
+html.dark .reading-actions-top .icon-btn:hover,
+[data-theme="dark"] .reading-actions-top .icon-btn:hover,
+body.dark .reading-actions-top .icon-btn:hover,
+.dark .reading-actions-top .icon-btn:hover {
+  background: #1e2536 !important;
+}
+
+html.dark .reading-actions-top .icon-btn:hover svg,
+[data-theme="dark"] .reading-actions-top .icon-btn:hover svg,
+body.dark .reading-actions-top .icon-btn:hover svg,
+.dark .reading-actions-top .icon-btn:hover svg {
+  stroke: #ffffff !important;
+}
+
+html.dark .reading-body,
+html.dark #readingBody,
+[data-theme="dark"] .reading-body,
+[data-theme="dark"] #readingBody,
+body.dark .reading-body,
+body.dark #readingBody,
+.dark .reading-body,
+.dark #readingBody {
+  background: #0b0e14 !important;
+  background-color: #0b0e14 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Strictly theme application-owned reading cards — do NOT wildcard override rich HTML email body styles */
+html.dark .threaded-container,
+[data-theme="dark"] .threaded-container,
+body.dark .threaded-container,
+.dark .threaded-container {
+  background: transparent !important;
+}
+
+html.dark .threaded-card,
+[data-theme="dark"] .threaded-card,
+body.dark .threaded-card,
+.dark .threaded-card {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: inherit !important;
+}
+
+html.dark .reading-attachments-box,
+[data-theme="dark"] .reading-attachments-box,
+body.dark .reading-attachments-box,
+.dark .reading-attachments-box {
+  background: #11151f !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+html.dark .reading-attachment-card,
+[data-theme="dark"] .reading-attachment-card,
+body.dark .reading-attachment-card,
+.dark .reading-attachment-card {
+  background: #141821 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .reading-attachment-card:hover,
+[data-theme="dark"] .reading-attachment-card:hover,
+body.dark .reading-attachment-card:hover,
+.dark .reading-attachment-card:hover {
+  background: #1a202e !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+html.dark .reading-attachment-name,
+[data-theme="dark"] .reading-attachment-name,
+body.dark .reading-attachment-name,
+.dark .reading-attachment-name {
+  color: #f8fafc !important;
+}
+
+html.dark .reading-attachment-size,
+[data-theme="dark"] .reading-attachment-size,
+body.dark .reading-attachment-size,
+.dark .reading-attachment-size {
+  color: #94a3b8 !important;
+}
+
+/* ── 8. INLINE COMPOSER & FORMAT TOOLBAR IN DARK MODE ──────────────────── */
+html.dark .mail-toolbar-container:has(#formatToolbar),
+[data-theme="dark"] .mail-toolbar-container:has(#formatToolbar),
+body.dark .mail-toolbar-container:has(#formatToolbar),
+.dark .mail-toolbar-container:has(#formatToolbar) {
+  background: #0e131d !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14) !important;
+  padding: 6px 12px !important;
+  overflow: visible !important;
+}
+
+html.dark #formatToolbar,
+html.dark #formatToolbar.email-composer-toolbar.expanded-ribbon,
+[data-theme="dark"] #formatToolbar,
+[data-theme="dark"] #formatToolbar.email-composer-toolbar.expanded-ribbon,
+body.dark #formatToolbar,
+.dark #formatToolbar {
+  background: linear-gradient(180deg, #141a26 0%, #0f141e 100%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  padding: 4px 8px !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+@media (min-width: 1025px) {
+  html.dark #formatToolbar.email-composer-toolbar.expanded-ribbon,
+  [data-theme="dark"] #formatToolbar.email-composer-toolbar.expanded-ribbon,
+  body.dark #formatToolbar.email-composer-toolbar.expanded-ribbon,
+  .dark #formatToolbar.email-composer-toolbar.expanded-ribbon {
+    overflow: visible !important;
+  }
+}
+
+html.dark #formatToolbar .ribbon-group,
+[data-theme="dark"] #formatToolbar .ribbon-group,
+body.dark #formatToolbar .ribbon-group,
+.dark #formatToolbar .ribbon-group {
+  height: 100% !important;
+  padding: 2px 10px 1px !important;
+  justify-content: space-between !important;
+  background: transparent !important;
+}
+
+html.dark #formatToolbar .ribbon-group::after,
+[data-theme="dark"] #formatToolbar .ribbon-group::after,
+body.dark #formatToolbar .ribbon-group::after,
+.dark #formatToolbar .ribbon-group::after {
+  top: 12% !important;
+  height: 76% !important;
+  width: 1px !important;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.2) 20%,
+    rgba(148, 163, 184, 0.2) 80%,
+    transparent 100%
+  ) !important;
+}
+
+html.dark #formatToolbar .ribbon-subgroup-divider,
+[data-theme="dark"] #formatToolbar .ribbon-subgroup-divider,
+body.dark #formatToolbar .ribbon-subgroup-divider,
+.dark #formatToolbar .ribbon-subgroup-divider {
+  background: rgba(148, 163, 184, 0.2) !important;
+}
+
+html.dark #formatToolbar .ribbon-group-content,
+[data-theme="dark"] #formatToolbar .ribbon-group-content,
+body.dark #formatToolbar .ribbon-group-content,
+.dark #formatToolbar .ribbon-group-content {
+  align-items: center !important;
+}
+
+html.dark #formatToolbar .ribbon-group-label,
+[data-theme="dark"] #formatToolbar .ribbon-group-label,
+body.dark #formatToolbar .ribbon-group-label,
+.dark #formatToolbar .ribbon-group-label {
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  margin-top: 2px !important;
+  padding-bottom: 1px !important;
+  line-height: 1 !important;
+}
+
+/* Ghost-style ribbon buttons in dark mode (clean, borderless until hovered/active) */
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn),
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn),
+body.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn),
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: #cbd5e1 !important;
+  border-radius: 5px !important;
+  box-shadow: none !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+}
+
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover,
+body.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.28) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):active,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):active,
+body.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active {
+  background: rgba(56, 189, 248, 0.18) !important;
+  border-color: rgba(56, 189, 248, 0.42) !important;
+  color: #38bdf8 !important;
+}
+
+/* High-contrast text & icon colors inside #formatToolbar buttons */
+html.dark #formatToolbar .email-composer-toolbar-btn svg,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn svg,
+body.dark #formatToolbar .email-composer-toolbar-btn svg,
+.dark #formatToolbar .email-composer-toolbar-btn svg {
+  color: currentColor !important;
+}
+
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) strong,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) em,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) span:not(.color-underline-indicator),
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) strong,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) em,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) span:not(.color-underline-indicator),
+body.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) strong,
+body.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) em,
+body.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) span:not(.color-underline-indicator),
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) strong,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) em,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn) span:not(.color-underline-indicator) {
+  color: #e2e8f0 !important;
+}
+
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover strong,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover em,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover span:not(.color-underline-indicator),
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover strong,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover em,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover span:not(.color-underline-indicator),
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover strong,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover em,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn):hover span:not(.color-underline-indicator) {
+  color: #f8fafc !important;
+}
+
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active strong,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active em,
+html.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active span:not(.color-underline-indicator),
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active strong,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active em,
+[data-theme="dark"] #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active span:not(.color-underline-indicator),
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active strong,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active em,
+.dark #formatToolbar .email-composer-toolbar-btn:not(.dropdown-select-btn).active span:not(.color-underline-indicator) {
+  color: #38bdf8 !important;
+}
+
+/* Stacked buttons (Paste, Attach, Table, Dictate, Editor, Add-ins, Print) */
+html.dark #formatToolbar .stacked-btn,
+[data-theme="dark"] #formatToolbar .stacked-btn,
+body.dark #formatToolbar .stacked-btn,
+.dark #formatToolbar .stacked-btn {
+  height: 40px !important;
+  min-width: 42px !important;
+  padding: 3px 6px !important;
+  gap: 2px !important;
+  border-radius: 6px !important;
+}
+
+html.dark #formatToolbar .stacked-btn-text,
+html.dark #formatToolbar .ribbon-btn-text,
+[data-theme="dark"] #formatToolbar .stacked-btn-text,
+[data-theme="dark"] #formatToolbar .ribbon-btn-text,
+body.dark #formatToolbar .stacked-btn-text,
+.dark #formatToolbar .stacked-btn-text {
+  color: #cbd5e1 !important;
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.1 !important;
+}
+
+/* Compact icon buttons inside Basic Text, Paragraph, Insert, Tags */
+html.dark #formatToolbar .icon-only:not(.stacked-btn),
+html.dark #formatToolbar .line-spacing-trigger-btn,
+[data-theme="dark"] #formatToolbar .icon-only:not(.stacked-btn),
+[data-theme="dark"] #formatToolbar .line-spacing-trigger-btn,
+body.dark #formatToolbar .icon-only:not(.stacked-btn),
+.dark #formatToolbar .icon-only:not(.stacked-btn) {
+  height: 22px !important;
+  min-width: 24px !important;
+}
+
+/* Font Family & Font Size select pills in Dark Mode */
+html.dark #formatToolbar .dropdown-select-btn,
+html.dark #formatToolbar #editorFontBtn,
+html.dark #formatToolbar #editorFontSizeBtn,
+[data-theme="dark"] #formatToolbar .dropdown-select-btn,
+[data-theme="dark"] #formatToolbar #editorFontBtn,
+[data-theme="dark"] #formatToolbar #editorFontSizeBtn,
+body.dark #formatToolbar .dropdown-select-btn,
+.dark #formatToolbar .dropdown-select-btn {
+  background: #182032 !important;
+  border: 1px solid rgba(148, 163, 184, 0.24) !important;
+  border-radius: 5px !important;
+  height: 22px !important;
+  padding: 0 7px !important;
+  color: #f1f5f9 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+
+html.dark #formatToolbar .dropdown-select-btn:hover,
+html.dark #formatToolbar #editorFontBtn:hover,
+html.dark #formatToolbar #editorFontSizeBtn:hover,
+[data-theme="dark"] #formatToolbar .dropdown-select-btn:hover,
+body.dark #formatToolbar .dropdown-select-btn:hover,
+.dark #formatToolbar .dropdown-select-btn:hover {
+  background: #1e293b !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+  color: #ffffff !important;
+}
+
+html.dark #formatToolbar #currentFontName,
+html.dark #formatToolbar #currentFontSize,
+[data-theme="dark"] #formatToolbar #currentFontName,
+[data-theme="dark"] #formatToolbar #currentFontSize,
+body.dark #formatToolbar #currentFontName,
+body.dark #formatToolbar #currentFontSize,
+.dark #formatToolbar #currentFontName,
+.dark #formatToolbar #currentFontSize {
+  color: #f1f5f9 !important;
+  font-weight: 500 !important;
+}
+
+html.dark #formatToolbar .dropdown-select-btn svg,
+[data-theme="dark"] #formatToolbar .dropdown-select-btn svg,
+body.dark #formatToolbar .dropdown-select-btn svg,
+.dark #formatToolbar .dropdown-select-btn svg {
+  color: #94a3b8 !important;
+}
+
+/* Format Toolbar Dropdown Menus & Color Palettes in Dark Mode */
+html.dark #formatToolbar .email-composer-dropdown-menu,
+html.dark #formatToolbar .email-composer-color-palette,
+[data-theme="dark"] #formatToolbar .email-composer-dropdown-menu,
+[data-theme="dark"] #formatToolbar .email-composer-color-palette,
+body.dark #formatToolbar .email-composer-dropdown-menu,
+body.dark #formatToolbar .email-composer-color-palette,
+.dark #formatToolbar .email-composer-dropdown-menu,
+.dark #formatToolbar .email-composer-color-palette {
+  background: #141821 !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65) !important;
+  color: #f1f5f9 !important;
+  z-index: 2500 !important;
+}
+
+html.dark #formatToolbar .email-composer-dropdown-item,
+[data-theme="dark"] #formatToolbar .email-composer-dropdown-item,
+body.dark #formatToolbar .email-composer-dropdown-item,
+.dark #formatToolbar .email-composer-dropdown-item {
+  color: #cbd5e1 !important;
+  border-radius: 5px !important;
+}
+
+html.dark #formatToolbar .email-composer-dropdown-item:hover,
+[data-theme="dark"] #formatToolbar .email-composer-dropdown-item:hover,
+body.dark #formatToolbar .email-composer-dropdown-item:hover,
+.dark #formatToolbar .email-composer-dropdown-item:hover {
+  background: rgba(56, 189, 248, 0.14) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark #formatToolbar .color-swatch,
+[data-theme="dark"] #formatToolbar .color-swatch,
+body.dark #formatToolbar .color-swatch,
+.dark #formatToolbar .color-swatch {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Inline Composer Card (#inlineComposerContent) in Dark Mode (Support & Email Tabs) */
+html.dark #inlineComposerContent,
+html.dark .inline-composer-card,
+html.dark .email-composer-inline,
+[data-theme="dark"] #inlineComposerContent,
+[data-theme="dark"] .inline-composer-card,
+[data-theme="dark"] .email-composer-inline,
+body.dark #inlineComposerContent,
+.dark #inlineComposerContent {
+  background: #0b0e14 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark #inlineComposerContent .composer-top-action-bar,
+html.dark .email-composer-header,
+[data-theme="dark"] #inlineComposerContent .composer-top-action-bar,
+[data-theme="dark"] .email-composer-header,
+body.dark #inlineComposerContent .composer-top-action-bar,
+.dark #inlineComposerContent .composer-top-action-bar {
+  background: #11151f !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12) !important;
+}
+
+html.dark #inlineComposerContent .composer-top-attachment-btn,
+[data-theme="dark"] #inlineComposerContent .composer-top-attachment-btn,
+body.dark #inlineComposerContent .composer-top-attachment-btn,
+.dark #inlineComposerContent .composer-top-attachment-btn {
+  background: #182032 !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark #inlineComposerContent .composer-top-attachment-btn:hover,
+[data-theme="dark"] #inlineComposerContent .composer-top-attachment-btn:hover,
+body.dark #inlineComposerContent .composer-top-attachment-btn:hover,
+.dark #inlineComposerContent .composer-top-attachment-btn:hover {
+  background: #1e293b !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark #inlineComposerContent .composer-top-delete-btn,
+html.dark .email-composer-discard-btn,
+[data-theme="dark"] #inlineComposerContent .composer-top-delete-btn,
+[data-theme="dark"] .email-composer-discard-btn,
+body.dark #inlineComposerContent .composer-top-delete-btn,
+.dark #inlineComposerContent .composer-top-delete-btn {
+  background: #141821 !important;
+  border: 1px solid rgba(148, 163, 184, 0.14) !important;
+  color: #94a3b8 !important;
+}
+
+html.dark #inlineComposerContent .composer-top-delete-btn:hover,
+html.dark .email-composer-discard-btn:hover,
+[data-theme="dark"] #inlineComposerContent .composer-top-delete-btn:hover,
+[data-theme="dark"] .email-composer-discard-btn:hover,
+body.dark #inlineComposerContent .composer-top-delete-btn:hover,
+.dark #inlineComposerContent .composer-top-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+}
+
+html.dark .email-composer-fields-wrap,
+html.dark .email-composer-row,
+html.dark #inlineComposerContent .email-composer-field,
+[data-theme="dark"] .email-composer-fields-wrap,
+[data-theme="dark"] .email-composer-row,
+[data-theme="dark"] #inlineComposerContent .email-composer-field,
+body.dark #inlineComposerContent .email-composer-field,
+.dark #inlineComposerContent .email-composer-field {
+  background: #0e121a !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #inlineComposerContent .composer-field-label-btn,
+html.dark .email-composer-pill-btn,
+[data-theme="dark"] #inlineComposerContent .composer-field-label-btn,
+[data-theme="dark"] .email-composer-pill-btn,
+body.dark #inlineComposerContent .composer-field-label-btn,
+.dark #inlineComposerContent .composer-field-label-btn {
+  background: #182032 !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark #inlineComposerContent .email-composer-field input,
+html.dark #inlineComposerContent .compose-subject-input,
+[data-theme="dark"] #inlineComposerContent .email-composer-field input,
+[data-theme="dark"] #inlineComposerContent .compose-subject-input,
+body.dark #inlineComposerContent .email-composer-field input,
+body.dark #inlineComposerContent .compose-subject-input,
+.dark #inlineComposerContent .email-composer-field input,
+.dark #inlineComposerContent .compose-subject-input {
+  background: transparent !important;
+  color: #f8fafc !important;
+  caret-color: #38bdf8 !important;
+}
+
+html.dark #inlineComposerContent .email-composer-field input[readonly],
+[data-theme="dark"] #inlineComposerContent .email-composer-field input[readonly],
+body.dark #inlineComposerContent .email-composer-field input[readonly],
+.dark #inlineComposerContent .email-composer-field input[readonly] {
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+}
+
+html.dark #inlineComposerContent .email-composer-field input::placeholder,
+html.dark #inlineComposerContent .compose-subject-input::placeholder,
+[data-theme="dark"] #inlineComposerContent .email-composer-field input::placeholder,
+[data-theme="dark"] #inlineComposerContent .compose-subject-input::placeholder,
+body.dark #inlineComposerContent .email-composer-field input::placeholder,
+.dark #inlineComposerContent .email-composer-field input::placeholder {
+  color: #64748b !important;
+}
+
+html.dark #inlineComposerContent .cc-bcc-trigger-btn,
+[data-theme="dark"] #inlineComposerContent .cc-bcc-trigger-btn,
+body.dark #inlineComposerContent .cc-bcc-trigger-btn,
+.dark #inlineComposerContent .cc-bcc-trigger-btn {
+  color: #94a3b8 !important;
+}
+
+html.dark #inlineComposerContent .cc-bcc-trigger-btn.cc-bcc-active,
+html.dark #inlineComposerContent .cc-bcc-trigger-btn:hover,
+[data-theme="dark"] #inlineComposerContent .cc-bcc-trigger-btn:hover,
+body.dark #inlineComposerContent .cc-bcc-trigger-btn:hover,
+.dark #inlineComposerContent .cc-bcc-trigger-btn:hover {
+  color: #38bdf8 !important;
+}
+
+html.dark #inlineComposerContent .email-composer-editor-wrap,
+html.dark .email-composer-body,
+html.dark #inlineComposerContent .email-composer-editor,
+[data-theme="dark"] #inlineComposerContent .email-composer-editor-wrap,
+[data-theme="dark"] .email-composer-body,
+[data-theme="dark"] #inlineComposerContent .email-composer-editor,
+body.dark #inlineComposerContent .email-composer-editor,
+.dark #inlineComposerContent .email-composer-editor {
+  background: #0b0e14 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark #inlineComposerContent .email-composer-editor:empty::before,
+[data-theme="dark"] #inlineComposerContent .email-composer-editor:empty::before,
+body.dark #inlineComposerContent .email-composer-editor:empty::before,
+.dark #inlineComposerContent .email-composer-editor:empty::before {
+  color: #64748b !important;
+}
+
+html.dark #inlineComposerContent .email-composer-attachments,
+[data-theme="dark"] #inlineComposerContent .email-composer-attachments,
+body.dark #inlineComposerContent .email-composer-attachments,
+.dark #inlineComposerContent .email-composer-attachments {
+  background: #0e121a !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+html.dark #inlineComposerContent .email-attachment-card,
+[data-theme="dark"] #inlineComposerContent .email-attachment-card,
+body.dark #inlineComposerContent .email-attachment-card,
+.dark #inlineComposerContent .email-attachment-card {
+  background: #141821 !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark #inlineComposerContent .attachment-name,
+[data-theme="dark"] #inlineComposerContent .attachment-name,
+body.dark #inlineComposerContent .attachment-name,
+.dark #inlineComposerContent .attachment-name {
+  color: #f1f5f9 !important;
+}
+
+html.dark #inlineComposerContent .attachment-size,
+[data-theme="dark"] #inlineComposerContent .attachment-size,
+body.dark #inlineComposerContent .attachment-size,
+.dark #inlineComposerContent .attachment-size {
+  color: #94a3b8 !important;
+}
+
+/* ── 9. POPOVERS, JUMP-TO DATE MENU & BANNERS ─────────────────────────── */
+html.dark .header-border-tweak-card,
+[data-theme="dark"] .header-border-tweak-card,
+body.dark .header-border-tweak-card,
+.dark .header-border-tweak-card {
+  background: #141821 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.65) !important;
+}
+
+html.dark .tweak-card-header,
+[data-theme="dark"] .tweak-card-header,
+body.dark .tweak-card-header,
+.dark .tweak-card-header {
+  background: #11151f !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .tweak-header-title,
+[data-theme="dark"] .tweak-header-title,
+body.dark .tweak-header-title,
+.dark .tweak-header-title {
+  color: #f8fafc !important;
+}
+
+html.dark .tweak-target-row-bar,
+[data-theme="dark"] .tweak-target-row-bar,
+body.dark .tweak-target-row-bar,
+.dark .tweak-target-row-bar {
+  background: #0e121a !important;
+}
+
+html.dark .jump-to-menu,
+[data-theme="dark"] .jump-to-menu,
+body.dark .jump-to-menu,
+.dark .jump-to-menu {
+  background: #141821 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65) !important;
+}
+
+html.dark .jump-to-item,
+[data-theme="dark"] .jump-to-item,
+body.dark .jump-to-item,
+.dark .jump-to-item {
+  color: #cbd5e1 !important;
+}
+
+html.dark .jump-to-item:hover,
+[data-theme="dark"] .jump-to-item:hover,
+body.dark .jump-to-item:hover,
+.dark .jump-to-item:hover {
+  background: #1e2536 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .jump-to-go-btn,
+[data-theme="dark"] .jump-to-go-btn,
+body.dark .jump-to-go-btn,
+.dark .jump-to-go-btn {
+  background: #1a202e !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #jumpToDateInput,
+[data-theme="dark"] #jumpToDateInput,
+body.dark #jumpToDateInput,
+.dark #jumpToDateInput {
+  background: transparent !important;
+  color: #f8fafc !important;
+  color-scheme: dark !important;
+}
+
+html.dark .jump-to-date-field,
+[data-theme="dark"] .jump-to-date-field,
+body.dark .jump-to-date-field,
+.dark .jump-to-date-field {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #0e121a !important;
+}
+
+html.dark .project-group-banner,
+[data-theme="dark"] .project-group-banner,
+body.dark .project-group-banner,
+.dark .project-group-banner {
+  background: #131c2e !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Dynamic Accent bindings */
+.mail-toolbar-btn.btn-new-mail,
+.btn-new-mail-caret,
+.mail-newmail-split .mail-toolbar-btn.btn-new-mail,
+.mail-newmail-split .mail-toolbar-btn.btn-new-mail-caret,
+.reading-empty-cta {
+  background: var(--accent-primary, #0078d4) !important;
+  color: #ffffff !important;
+}
+
+.mail-toolbar-btn.btn-new-mail:hover,
+.btn-new-mail-caret:hover,
+.btn-new-mail-caret.is-open,
+.mail-newmail-split .mail-toolbar-btn:hover:not(:disabled),
+.mail-newmail-split .mail-toolbar-btn.is-open,
+.reading-empty-cta:hover {
+  background: var(--accent-hover, #106ebe) !important;
+  color: #ffffff !important;
+}
+
+.mail-selection-chip {
+  background: var(--accent-soft-bg, rgba(0, 120, 212, 0.15)) !important;
+  color: var(--accent-primary, #0078d4) !important;
+}

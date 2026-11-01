@@ -14,12 +14,13 @@ initDb();
 // Middleware
 app.use(cors());
 app.use(express.json({
+    limit: '25mb',
     verify: (req, res, buf) => {
         // Keep raw body available for debugging malformed JSON if needed
         req.rawBody = buf;
     }
 })); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // Return JSON (not HTML) for body-parser / other middleware errors on API routes
 app.use((err, req, res, next) => {
@@ -57,14 +58,27 @@ app.use('/api', (req, res, next) => {
     });
 });
 
+// ─── Session-Guard middleware ──────────────────────────────────────────────
+const authSessionGuard = require('./middleware/authSessionGuard');
+app.use('/api', authSessionGuard);
+
 // ─── API Routes (before static so /api/* never falls through to HTML) ────────
+const ownerRoutes = require('./routes/owner');
+app.use('/api/v1/owner', ownerRoutes);
+app.use('/api/v1', ownerRoutes);
 app.use('/api', authRoutes);
 const paymentRoutes = require('./routes/payment');
 app.use('/api/payment', paymentRoutes);
+const snoozeRoutes = require('./routes/snooze');
+app.use('/api/email/snooze', snoozeRoutes);
+app.use('/api/emails/snooze', snoozeRoutes);
 const emailRoutes = require('./routes/emails');
 app.use('/api/emails', emailRoutes);
+app.use('/api/email', emailRoutes);
 const settingsRoutes = require('./routes/settings');
 app.use('/api/settings', settingsRoutes);
+app.use('/api/employees', settingsRoutes);
+app.use('/api/admins', settingsRoutes);
 const syncRoutes = require('./routes/sync');
 app.use('/api/sync', syncRoutes);
 const inviteRoutes = require('./routes/invite');
@@ -73,8 +87,12 @@ const clientsRoutes = require('./routes/clients');
 app.use('/api/clients', clientsRoutes);
 const projectsRoutes = require('./routes/projects');
 app.use('/api/projects', projectsRoutes);
+const { createTasksRouter } = require('./routes/tasks');
+app.use('/api/tasks', createTasksRouter(require('./db').client, process.env.JWT_SECRET || 'safemailz-jwt-secret-key'));
 const autoCcRoutes = require('./routes/autoCc');
 app.use('/api/auto-cc', autoCcRoutes);
+app.use('/api/email/settings/auto-cc', autoCcRoutes);
+app.use('/api/emails/settings/auto-cc', autoCcRoutes);
 
 // Serve static files from the React app (Frontend)
 app.use(express.static(path.join(__dirname, 'client/dist')));
@@ -100,3 +118,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+

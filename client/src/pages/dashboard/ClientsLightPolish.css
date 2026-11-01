@@ -1,0 +1,37 @@
+/* Shared light palette for the client directory and its sidebar. */
+html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]){
+  #clientsView{background:#f5f8fc!important;color:#24364d;padding:28px!important}
+  #clientsView .clients-header-bar{border-color:#dce5ef!important;padding-bottom:20px!important;gap:20px}
+  #clientsView .clients-page-title{color:#20344e!important;font-size:24px!important;line-height:1.3}
+  #clientsView .clients-page-subtitle{color:#61748c!important;font-size:13px!important;line-height:1.6}
+  #clientsView .clients-count-pill{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
+  #clientsView .clients-main-search-input,#clientsSidebar #clientsSidebarSearch{background:#fff!important;border:1px solid #d4dfec!important;color:#24364d!important;min-height:40px;border-radius:9px!important}
+  #clientsView .clients-main-search-input::placeholder,#clientsSidebar #clientsSidebarSearch::placeholder{color:#70829a!important}
+  #clientsView .client-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:14px!important;box-shadow:0 3px 12px #243b5308!important;padding:22px!important;overflow:visible!important}
+  #clientsView .client-card-accent-bar{height:3px!important;border-radius:14px 14px 0 0;opacity:.75}
+  #clientsView .client-card-header{border-color:#e7edf5!important;padding-bottom:16px!important;margin-bottom:18px!important}
+  #clientsView .client-card-title{color:#20344e!important;font-size:17px!important;white-space:normal!important;overflow-wrap:anywhere}
+  #clientsView .client-location-pill{background:#f0f5fb!important;border-color:#dce5ef!important;color:#526982!important}
+  #clientsView .client-field-label{color:#61748c!important;font-size:11px!important;letter-spacing:.06em}
+  #clientsView .client-field-box{background:#f7f9fc!important;border:1px solid #e1e8f1!important;border-radius:9px!important;min-height:44px!important}
+  #clientsView .client-field-value{color:#2e425b!important;font-weight:500!important}
+  #clientsView .client-id-value{color:#175d9d!important;background:#edf4fe!important;border-color:#ccdef4!important}
+  #clientsView .client-empty-val{color:#74839a!important}
+  #clientsView :is(.client-quick-edit-btn,.client-kebab-btn){background:#fff!important;border:1px solid #d4dfec!important;color:#4e637c!important;min-height:34px!important;min-width:34px}
+  #clientsView :is(.client-quick-edit-btn,.client-kebab-btn):hover{background:#eaf3ff!important;border-color:#a8cbef!important;color:#0967ba!important}
+  #clientsView .client-dropdown-menu{background:#fff!important;border-color:#d6e0ec!important;box-shadow:0 10px 28px #243b5320!important}
+  #clientsView .client-dropdown-item{min-height:34px;color:#344b64}
+  #clientsView .clients-empty-state{background:#fff!important;border:1px dashed #c8d6e7!important}
+  #clientsSidebar{background:#f7f9fc!important;border-color:#dce5ef!important}
+  #clientsSidebar .clients-sidebar-stats{background:#fff!important;border-color:#dce5ef!important;color:#354c67!important}
+  #clientsSidebar .clients-sidebar-action-btn{background:#fff!important;border-color:#d4dfec!important;color:#425a76!important;min-height:36px}
+  #clientsSidebar .clients-directory-heading{color:#6b7e96!important;letter-spacing:.08em}
+  #clientsSidebar .sidebar-client-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:10px!important;box-shadow:0 2px 6px #243b5306!important;padding:14px 12px!important}
+  #clientsSidebar .sidebar-client-card:hover{background:#f0f6ff!important;border-color:#b5d1f0!important}
+  #clientsSidebar .sidebar-client-card:is(.active,.selected){background:#e8f2ff!important;border-color:#9fc8f0!important;box-shadow:inset 3px 0 #0875d1!important}
+  #clientsSidebar .sidebar-client-name{color:#243b55!important}
+  #clientsSidebar .sidebar-client-sub{color:#61748c!important}
+  #clientsSidebar #btnAddClient{background:#0875d1!important;color:#fff!important;border-radius:9px!important;min-height:40px}
+  :is(#clientsView,#clientsSidebar) :is(button,input,[tabindex]):focus-visible{outline:2px solid #0875d1!important;outline-offset:3px!important}
+}
+@media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #clientsView{padding:16px!important}#clientsView .clients-header-bar{flex-wrap:wrap}#clientsView .clients-main-search-wrap{max-width:100%}}

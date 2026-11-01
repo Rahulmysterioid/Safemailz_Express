@@ -38,7 +38,48 @@
   /* Effects */
   --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   --backdrop-blur: 16px;
-  --card-hover-lift: -6px;
+  /* Reading pane and Toolbar Theme Variables */
+  --reading-pane-bg: #FFFFFF;
+  --reading-pane-header-bg: #FFFFFF;
+  --reading-pane-title-color: #0F172A;
+  --reading-pane-meta-color: #475569;
+  --reading-pane-body-color: #334155;
+  --toolbar-btn-bg: #FFFFFF;
+  --toolbar-btn-text: #475569;
+  --toolbar-btn-border-color: #E2E8F0;
+  --toolbar-btn-hover-bg: #F8FAFC;
+  --menu-card-bg: #ffffff;
+  --menu-card-border: #e5e7eb;
+  --menu-card-text: #1f2937;
+  --menu-hover-bg: #F3F2F1;
+  --menu-hover-text: #111827;
+  --menu-divider: #e5e7eb;
+}
+
+html.dark,
+[data-theme="dark"],
+body.dark,
+.dark {
+  --bg-page: #0f0f0f !important;
+  --card-bg: #1e1e1e !important;
+  --text-dark: #f1f5f9 !important;
+  --text-gray: #94a3b8 !important;
+  --border-color: #2b2b2b !important;
+  --reading-pane-bg: #181818 !important;
+  --reading-pane-header-bg: #181818 !important;
+  --reading-pane-title-color: #f1f5f9 !important;
+  --reading-pane-meta-color: #94a3b8 !important;
+  --reading-pane-body-color: #e2e8f0 !important;
+  --toolbar-btn-bg: transparent !important;
+  --toolbar-btn-text: #cbd5e1 !important;
+  --toolbar-btn-border-color: transparent !important;
+  --toolbar-btn-hover-bg: #262626 !important;
+  --menu-card-bg: #1e1e1e !important;
+  --menu-card-border: #333333 !important;
+  --menu-card-text: #f1f5f9 !important;
+  --menu-hover-bg: #262626 !important;
+  --menu-hover-text: #f1f5f9 !important;
+  --menu-divider: #2b2b2b !important;
 }
 
 /* Page Root & Body Styling */

@@ -1,3 +1,4 @@
+import { signInToAccount, rememberCurrentSession, forgetAccountSession } from '../../utils/accountSession';
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,6 +29,7 @@ export default function SwitchAccountModal({ isOpen, onClose }) {
     }, [isOpen, onClose]);
 
     function loadAccounts() {
+        rememberCurrentSession();
         let saved = [];
         try { saved = JSON.parse(localStorage.getItem("savedAccounts") || "[]"); } catch (e) {}
         let current = null;
@@ -46,8 +48,7 @@ export default function SwitchAccountModal({ isOpen, onClose }) {
     function switchToAccount(accountId) {
         const target = accounts.find(a => a.id.toString() === accountId.toString());
         if (target) {
-            localStorage.setItem("currentUser", JSON.stringify(target));
-            window.location.reload();
+            signInToAccount(target);
         }
     }
 
@@ -62,16 +63,35 @@ export default function SwitchAccountModal({ isOpen, onClose }) {
         try { current = JSON.parse(localStorage.getItem("currentUser")); } catch (e) {}
 
         if (current) {
+            forgetAccountSession(current.id);
             saved = saved.filter(a => a.id !== current.id);
             localStorage.setItem("savedAccounts", JSON.stringify(saved));
         }
 
         if (saved.length > 0) {
-            localStorage.setItem("currentUser", JSON.stringify(saved[0]));
-            window.location.reload();
+            signInToAccount(saved[0], { preserveCurrent: false });
         } else {
-            localStorage.removeItem("currentUser");
-            window.location.href = "/signin";
+            signInToAccount(null, { preserveCurrent: false });
+        }
+    }
+
+    function removeSpecificAccount(accountId, e) {
+        e.stopPropagation(); // Prevent switching account when clicking the cross
+        let saved = [...accounts];
+        const target = saved.find(a => a.id.toString() === accountId.toString());
+        if (!target) return;
+        forgetAccountSession(target.id);
+        
+        saved = saved.filter(a => a.id.toString() !== accountId.toString());
+        localStorage.setItem("savedAccounts", JSON.stringify(saved));
+        setAccounts(saved);
+
+        if (currentUser && currentUser.id.toString() === accountId.toString()) {
+            if (saved.length > 0) {
+                signInToAccount(saved[0], { preserveCurrent: false });
+            } else {
+                signInToAccount(null, { preserveCurrent: false });
+            }
         }
     }
 
@@ -225,9 +245,32 @@ export default function SwitchAccountModal({ isOpen, onClose }) {
                                                 height: "8px",
                                                 borderRadius: "50%",
                                                 background: "#34a853",
+                                                marginRight: "8px"
                                             }}
                                         />
                                     )}
+
+                                    {/* Remove Account Button */}
+                                    <button
+                                        onClick={(e) => removeSpecificAccount(account.id, e)}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: "var(--text-secondary)",
+                                            cursor: "pointer",
+                                            fontSize: "1.2rem",
+                                            padding: "4px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            transition: "color 0.2s"
+                                        }}
+                                        title="Remove Account"
+                                        onMouseOver={(e) => e.currentTarget.style.color = "var(--danger)"}
+                                        onMouseOut={(e) => e.currentTarget.style.color = "var(--text-secondary)"}
+                                    >
+                                        &times;
+                                    </button>
                                 </div>
                             );
                         })

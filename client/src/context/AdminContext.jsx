@@ -48,20 +48,110 @@ export function AdminProvider({ children }) {
         });
     };
 
-    const updateAdminPermission = (permKey, value) => {
+    const updateAdminPermission = async (permKey, value) => {
+        let adminIdToUpdate = null;
+        let newPermissions = null;
+
         setAdmins(prev => {
             const next = [...prev];
             if (next[selectedAdminIndex]) {
+                newPermissions = {
+                    ...(next[selectedAdminIndex].permissions || {}),
+                    [permKey]: value
+                };
+                adminIdToUpdate = next[selectedAdminIndex].id;
                 next[selectedAdminIndex] = {
                     ...next[selectedAdminIndex],
-                    permissions: {
-                        ...(next[selectedAdminIndex].permissions || {}),
-                        [permKey]: value
-                    }
+                    permissions: newPermissions
                 };
             }
             return next;
         });
+
+        if (adminIdToUpdate && newPermissions) {
+            try {
+                const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const token = localStorage.getItem('token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                if (user?.id) headers['x-user-id'] = String(user.id);
+                if (user?.org_id || user?.organization_id) headers['x-org-id'] = String(user.org_id || user.organization_id);
+
+                const res = await fetch(`/api/settings/admins/${adminIdToUpdate}/permissions`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify(newPermissions)
+                });
+                
+                if (!res.ok) {
+                    console.error('Failed to update admin permissions on backend');
+                }
+            } catch (err) {
+                console.error('Error updating admin permissions:', err);
+            }
+        }
+    };
+
+    const setAllAdminPermissions = async (permissionsObj) => {
+        let adminIdToUpdate = null;
+
+        setAdmins(prev => {
+            const next = [...prev];
+            if (next[selectedAdminIndex]) {
+                adminIdToUpdate = next[selectedAdminIndex].id;
+                next[selectedAdminIndex] = {
+                    ...next[selectedAdminIndex],
+                    permissions: { ...permissionsObj }
+                };
+            }
+            return next;
+        });
+
+        if (adminIdToUpdate) {
+            try {
+                const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const token = localStorage.getItem('token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                if (user?.id) headers['x-user-id'] = String(user.id);
+                if (user?.org_id || user?.organization_id) headers['x-org-id'] = String(user.org_id || user.organization_id);
+
+                await fetch(`/api/settings/admins/${adminIdToUpdate}/permissions`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify(permissionsObj)
+                });
+            } catch (err) {
+                console.error('Error updating all admin permissions:', err);
+            }
+        }
+    };
+
+    const saveAdminProfile = async () => {
+        const current = admins[selectedAdminIndex];
+        if (!current?.id) return true;
+        try {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const token = localStorage.getItem('token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            if (user?.id) headers['x-user-id'] = String(user.id);
+            if (user?.org_id || user?.organization_id) headers['x-org-id'] = String(user.org_id || user.organization_id);
+
+            const res = await fetch(`/api/settings/admins/${current.id}/profile`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({
+                    name: current.name,
+                    email: current.email,
+                    permissions: current.permissions
+                })
+            });
+            return res.ok;
+        } catch (err) {
+            console.error('Error saving admin profile:', err);
+            return false;
+        }
     };
 
     const addAdmin = (newAdminData) => {
@@ -147,6 +237,8 @@ export function AdminProvider({ children }) {
         setSearchQuery,
         updateAdminField,
         updateAdminPermission,
+        setAllAdminPermissions,
+        saveAdminProfile,
         addAdmin,
         deleteAdmin,
         isAddAdminModalOpen,

@@ -149,30 +149,9 @@ export default function AddProjectModal() {
         closeAddModal();
     };
 
-    // Common input style
-    const inputStyle = {
-        width: '100%',
-        height: '40px',
-        border: '1px solid #D1D5DB',
-        borderRadius: '8px',
-        background: '#fff',
-        color: '#0F172A',
-        fontSize: '0.875rem',
-        padding: '0 0.85rem',
-        fontFamily: "'Inter', sans-serif",
-        boxSizing: 'border-box',
-        outline: 'none'
-    };
-
-    const labelStyle = {
-        color: '#111827',
-        fontSize: '0.8rem',
-        fontWeight: 600
-    };
-
     return (
         <div
-            className="modal-overlay"
+            className="modal-overlay project-modal-overlay"
             role="dialog"
             aria-modal="true"
             aria-labelledby="addProjectTitle"
@@ -183,7 +162,8 @@ export default function AddProjectModal() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(4px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -193,14 +173,11 @@ export default function AddProjectModal() {
             }}
         >
             <div
-                className="modal-card form-modal-content"
+                className="modal-card form-modal-content project-modal-card"
                 style={{
                     maxWidth: '640px',
                     padding: '2rem 2.25rem',
-                    borderRadius: '12px',
-                    background: '#fff',
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
-                    border: '1px solid #E2E8F0',
+                    borderRadius: '16px',
                     textAlign: 'left',
                     width: '100%',
                     maxHeight: '92vh',
@@ -210,29 +187,18 @@ export default function AddProjectModal() {
             >
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                    <div style={{ textAlign: 'center', flex: 1 }}>
-                        <h2 id="addProjectTitle" style={{ fontSize: '1.2rem', fontWeight: 700, color: '#111827', margin: 0, fontFamily: "'Inter', sans-serif" }}>
+                    <div style={{ textAlign: 'left', flex: 1 }}>
+                        <h2 id="addProjectTitle" className="project-modal-title" style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, fontFamily: "'Inter', sans-serif" }}>
                             {editingProject ? 'Edit Project Details' : 'Project Details'}
                         </h2>
-                        <p style={{ fontSize: '0.8rem', color: '#6B7280', margin: '0.35rem 0 0 0', fontFamily: "'Inter', sans-serif" }}>
-                            please provide the necessary information related to your project
+                        <p className="project-modal-subtitle" style={{ fontSize: '0.8rem', margin: '0.35rem 0 0 0', fontFamily: "'Inter', sans-serif" }}>
+                            Please provide the necessary information related to your project
                         </p>
                     </div>
                     <button
+                        type="button"
                         onClick={closeAddModal}
-                        style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontSize: '1.35rem',
-                            cursor: 'pointer',
-                            color: '#6B7280',
-                            lineHeight: 1,
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
+                        className="project-modal-close-btn"
                         aria-label="Close modal"
                     >
                         &times;
@@ -240,43 +206,59 @@ export default function AddProjectModal() {
                 </div>
 
                 <form onSubmit={handleSave}>
-                    {/* Project Name */}
-                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '1.15rem' }}>
-                        <label htmlFor="addProjName" style={labelStyle}>
-                            Project Name
-                        </label>
-                        <input
-                            type="text"
-                            id="addProjName"
-                            className="form-input"
-                            placeholder="Write project name"
-                            value={projectName}
-                            onChange={(e) => setProjectName(e.target.value)}
-                            style={inputStyle}
-                            required
-                        />
+                    {/* Project Name & Status Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5" style={{ marginBottom: '1.15rem' }}>
+                        <div className="form-modal-row sm:col-span-2" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: 0 }}>
+                            <label htmlFor="addProjName" className="project-modal-label">
+                                Project Name
+                            </label>
+                            <input
+                                type="text"
+                                id="addProjName"
+                                className="form-input project-modal-input"
+                                placeholder="Write project name"
+                                value={projectName}
+                                onChange={(e) => setProjectName(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: 0 }}>
+                            <label htmlFor="addProjStatus" className="project-modal-label">
+                                Status
+                            </label>
+                            <select
+                                id="addProjStatus"
+                                className="form-input project-modal-input"
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                <option value="Active">Active</option>
+                                <option value="Completed">Completed</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
                     </div>
 
                     {/* Select Client */}
                     <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '1.15rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <label htmlFor="addProjClient" style={labelStyle}>
+                            <label htmlFor="addProjClient" className="project-modal-label">
                                 Select client
                             </label>
                             <a
                                 href="#add-client"
+                                className="project-modal-link"
                                 onClick={(e) => { e.preventDefault(); openAddClientModal(); }}
-                                style={{ color: '#2563EB', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
                             >
                                 <span style={{ fontSize: '0.9rem', lineHeight: 1 }}>+</span> Add Client
                             </a>
                         </div>
                         <select
                             id="addProjClient"
-                            className="form-input"
+                            className="form-input project-modal-input"
                             value={client}
                             onChange={(e) => setClient(e.target.value)}
-                            style={inputStyle}
                         >
                             <option value="">Select client</option>
                             {clients.map(c => (
@@ -287,15 +269,14 @@ export default function AddProjectModal() {
 
                     {/* Project Leader */}
                     <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '1.15rem' }}>
-                        <label htmlFor="addProjLeader" style={labelStyle}>
+                        <label htmlFor="addProjLeader" className="project-modal-label">
                             Project leader
                         </label>
                         <select
                             id="addProjLeader"
-                            className="form-input"
+                            className="form-input project-modal-input"
                             value={leader}
                             onChange={(e) => setLeader(e.target.value)}
-                            style={inputStyle}
                         >
                             <option value="">Select project leader</option>
                             {leaders.length > 0 ? (
@@ -316,23 +297,22 @@ export default function AddProjectModal() {
                     {/* Employee Name */}
                     <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '1.15rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <label htmlFor="addProjEmployee" style={labelStyle}>
+                            <label htmlFor="addProjEmployee" className="project-modal-label">
                                 Employee name
                             </label>
                             <a
                                 href="#add-employee"
+                                className="project-modal-link"
                                 onClick={(e) => { e.preventDefault(); openAddEmployeeModal(); }}
-                                style={{ color: '#2563EB', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
                             >
-                                <span style={{ fontSize: '0.9rem', lineHeight: 1 }}>+</span> Add Employ
+                                <span style={{ fontSize: '0.9rem', lineHeight: 1 }}>+</span> Add Employee
                             </a>
                         </div>
                         <select
                             id="addProjEmployee"
-                            className="form-input"
+                            className="form-input project-modal-input"
                             value={employeeName}
                             onChange={(e) => setEmployeeName(e.target.value)}
-                            style={inputStyle}
                         >
                             <option value="">Select employee</option>
                             {employees.filter(e => e && e.status === 'filled').map(emp => {
@@ -345,35 +325,21 @@ export default function AddProjectModal() {
                     </div>
 
                     {/* Projects Email ID */}
-                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.5rem' }}>
-                        <label htmlFor="addProjEmailPrefix" style={labelStyle}>
+                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.6rem' }}>
+                        <label htmlFor="addProjEmailPrefix" className="project-modal-label">
                             Projects email ID
                         </label>
                         <div style={{ display: 'flex', alignItems: 'stretch', gap: '0', width: '100%' }}>
                             <input
                                 type="text"
                                 id="addProjEmailPrefix"
-                                className="form-input"
+                                className="form-input project-modal-input project-modal-input-prefix"
                                 placeholder="Project email id"
                                 value={emailPrefix}
                                 onChange={(e) => setEmailPrefix(e.target.value)}
-                                style={{ ...inputStyle, flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRight: 'none' }}
+                                style={{ flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRight: 'none' }}
                             />
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '0 0.85rem',
-                                    background: '#F9FAFB',
-                                    border: '1px solid #D1D5DB',
-                                    borderTopRightRadius: '8px',
-                                    borderBottomRightRadius: '8px',
-                                    color: '#6B7280',
-                                    fontSize: '0.82rem',
-                                    fontFamily: "'Inter', sans-serif",
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
+                            <div className="project-modal-suffix">
                                 @yourcompanydomain.com
                             </div>
                         </div>
@@ -384,21 +350,7 @@ export default function AddProjectModal() {
                         <button
                             type="button"
                             onClick={handleGenerateEmail}
-                            style={{
-                                height: '32px',
-                                padding: '0 1rem',
-                                borderRadius: '6px',
-                                fontSize: '0.8rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                fontFamily: "'Inter', sans-serif",
-                                background: '#fff',
-                                color: '#2563EB',
-                                border: '1.5px solid #2563EB',
-                                transition: 'background-color 0.15s ease'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
+                            className="project-modal-btn-outline project-modal-btn-sm"
                         >
                             Generate
                         </button>
@@ -409,42 +361,14 @@ export default function AddProjectModal() {
                         <button
                             type="button"
                             onClick={closeAddModal}
-                            style={{
-                                height: '38px',
-                                padding: '0 1.5rem',
-                                borderRadius: '8px',
-                                fontSize: '0.85rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                fontFamily: "'Inter', sans-serif",
-                                background: '#fff',
-                                color: '#2563EB',
-                                border: '1.5px solid #2563EB',
-                                transition: 'background-color 0.15s ease'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
+                            className="project-modal-btn-outline"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             id="btnSaveProject"
-                            style={{
-                                height: '38px',
-                                padding: '0 1.75rem',
-                                borderRadius: '8px',
-                                fontSize: '0.85rem',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                fontFamily: "'Inter', sans-serif",
-                                background: '#2563EB',
-                                color: '#fff',
-                                border: 'none',
-                                transition: 'background-color 0.15s ease'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1D4ED8'}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                            className="project-modal-btn-primary"
                         >
                             {editingProject ? 'Update' : 'Save'}
                         </button>

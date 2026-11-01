@@ -1,0 +1,91 @@
+/* Scoped to the Email IDs overview and configured-route cards. */
+#emailIdsView{--ei-surface:#fff;--ei-soft:#f8fafc;--ei-border:#e2e8f0;--ei-text:#0f172a;--ei-muted:#64748b;--ei-accent:#3b82f6}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsView{--ei-surface:#141821;--ei-soft:#19263b;--ei-border:#2b3443;--ei-text:#f8fafc;--ei-muted:#a1aec1;--ei-accent:#38bdf8}
+#emailIdsView #emailIdsStatsRow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:22px 0 20px!important}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px!important;min-width:0;border:1px solid var(--ei-border)!important;border-radius:12px;background:var(--ei-surface)!important;box-shadow:0 1px 3px #00000008!important;transform:none;min-height:124px;cursor:default}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-card[role="button"]{cursor:pointer}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-card[role="button"]:hover{border-color:var(--ei-accent)!important;background:var(--ei-soft)!important}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-card.kpi-selected{border-color:var(--ei-accent)!important;background:var(--ei-soft)!important;box-shadow:none!important}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-card:focus-visible{outline:2px solid var(--ei-accent);outline-offset:3px}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-card>div{width:100%;gap:12px}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-icon{width:38px;height:38px;flex:0 0 38px;border-radius:10px;box-shadow:none}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-value{font-size:25px;font-weight:650;line-height:1.2;color:var(--ei-text)!important}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-label{font-size:12px;font-weight:500;line-height:1.5;margin-top:4px;white-space:normal;overflow:visible;text-overflow:clip;color:var(--ei-muted)!important}
+#emailIdsView #emailIdsStatsRow .email-ids-kpi-badge{margin-left:50px;padding:3px 8px;line-height:1.4;font-size:10px;font-weight:600;border-radius:6px;box-shadow:none;max-width:100%}
+#emailIdsView .email-ids-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:14px;margin-bottom:20px!important}
+#emailIdsView .email-ids-search{width:100%;max-width:620px;min-height:44px;background:var(--ei-surface)!important;border:1px solid var(--ei-border)!important;border-radius:10px;padding:10px 14px;box-shadow:none!important;gap:10px}
+#emailIdsView .email-ids-search:focus-within{border-color:var(--ei-accent)!important;outline:2px solid color-mix(in srgb,var(--ei-accent) 20%,transparent)}
+#emailIdsView #emailIdsSearchBoxInput{font-size:13px!important;min-width:0;line-height:1.5;color:var(--ei-text)!important}
+#emailIdsView .email-ids-search-icon{width:17px;height:17px;color:var(--ei-muted)!important}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item{padding:13px 14px!important;border-radius:12px;border:1px solid #e2e8f0!important;background:#fff!important;box-shadow:0 1px 3px #00000008!important;min-width:0;transition:background-color .15s,border-color .15s;outline-offset:3px}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item>div:first-child{margin-bottom:10px;gap:10px}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item>div:last-child{padding-top:9px;border-top:1px solid #e2e8f0;gap:8px}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item:hover{background:#eff6ff!important;border-color:#3b82f6!important;transform:none}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item:focus-visible{outline:2px solid #3b82f6}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-project{font-size:13px;font-weight:600;line-height:1.5;min-width:0;color:#0f172a!important}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-num{font-size:11px;font-weight:500;color:#64748b!important;margin-right:8px}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-email{font-size:11px;color:#64748b!important;line-height:1.5;min-width:0;flex:1}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-copy-tag{padding:4px 7px;border-radius:5px;font-size:10px;font-weight:600;flex-shrink:0;min-width:42px;text-align:center;background:#eff6ff;color:#2563eb}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-dot{width:6px;height:6px;flex-shrink:0;box-shadow:none!important}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item{background:#141821!important;border-color:#2b3443!important}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item:hover{background:#19263b!important;border-color:#38bdf8!important}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item>div:last-child{border-color:#2b3443}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-project{color:#f8fafc!important}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent :is(.route-card-email,.route-card-num){color:#a1aec1!important}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-copy-tag{background:#22344d;color:#93c5fd}
+@media(max-width:1200px){#emailIdsView #emailIdsStatsRow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){#emailIdsView #emailIdsStatsRow{gap:10px}#emailIdsView #emailIdsStatsRow .email-ids-kpi-card{padding:12px!important}#emailIdsView #emailIdsStatsRow .email-ids-kpi-card>div{gap:8px}#emailIdsView #emailIdsStatsRow .email-ids-kpi-icon{width:30px;height:30px;flex-basis:30px}#emailIdsView #emailIdsStatsRow .email-ids-kpi-badge{margin-left:38px}}
+@media(prefers-reduced-motion:reduce){#emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item{transition:none}}
+/* Configured routes mirror the compact avatar/name/email hierarchy of Clients. */
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route{display:flex;align-items:center;gap:10px;padding:11px 12px!important;min-height:70px}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-client-avatar{display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:0 0 32px;border-radius:50%;color:#fff;font-size:11.5px;font-weight:700}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-client-info{flex:1;min-width:0;margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:2px}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-card-project{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;line-height:1.5;font-weight:600}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-card-num{margin-right:5px;font-weight:400}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-card-email{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;line-height:1.5}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-client-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route .route-card-copy-tag{font-size:9px;min-width:32px;padding:2px 4px;line-height:1.4}
+#emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route.route-copied{border-color:#3b82f6!important;background:#eff6ff!important}
+:is(html.dark,body.dark,[data-theme="dark"]) #emailIdsSidebar #emailIdsSidebarEmptyContent .client-style-route.route-copied{border-color:#38bdf8!important;background:#19263b!important}
+/* Light mode aligned with the client, project and admin pages. */
+html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]){
+ #emailIdsView{--ei-surface:#fff;--ei-soft:#f5f9ff;--ei-border:#dce5ef;--ei-text:#24364d;--ei-muted:#61748c;--ei-accent:#0875d1;background:#f5f8fc!important;padding:28px!important}
+ #emailIdsView h1,#emailIdsView h2{color:#20344e!important;font-size:24px!important;line-height:1.3}
+ #emailIdsView #emailIdsStatsRow .email-ids-kpi-card{border-radius:12px!important;box-shadow:0 3px 12px #243b5308!important}
+ #emailIdsView #emailIdsStatsRow .email-ids-kpi-card.kpi-selected{border-color:#9fc8f0!important;background:#f5faff!important}
+ #emailIdsView .badge-blue{background:#e7f2ff!important;color:#0964b5!important}
+ #emailIdsView .badge-emerald{background:#e1f6ed!important;color:#13734f!important}
+ #emailIdsView .badge-purple{background:#f0eaff!important;color:#7246ae!important}
+ #emailIdsView .badge-amber{background:#fff2d9!important;color:#8c5900!important}
+ #emailIdsView .email-ids-search{border-radius:9px!important;border-color:#d4dfec!important;box-shadow:0 1px 3px #243b5305!important}
+ #emailIdsView #emailIdsSearchBoxInput::placeholder{color:#70829a!important}
+ #emailIdsView .email-ids-filter-group{background:#fff!important;border:1px solid #dce5ef!important;border-radius:10px!important;padding:5px!important;gap:6px!important}
+ #emailIdsView .email-ids-filter-pill{background:transparent!important;color:#526982!important;border:1px solid transparent!important;border-radius:7px!important;min-height:34px}
+ #emailIdsView .email-ids-filter-pill.active{background:#e8f2ff!important;border-color:#bdd8f5!important;color:#0964b5!important}
+ #emailIdsView .email-ids-filter-pill:hover{background:#f0f5fc!important}
+ #emailIdsView .email-ids-filter-count{background:#edf2f8!important;color:#526982!important}
+ #emailIdsView .email-ids-table-wrap{background:#fff!important;border:1px solid #dce5ef!important;border-radius:14px!important;box-shadow:0 3px 12px #243b5308!important}
+ #emailIdsView .email-ids-table{background:#fff!important}
+ #emailIdsView .email-ids-table th{background:#f7f9fc!important;color:#61748c!important;border-color:#e1e8f1!important;font-size:11px!important;letter-spacing:.05em;padding-top:17px!important;padding-bottom:17px!important}
+ #emailIdsView .email-ids-table td{border-color:#e7edf5!important;padding-top:17px!important;padding-bottom:17px!important}
+ #emailIdsView .email-ids-row{background:#fff!important}
+ #emailIdsView .email-ids-row:hover{background:#f5f9ff!important}
+ #emailIdsView :is(.real-email-text,.leader-name-primary,.project-name-text){color:#243b55!important;font-weight:600!important}
+ #emailIdsView .leader-email-sub{color:#61748c!important}
+ #emailIdsView .client-id-chip{background:#f2f6fc!important;border:1px solid #dce5ef!important;color:#405978!important;font-weight:500!important}
+ #emailIdsView .email-no-badge{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
+ #emailIdsView .signature-chip{background:#fff6e5!important;color:#8c5900!important;border-color:#efdbb2!important}
+ #emailIdsView .email-ids-table-footer{background:#f7f9fc!important;border-color:#e1e8f1!important;color:#61748c!important;padding:16px 20px!important}
+ #emailIdsView .email-ids-export-btn{background:#fff!important;color:#425a76!important;border:1px solid #d4dfec!important;border-radius:8px!important;min-height:38px}
+ #emailIdsView .email-ids-export-btn:hover{background:#eaf3ff!important}
+ #emailIdsSidebar{background:#f7f9fc!important;border-color:#dce5ef!important}
+ #emailIdsSidebar :is(#emailIdsSidebarStatsBox,#emailIdsImportBtn,#emailIdsExportBtn){background:#fff!important;border:1px solid #d4dfec!important;color:#425a76!important;border-radius:9px!important;min-height:36px}
+ #emailIdsSidebar #btnEmailIdsAddEmployee{background:#0875d1!important;color:#fff!important;border-radius:9px!important;min-height:40px}
+ #emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item{background:#fff!important;border-color:#dce5ef!important;border-radius:10px!important;box-shadow:0 2px 6px #243b5306!important}
+ #emailIdsSidebar #emailIdsSidebarEmptyContent .email-route-item:hover{background:#f0f6ff!important;border-color:#b5d1f0!important}
+ #emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-project{color:#243b55!important}
+ #emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-email{color:#61748c!important}
+ #emailIdsSidebar #emailIdsSidebarEmptyContent .route-card-copy-tag{background:#e7f2ff!important;color:#0964b5!important}
+ :is(#emailIdsView,#emailIdsSidebar) :is(button,input,[tabindex]):focus-visible{outline:2px solid #0875d1!important;outline-offset:3px!important}
+}
+@media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #emailIdsView{padding:16px!important}}

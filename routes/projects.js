@@ -13,6 +13,57 @@ const getUserContext = (req) => {
     return { userId: parseInt(userId, 10), orgId: parseInt(orgId, 10) };
 };
 
+// GET /api/projects/my-projects
+// Returns projects where the logged-in user is the leader or an assigned employee (or all for org_owner/admin).
+router.get('/my-projects', (req, res) => {
+    const context = getUserContext(req);
+    if (!context) return res.status(401).json({ error: 'Unauthorized' });
+
+    db.get('SELECT id, admin_name, email, role FROM users WHERE id = ?', [context.userId], (err, user) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const mapProject = (r) => ({
+            id: r.project_id,
+            projectName: r.project_name,
+            leader: r.leader,
+            client: r.client,
+            employeeName: r.employee_name,
+            projectEmailId: r.project_email_id,
+            status: r.status
+        });
+
+        if (user.role === 'org_owner' || user.role === 'admin') {
+            db.all(
+                `SELECT * FROM projects WHERE organization_id = ? ORDER BY created_at DESC`,
+                [context.orgId],
+                (err2, rows) => {
+                    if (err2) return res.status(500).json({ error: 'Failed to fetch projects' });
+                    res.json({ success: true, projects: (rows || []).map(mapProject) });
+                }
+            );
+        } else {
+            const namePattern = `%${user.admin_name}%`;
+            const emailPattern = `%${user.email}%`;
+
+            db.all(
+                `SELECT * FROM projects
+                 WHERE organization_id = ?
+                   AND (
+                     leader LIKE ? OR leader LIKE ?
+                     OR employee_name LIKE ? OR employee_name LIKE ?
+                   )
+                 ORDER BY created_at DESC`,
+                [context.orgId, namePattern, emailPattern, namePattern, emailPattern],
+                (err2, rows) => {
+                    if (err2) return res.status(500).json({ error: 'Failed to fetch projects' });
+                    res.json({ success: true, projects: (rows || []).map(mapProject) });
+                }
+            );
+        }
+    });
+});
+
 // GET /api/projects
 router.get('/', (req, res) => {
     const context = getUserContext(req);
@@ -78,6 +129,62 @@ router.post('/', (req, res) => {
         if (err) return res.status(500).json({ error: 'Failed to create project' });
         res.json({ success: true, project_id: id });
     });
+});
+
+// GET /api/projects/:id/members
+router.get('/:id/members', (req, res) => {
+    const context = getUserContext(req);
+    if (!context) return res.status(401).json({ error: 'Unauthorized' });
+
+    const projectId = req.params.id;
+    db.get(
+        'SELECT * FROM projects WHERE organization_id = ? AND (project_id = ? OR id = ? OR LOWER(project_email_id) = ?)',
+        [context.orgId, projectId, projectId, projectId.toLowerCase()],
+        (err, project) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            if (!project) return res.status(404).json({ error: 'Project not found' });
+
+            const members = [];
+            const seen = new Set();
+
+            const parseEntry = (text, defaultRole) => {
+                if (!text) return;
+                const parts = text.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+                parts.forEach(p => {
+                    const emailMatch = p.match(/<([^>]+)>|([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+                    const email = emailMatch ? (emailMatch[1] || emailMatch[2]).toLowerCase().trim() : '';
+                    let name = p.replace(/<[^>]+>/g, '').replace(/\([^)]*\)/g, '').trim();
+                    if (!name && email) name = email.split('@')[0];
+                    if (!name) name = 'Member';
+                    const key = email || name.toLowerCase();
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        members.push({
+                            name,
+                            email,
+                            role: defaultRole,
+                            avatar: name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'M'
+                        });
+                    }
+                });
+            };
+
+            parseEntry(project.leader, 'Project Leader');
+            parseEntry(project.employee_name, 'Member');
+            parseEntry(project.client, 'Client');
+
+            res.json({
+                success: true,
+                project: {
+                    id: project.project_id,
+                    projectName: project.project_name,
+                    projectEmailId: project.project_email_id,
+                    status: project.status
+                },
+                members
+            });
+        }
+    );
 });
 
 // PUT /api/projects/:id

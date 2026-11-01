@@ -40,10 +40,9 @@ const sendInvite = async (req, res) => {
     
     // User must be logged in as admin
     const userId = req.headers['x-user-id'];
-    const orgId = req.headers['x-org-id'];
 
-    if (!userId || !orgId) {
-        console.log('[sendInvite] Missing headers - userId:', userId, 'orgId:', orgId);
+    if (!userId) {
+        console.log('[sendInvite] Missing headers - userId:', userId);
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
@@ -51,19 +50,27 @@ const sendInvite = async (req, res) => {
         return res.status(400).json({ error: 'First name and email are required.' });
     }
 
-    console.log(`[sendInvite] Sending invite to ${email} (firstName: ${firstName}) from user ${userId}, org ${orgId}`);
+    db.get('SELECT organization_id FROM users WHERE id = ?', [userId], (err, adminUser) => {
+        if (err || !adminUser) {
+            console.error('[sendInvite] Failed to fetch admin user:', err);
+            return res.status(401).json({ error: 'Admin user not found' });
+        }
 
-    // Check if the user is already registered AND has completed signup (has a password_hash)
-    db.get('SELECT id, organization_id, password_hash FROM users WHERE email = ?', [email], (err, row) => {
-        if (err) {
-            console.error('[sendInvite] DB error checking user:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
-        
-        // If user exists, has a password, and is in a DIFFERENT org — block
-        if (row && row.password_hash && row.organization_id != orgId) {
-            return res.status(400).json({ error: 'User is already registered with another organization.' });
-        }
+        const orgId = adminUser.organization_id;
+
+        console.log(`[sendInvite] Sending invite to ${email} (firstName: ${firstName}) from user ${userId}, org ${orgId}`);
+
+        // Check if the user is already registered AND has completed signup (has a password_hash)
+        db.get('SELECT id, organization_id, password_hash FROM users WHERE email = ?', [email], (err, row) => {
+            if (err) {
+                console.error('[sendInvite] DB error checking user:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
+            
+            // If user exists, has a password, and is in a DIFFERENT org — block
+            if (row && row.password_hash && row.organization_id != orgId) {
+                return res.status(400).json({ error: 'User is already registered with another organization.' });
+            }
 
         // If user already exists with a password in the SAME org — they already signed up
         if (row && row.password_hash && row.organization_id == orgId) {
@@ -86,7 +93,8 @@ const sendInvite = async (req, res) => {
                 // Create the invite URL
                 const protocol = req.protocol === 'file' ? 'http' : req.protocol;
                 const host = req.get('host') || 'localhost:3000';
-                const inviteUrl = `${protocol}://${host}/signup-invite.html?token=${token}`;
+                const baseUrl = process.env.FRONTEND_URL || (host.includes('localhost') || host.includes('127.0.0.1') ? 'http://localhost:3000' : `${protocol}://${host}`);
+                const inviteUrl = `${baseUrl}/signup?token=${token}&email=${encodeURIComponent(email)}`;
 
                 if (transporter) {
                     const mailOptions = {
@@ -113,6 +121,7 @@ const sendInvite = async (req, res) => {
                 res.json({ success: true, message: 'Invite sent successfully', token: token, inviteUrl: inviteUrl });
             }
         );
+    });
     });
 };
 
@@ -144,9 +153,9 @@ const verifyInvite = (req, res) => {
 };
 
 const signupInvited = async (req, res) => {
-    const { token, firstName, password, dob } = req.body;
+    const { token, firstName, password, dob, workMode, workLocation, bio, isGoogleAuth } = req.body;
 
-    if (!token || !firstName || !password) {
+    if (!token || !firstName || (!password && !isGoogleAuth)) {
         return res.status(400).json({ error: 'Please fill in all required fields.' });
     }
 
@@ -161,48 +170,110 @@ const signupInvited = async (req, res) => {
             return res.status(400).json({ error: 'This invitation has expired.' });
         }
 
-        // 2. Ensure email is not already registered (edge case)
-        db.get('SELECT id FROM users WHERE email = ?', [invite.email], async (err, row) => {
+        // Check if user already exists
+        db.get('SELECT id, organization_id FROM users WHERE email = ?', [invite.email], async (err, existingUser) => {
             if (err) return res.status(500).json({ error: 'Database error' });
-            if (row) return res.status(400).json({ error: 'An account with this email already exists.' });
 
             try {
-                // 3. Hash password
-                const saltRounds = 10;
-                const password_hash = await bcrypt.hash(password, saltRounds);
+                // Hash password if provided
+                let password_hash = '';
+                if (password) {
+                    const saltRounds = 10;
+                    password_hash = await bcrypt.hash(password, saltRounds);
+                }
 
-                // 4. Insert user
-                db.serialize(() => {
-                    db.run('BEGIN TRANSACTION');
+                // Check for Google OAuth tokens if Google Auth was performed
+                const syncController = require('./syncController');
+                const pending = syncController.pendingAuth ? syncController.pendingAuth.get(invite.email) : null;
+                let sync_provider = isGoogleAuth ? 'google' : null;
+                let sync_access_token = pending ? pending.access_token : null;
+                let sync_refresh_token = pending ? pending.refresh_token : null;
+                let sync_token_expires_at = pending ? pending.expires_at : null;
+                if (pending && syncController.pendingAuth) {
+                    syncController.pendingAuth.delete(invite.email);
+                }
 
-                    // Map firstName to admin_name, insert dob and set role='employee'
+                const completeSignup = (userId) => {
+                    db.run(`UPDATE invitations SET status = 'used' WHERE id = ?`, [invite.id], (err) => {
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).json({ error: 'Failed to update invite status.' });
+                        }
+
+                        const userObj = {
+                            id: userId,
+                            organization_id: invite.organization_id,
+                            email: invite.email,
+                            admin_name: firstName,
+                            role: 'employee',
+                            dob: dob || null,
+                            workMode: workMode || 'Remote',
+                            workLocation: workLocation || 'Gilgit Baltistan, Pakistan',
+                            bio: bio || '',
+                            subscription_status: 'active',
+                            permissions: {
+                                addEmployees: false,
+                                createProjects: false,
+                                manageProjects: false,
+                                makeAdmin: false,
+                                deleteProject: false
+                            }
+                        };
+
+                        return res.status(201).json({
+                            success: true,
+                            message: 'Account created successfully.',
+                            user: userObj,
+                            redirectUrl: '/dashboard'
+                        });
+                    });
+                };
+
+                if (existingUser) {
+                    // Update existing record
                     db.run(
-                        `INSERT INTO users (organization_id, admin_name, email, password_hash, marketing_opt_in, terms_accepted, role, dob) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                        [invite.organization_id, firstName, invite.email, password_hash, 0, 1, 'employee', dob || null],
+                        `UPDATE users SET 
+                            organization_id = ?, admin_name = ?, password_hash = COALESCE(NULLIF(?, ''), password_hash), 
+                            terms_accepted = 1, role = 'employee', dob = ?,
+                            sync_provider = COALESCE(?, sync_provider),
+                            sync_access_token = COALESCE(?, sync_access_token),
+                            sync_refresh_token = COALESCE(?, sync_refresh_token),
+                            sync_token_expires_at = COALESCE(?, sync_token_expires_at)
+                         WHERE id = ?`,
+                        [
+                            invite.organization_id, firstName, password_hash, dob || null,
+                            sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at,
+                            existingUser.id
+                        ],
                         function (err) {
                             if (err) {
                                 console.error(err);
-                                db.run('ROLLBACK');
-                                return res.status(500).json({ error: 'Failed to create user account.' });
+                                return res.status(500).json({ error: 'Failed to update user account.' });
                             }
-
-                            // 5. Update invite status to 'used'
-                            db.run(`UPDATE invitations SET status = 'used' WHERE id = ?`, [invite.id], (err) => {
-                                if (err) {
-                                    console.error(err);
-                                    db.run('ROLLBACK');
-                                    return res.status(500).json({ error: 'Failed to update invite.' });
-                                }
-
-                                db.run('COMMIT');
-                                return res.status(201).json({
-                                    message: 'Account created successfully.',
-                                    redirectUrl: 'signin.html'
-                                });
-                            });
+                            completeSignup(existingUser.id);
                         }
                     );
-                });
+                } else {
+                    // Insert new user
+                    db.run(
+                        `INSERT INTO users (
+                            organization_id, admin_name, email, password_hash, 
+                            marketing_opt_in, terms_accepted, role, dob,
+                            sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at
+                        ) VALUES (?, ?, ?, ?, 0, 1, 'employee', ?, ?, ?, ?, ?)`,
+                        [
+                            invite.organization_id, firstName, invite.email, password_hash,
+                            dob || null, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at
+                        ],
+                        function (err) {
+                            if (err) {
+                                console.error(err);
+                                return res.status(500).json({ error: 'Failed to create user account.' });
+                            }
+                            completeSignup(this.lastID);
+                        }
+                    );
+                }
             } catch (error) {
                 console.error(error);
                 return res.status(500).json({ error: 'Internal server error.' });

@@ -1,0 +1,28 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Employee {
+  id                  String    @id @default(uuid())
+  ownerId             String    // Links employee to the Organization Owner
+  email               String    @unique
+  passwordHash        String
+  mustChangePassword  Boolean   @default(false)
+  passwordChangedAt   DateTime?
+  tokenVersion        Int       @default(0) // Incremented to force logout active sessions
+}
+
+model SecurityAuditLog {
+  id               String   @id @default(uuid())
+  actorId          String   // Owner ID
+  actorRole        String   // "OWNER"
+  targetEmployeeId String   // Selected Employee ID
+  action           String   // "OWNER_RESET_EMPLOYEE_PASSWORD"
+  ipAddress        String?
+  metadata         Json?    // { forceChangeOnLogin: true, revokeSessions: true }
+  createdAt        DateTime @default(now())
+}

@@ -14,7 +14,13 @@ router.get('/auth/google', (req, res) => {
     const scope = encodeURIComponent('https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile');
     
     let state = req.headers['x-user-id'] || 'unknown'; 
-    if (req.query.action === 'signup') state = 'signup';
+    if (req.query.action === 'signup') {
+        if (req.query.invite_token) {
+            state = `signup:invite:${req.query.invite_token}:${encodeURIComponent(req.query.email || '')}`;
+        } else {
+            state = 'signup';
+        }
+    }
     if (req.query.action === 'signin') state = 'signin';
 
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent&state=${state}`;

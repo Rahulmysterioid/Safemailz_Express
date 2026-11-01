@@ -1,0 +1,52 @@
+/* Admin light theme aligned with the client and project workspace. */
+html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]){
+ #adminsView{background:#f5f8fc!important;color:#24364d;padding:28px!important}
+ #adminsView :is(.admin-header-card,.admin-identity-card){background:#fff!important;border:1px solid #dce5ef!important;border-radius:14px!important;box-shadow:0 3px 12px #243b5308!important;padding:22px!important}
+ #adminsView .admin-header-title{color:#20344e!important;font-size:24px!important;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+ #adminsView .admin-header-subtitle{color:#61748c!important;font-size:13px!important;line-height:1.6}
+ #adminsView .admin-stat-chip.chip-blue{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
+ #adminsView .admin-stat-chip.chip-emerald{background:#e1f6ed!important;color:#13734f!important;border-color:#bce6d4!important}
+ #adminsView .admin-identity-card-header{border-color:#e7edf5!important;margin-bottom:20px!important}
+ #adminsView .admin-field-label{color:#526982!important;font-size:12px!important;font-weight:600}
+ #adminsView .admin-input-field{background:#f7f9fc!important;border:1px solid #d4dfec!important;color:#24364d!important;border-radius:9px!important;min-height:44px}
+ #adminsView .admin-input-field:focus{background:#fff!important;border-color:#0875d1!important}
+ #adminsView .admin-input-icon{color:#61748c!important}
+ #adminsView .admin-privileges-title{color:#20344e!important;font-size:17px!important}
+ #adminsView .admin-privilege-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:12px!important;box-shadow:0 2px 8px #243b5305!important;padding:18px!important}
+ #adminsView .admin-privilege-card.is-enabled{background:#f5faff!important;border-color:#b9d5f2!important}
+ #adminsView .admin-perm-title{color:#243b55!important;font-weight:600!important}
+ #adminsView .admin-perm-desc{color:#61748c!important;line-height:1.5}
+ #adminsView .admin-perm-status-badge{background:#edf1f6!important;color:#61748c!important}
+ #adminsView .admin-perm-status-badge.on{background:#e1f6ed!important;color:#13734f!important}
+ #adminsView :is(.admin-quick-perm-btn,.admin-copy-inline-btn,#btnAdminCancel){background:#fff!important;border:1px solid #d4dfec!important;color:#4e637c!important;border-radius:7px!important;min-height:32px}
+ #adminsView :is(.admin-quick-perm-btn,.admin-copy-inline-btn,#btnAdminCancel):hover{background:#eaf3ff!important;color:#0967ba!important}
+ #adminsView .admin-action-footer{background:#fff!important;border:1px solid #dce5ef!important;border-radius:12px!important;padding:16px 20px!important;box-shadow:0 3px 12px #243b5308!important}
+ #adminsView :is(#btnAssignEmployees,#btnAdminSave){background:#0875d1!important;color:#fff!important;border-radius:8px!important;min-height:38px}
+ #adminsView #btnAdminSave:disabled{opacity:.5!important;cursor:not-allowed}
+ #adminsSidebar{background:#f7f9fc!important;border-color:#dce5ef!important}
+ #adminsSidebar :is(.sidebar-stats,#adminsImportBtn,#adminsExportBtn,#adminsSidebarSearch){background:#fff!important;border:1px solid #d4dfec!important;color:#425a76!important;border-radius:9px!important;min-height:36px}
+ #adminsSidebar #adminsSidebarSearch{min-height:40px}
+ #adminsSidebar .sidebar-admin-card{background:#fff!important;border:1px solid #dce5ef!important;box-shadow:0 2px 6px #243b5306!important;border-radius:10px!important;padding:14px 12px!important}
+ #adminsSidebar .sidebar-admin-card:hover{background:#f0f6ff!important;border-color:#b5d1f0!important}
+ #adminsSidebar .sidebar-admin-card:is(.active,.selected){background:#e8f2ff!important;border-color:#9fc8f0!important;box-shadow:inset 3px 0 #0875d1!important}
+ #adminsSidebar .sidebar-admin-name{color:#243b55!important}
+ #adminsSidebar .sidebar-admin-email{color:#61748c!important}
+ #adminsSidebar .sidebar-admin-storage-wrap{border-color:#dce5ef!important}
+ #adminsSidebar .admin-kebab-btn{color:#526982!important;min-width:28px;min-height:28px}
+ #adminsSidebar #btnAddAdmin{background:#0875d1!important;color:#fff!important;border-radius:9px!important;min-height:40px}
+ :is(#adminsView,#adminsSidebar) :is(button,input,[tabindex]):focus-visible{outline:2px solid #0875d1!important;outline-offset:3px!important}
+}
+@media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #adminsView{padding:16px!important}#adminsView .admin-action-footer{flex-wrap:wrap;gap:12px}}
+/* Let sidebar badges wrap before they crowd the action menu. */
+#adminsSidebar .sidebar-admin-card>div:first-child>div:first-child{min-width:0;flex:1}
+#adminsSidebar .sidebar-admin-card>div:first-child{align-items:flex-start}
+
+/* Explicit sizing: these views do not compile arbitrary Tailwind utility classes. */
+#adminsView.admins-empty-page {display:flex;align-items:center;justify-content:center;min-height:400px;overflow:auto;padding:32px;}
+#adminsView #adminDetailsEmptyState {display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;width:100%;max-width:540px;padding:32px 28px;background:var(--surface,#fff);border:1px solid var(--border,#dce5ef);border-radius:18px;box-shadow:0 8px 30px #243b5308;}
+#adminsView #adminDetailsEmptyState img {display:block;width:160px;max-width:100%;height:160px;object-fit:contain;margin:0 0 20px;flex-shrink:0;}
+#adminsView #adminDetailsEmptyState h2 {margin:0;font-size:22px;font-weight:700;line-height:1.3;color:var(--text-primary,#20344e);}
+#adminsView #adminDetailsEmptyState p {max-width:380px;margin:12px 0 24px;font-size:14px;line-height:1.6;color:var(--text-secondary,#61748c);}
+#adminsView #adminDetailsEmptyState button {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:11px 20px;border:0;border-radius:9px;background:#0875d1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
+#adminsView #adminDetailsEmptyState button:hover {background:#0665b6;}
+@media(max-width:600px){#adminsView #adminDetailsEmptyState {padding:24px 18px;}#adminsView #adminDetailsEmptyState img {width:120px;height:120px;}#adminsView.admins-empty-page {min-height:340px;}}

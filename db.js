@@ -39,7 +39,7 @@ function extractArgs(args) {
 
 // Wrapper to make @libsql/client drop-in compatible with sqlite3 API
 const db = {
-    get: function(...args) {
+    get: function (...args) {
         const { sql, params, callback } = extractArgs(args);
         client.execute({ sql, args: params }).then(rs => {
             if (callback) {
@@ -51,7 +51,7 @@ const db = {
             if (callback) callback(err);
         });
     },
-    all: function(...args) {
+    all: function (...args) {
         const { sql, params, callback } = extractArgs(args);
         client.execute({ sql, args: params }).then(rs => {
             if (callback) callback(null, rs.rows);
@@ -60,9 +60,9 @@ const db = {
             if (callback) callback(err);
         });
     },
-    run: function(...args) {
+    run: function (...args) {
         const { sql, params, callback } = extractArgs(args);
-        
+
         // HTTP protocol doesn't support interactive transactions directly.
         // We shim BEGIN/COMMIT/ROLLBACK to auto-commit to prevent errors.
         if (typeof sql === 'string') {
@@ -89,7 +89,7 @@ const db = {
             if (callback) callback(err);
         });
     },
-    serialize: function(cb) {
+    serialize: function (cb) {
         // @libsql/client is stateless and doesn't queue synchronously. 
         if (cb) cb();
     }
@@ -268,6 +268,71 @@ const initDb = async () => {
             )
         `);
 
+        // Create user email settings table (for Auto CC and general email configs)
+        await runQuery(`
+            CREATE TABLE IF NOT EXISTS user_email_settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL UNIQUE,
+                organization_id INTEGER,
+                is_auto_cc_enabled BOOLEAN DEFAULT 0,
+                auto_cc_emails TEXT DEFAULT '[]',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (organization_id) REFERENCES organizations(id)
+            )
+        `);
+
+        // Create admin assigned employees table
+        await runQuery(`
+            CREATE TABLE IF NOT EXISTS admin_assigned_employees (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                admin_id INTEGER NOT NULL,
+                employee_id TEXT NOT NULL,
+                organization_id INTEGER,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(admin_id, employee_id),
+                FOREIGN KEY (admin_id) REFERENCES users(id)
+            )
+        `);
+
+        // Create user general settings table (6-slice Outlook general settings)
+        await runQuery(`
+            CREATE TABLE IF NOT EXISTS user_general_settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL UNIQUE,
+                organization_id INTEGER DEFAULT 1,
+                settings_json TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (organization_id) REFERENCES organizations(id)
+            )
+        `);
+
+        await runQuery(`
+            CREATE INDEX IF NOT EXISTS idx_user_general_settings_user ON user_general_settings(user_id)
+        `);
+
+        // Create search history table (for search history controls, suggestions, and data export)
+        await runQuery(`
+            CREATE TABLE IF NOT EXISTS search_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                organization_id INTEGER DEFAULT 1,
+                query TEXT NOT NULL,
+                result_count INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (organization_id) REFERENCES organizations(id)
+            )
+        `);
+
+        await runQuery(`
+            CREATE INDEX IF NOT EXISTS idx_search_history_user ON search_history(user_id)
+        `);
+
         // Run Migrations (safe to fail if column already exists)
         const runMigration = async (query) => {
             const err = await runQuery(query);
@@ -284,15 +349,21 @@ const initDb = async () => {
         await runMigration("ALTER TABLE users ADD COLUMN sync_last_sync_time DATETIME");
         await runMigration("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'admin'");
         await runMigration("ALTER TABLE users ADD COLUMN dob TEXT");
-        
+
         // Role-Based Permissions
         await runMigration("ALTER TABLE users ADD COLUMN perm_add_employees BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN perm_create_projects BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN perm_manage_projects BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN perm_make_admin BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN perm_delete_project BOOLEAN DEFAULT 0");
+        await runMigration("ALTER TABLE users ADD COLUMN canViewRealEmailsAndSignatures BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN is_blocked BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN subscription_status TEXT DEFAULT 'active'");
+        await runMigration("ALTER TABLE users ADD COLUMN is_inbox_snoozed BOOLEAN DEFAULT 0");
+        await runMigration("ALTER TABLE users ADD COLUMN snooze_until DATETIME");
+        await runMigration("ALTER TABLE users ADD COLUMN snoozed_at DATETIME");
+        await runMigration("ALTER TABLE users ADD COLUMN cover_image TEXT");
+        await runMigration("ALTER TABLE invitations ADD COLUMN cover_image TEXT");
 
         // Migrations for emails table
         await runMigration("ALTER TABLE emails ADD COLUMN external_sender_name TEXT");
@@ -301,19 +372,79 @@ const initDb = async () => {
         await runMigration("ALTER TABLE emails ADD COLUMN to_address TEXT");
         await runMigration("ALTER TABLE emails ADD COLUMN cc TEXT");
         await runMigration("ALTER TABLE emails ADD COLUMN bcc TEXT");
+        await runMigration("ALTER TABLE emails ADD COLUMN project_id TEXT");
+        await runMigration("ALTER TABLE emails ADD COLUMN snoozed_until DATETIME");
+        await runMigration("ALTER TABLE emails ADD COLUMN delivery_status TEXT DEFAULT 'DELIVERED'");
+        await runMigration("ALTER TABLE emails ADD COLUMN is_visible_in_inbox BOOLEAN DEFAULT 1");
 
         // Migrations for clients table
         await runMigration("ALTER TABLE clients ADD COLUMN client_id TEXT");
-        
+
         // Migrations for email_attachments table
         await runMigration("ALTER TABLE email_attachments ADD COLUMN redacted_data TEXT");
+
+        // Migrations for email_recipients table
+        await runMigration("ALTER TABLE email_recipients ADD COLUMN is_pinned BOOLEAN DEFAULT 0");
+        await runMigration("ALTER TABLE email_recipients ADD COLUMN is_flagged BOOLEAN DEFAULT 0");
+        await runMigration("ALTER TABLE email_recipients ADD COLUMN categories TEXT DEFAULT '[]'");
+        await runMigration("ALTER TABLE email_recipients ADD COLUMN is_ignored BOOLEAN DEFAULT 0");
+
+        // Migrations for emails table
+        await runMigration("ALTER TABLE emails ADD COLUMN is_pinned BOOLEAN DEFAULT 0");
+        await runMigration("ALTER TABLE emails ADD COLUMN is_flagged BOOLEAN DEFAULT 0");
+        await runMigration("ALTER TABLE emails ADD COLUMN categories TEXT DEFAULT '[]'");
+        await runMigration("ALTER TABLE emails ADD COLUMN is_ignored BOOLEAN DEFAULT 0");
+
+        // Table for blocked senders
+        await runQuery(`
+            CREATE TABLE IF NOT EXISTS blocked_senders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                organization_id INTEGER,
+                sender_email TEXT NOT NULL,
+                sender_name TEXT,
+                reason TEXT DEFAULT 'blocked',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user_id, sender_email),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        `);
+
+        // Table for reported emails (Phishing / Junk)
+        await runQuery(`
+            CREATE TABLE IF NOT EXISTS email_security_reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                email_id INTEGER NOT NULL,
+                sender_email TEXT,
+                report_type TEXT NOT NULL,
+                details TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        `);
 
     } catch (e) {
         console.error("Failed to initialize database:", e);
     }
 };
 
+const closeDb = () => {
+    if (client && typeof client.close === 'function') {
+        try {
+            client.close();
+            console.log('Database client closed.');
+        } catch (closeErr) {
+            console.error('Error closing database client:', closeErr);
+        }
+    }
+};
+
 module.exports = {
     db,
+    client,
+    closeDb,
     initDb
 };
+
+

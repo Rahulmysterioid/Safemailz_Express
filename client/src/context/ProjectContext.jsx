@@ -32,6 +32,24 @@ export function ProjectProvider({ children }) {
     const [statusFilter, setStatusFilter] = useState('all');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
+    const [selectedProjectId, setSelectedProjectId] = useState(() => {
+        return projects[0]?.id || null;
+    });
+
+    useEffect(() => {
+        if (projects.length > 0) {
+            if (!selectedProjectId || !projects.some(p => p.id === selectedProjectId)) {
+                setSelectedProjectId(projects[0].id);
+            }
+        } else {
+            setSelectedProjectId(null);
+        }
+    }, [projects, selectedProjectId]);
+
+    const selectedProject = React.useMemo(() => {
+        if (!projects || projects.length === 0) return null;
+        return projects.find(p => p.id === selectedProjectId) || projects[0] || null;
+    }, [projects, selectedProjectId]);
 
     useEffect(() => {
         localStorage.setItem('safemailzProjects', JSON.stringify(projects));
@@ -72,6 +90,7 @@ export function ProjectProvider({ children }) {
         }
 
         setProjects(prev => [newProject, ...prev]);
+        setSelectedProjectId(newProject.id);
     };
 
     const updateProject = async (id, updatedFields) => {
@@ -100,7 +119,13 @@ export function ProjectProvider({ children }) {
 
     const deleteProject = (id) => {
         if (window.confirm('Are you sure you want to delete this project?')) {
-            setProjects(prev => prev.filter(p => p.id !== id));
+            setProjects(prev => {
+                const next = prev.filter(p => p.id !== id);
+                if (selectedProjectId === id) {
+                    setSelectedProjectId(next[0]?.id || null);
+                }
+                return next;
+            });
         }
     };
 
@@ -190,6 +215,9 @@ export function ProjectProvider({ children }) {
 
     const value = {
         projects,
+        selectedProjectId,
+        setSelectedProjectId,
+        selectedProject,
         searchQuery,
         setSearchQuery,
         statusFilter,

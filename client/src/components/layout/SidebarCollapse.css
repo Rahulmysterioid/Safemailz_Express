@@ -1,0 +1,27 @@
+.dashboard-wrapper #employeesSidebar{transition:margin 240ms cubic-bezier(.2,.8,.2,1),opacity 180ms ease,visibility 240ms!important}
+.dashboard-wrapper.employee-sidebar-collapsed #employeesSidebar{margin-left:calc(-1 * var(--collapsed-sidebar-width))!important;opacity:0;visibility:hidden;pointer-events:none}
+.dashboard-wrapper[data-sidebar-position="right"].employee-sidebar-collapsed #employeesSidebar{margin-left:0!important;margin-right:calc(-1 * var(--collapsed-sidebar-width))!important}
+.dashboard-wrapper:is([data-sidebar-position="top"],[data-sidebar-position="bottom"]).employee-sidebar-collapsed #employeesSidebar{margin-left:0!important;margin-top:calc(-1 * var(--collapsed-sidebar-height))!important}
+#employeesView .profile-hamburger{flex-shrink:0;cursor:pointer;border-radius:7px;min-width:36px;min-height:36px}
+#employeesView .profile-hamburger:hover{background:var(--primary-light,#e8f2ff);color:#0875d1}
+#employeesView .profile-hamburger svg{transition:transform 240ms ease}
+#employeesView .profile-hamburger[aria-expanded="false"] svg{transform:rotate(90deg)}
+@media(prefers-reduced-motion:reduce){.dashboard-wrapper #employeesSidebar,#employeesView .profile-hamburger svg{transition:none!important}}
+/* Size the profile from its available pane, including after sidebar collapse. */
+#employeesView .profile-tab-view{width:100%;min-width:0;container-type:inline-size;container-name:employee-profile;background:var(--profile-pane-bg,#f5f8fc)}
+:is(html.dark,body.dark,[data-theme="dark"]) #employeesView .profile-tab-view{--profile-pane-bg:#0f131c}
+#employeesView .profile-details-section{width:100%!important;max-width:none!important;box-sizing:border-box}
+#employeesView .profile-details-card{width:100%;max-width:none;box-sizing:border-box}
+#employeesView :is(.profile-identity-meta,.profile-form .form-row,.input-with-icon){min-width:0}
+#employeesView .profile-identity-email{overflow-wrap:anywhere}
+#employeesView .profile-avatar-large{left:28px}
+#employeesView .profile-form :is(input,textarea,select){width:100%;max-width:100%;box-sizing:border-box}
+.dashboard-wrapper .main-content{min-width:0}
+@container employee-profile (max-width:640px){
+ #employeesView .profile-form.profile-form-grid{grid-template-columns:minmax(0,1fr)!important}
+ #employeesView .profile-identity-bar{padding-left:0!important;padding-top:38px!important}
+ #employeesView .profile-card-header{flex-direction:column;align-items:flex-start}
+ #employeesView .profile-details-card{padding:18px!important}
+ #employeesView .profile-identity-name{font-size:21px!important}
+ #employeesView .profile-avatar-large{left:20px}
+}

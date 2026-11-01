@@ -1,0 +1,65 @@
+/* Scoped client assignment dialog styles. */
+dialog.client-assignment-dialog { --ca-surface:#fff;--ca-text:#172b46;--ca-muted:#687b93;--ca-border:#e2e9f2;--ca-soft:#f6f8fc; position:fixed;inset:0;margin:auto;box-sizing:border-box;width:min(600px,calc(100vw - 32px));max-width:600px;max-height:calc(100dvh - 48px);padding:0;border:1px solid var(--ca-border);border-radius:20px;color:var(--ca-text);background:var(--ca-surface);box-shadow:0 32px 100px #10234038,0 6px 24px #1023401a;font-family:inherit;text-align:left;overflow:hidden; }
+dialog.client-assignment-dialog[open] {display:flex;flex-direction:column;}
+.client-assignment-dialog::backdrop {background:rgba(23,38,59,.42);backdrop-filter:blur(4px);}
+.client-assignment-dialog * {box-sizing:border-box;}
+.client-assignment-dialog .ca-heading {display:flex;align-items:center;gap:14px;padding:24px 24px 20px;flex-shrink:0;}
+.client-assignment-dialog .ca-heading-icon {display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#edf4ff;color:#2466df;font-size:22px;flex-shrink:0;}
+.client-assignment-dialog .ca-heading-copy {flex:1;min-width:0;}
+.client-assignment-dialog h2 {font-size:21px;line-height:1.3;font-weight:700;letter-spacing:-.5px;margin:0;color:var(--ca-text);}
+.client-assignment-dialog p {margin:5px 0 0;font-size:13px;line-height:1.5;color:var(--ca-muted);}
+.client-assignment-dialog button {font:inherit;font-size:13px;font-weight:600;line-height:20px;min-height:40px;padding:9px 15px;border:1px solid var(--ca-border);border-radius:9px;background:var(--ca-surface);color:var(--ca-text);cursor:pointer;transition:background .15s,border-color .15s;box-shadow:none;}
+.client-assignment-dialog button:hover:not(:disabled) {background:var(--ca-soft);border-color:#c0cee2;}
+.client-assignment-dialog button:disabled {opacity:.5;cursor:default;}
+.client-assignment-dialog button:focus-visible,.client-assignment-dialog input:focus-visible {outline:3px solid #93bafd;outline-offset:3px;}
+.client-assignment-dialog button.ca-close {display:grid;place-items:center;min-width:40px;padding:9px;font-size:19px;border-color:transparent;color:var(--ca-muted);}
+.client-assignment-dialog .ca-client {display:flex;align-items:center;gap:12px;margin:0 24px 20px;padding:14px 16px;border:1px solid var(--ca-border);border-radius:12px;background:var(--ca-soft);flex-shrink:0;}
+.client-assignment-dialog .ca-client-avatar {display:grid;place-items:center;width:36px;height:36px;border-radius:10px;color:#5275aa;background:#e8eff9;font-size:18px;flex-shrink:0;}
+.client-assignment-dialog .ca-client>div {min-width:0;}
+.client-assignment-dialog .ca-eyebrow {display:block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--ca-muted);margin-bottom:3px;}
+.client-assignment-dialog .ca-client strong {display:block;font-size:14px;line-height:20px;}
+.client-assignment-dialog .ca-client small {display:block;font-size:12px;color:var(--ca-muted);overflow-wrap:anywhere;line-height:18px;}
+.client-assignment-dialog .ca-body {display:flex;flex-direction:column;min-height:0;padding:0 24px 20px;overflow:auto;}
+.client-assignment-dialog .ca-search {position:relative;display:flex;align-items:center;gap:10px;flex-shrink:0;margin:0;}
+.client-assignment-dialog .ca-search>svg {position:absolute;left:14px;font-size:18px;color:var(--ca-muted);pointer-events:none;}
+.client-assignment-dialog .ca-search input {width:100%;height:44px;padding:11px 14px 11px 42px;border:1px solid var(--ca-border);border-radius:10px;background:var(--ca-surface);color:var(--ca-text);font:inherit;font-size:13px;margin:0;box-shadow:none;}
+.client-assignment-dialog .ca-list-label {display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px;font-size:11px;font-weight:600;color:var(--ca-muted);flex-shrink:0;}
+.client-assignment-dialog .ca-list-label b {display:inline-block;margin-left:5px;padding:2px 6px;border-radius:5px;background:var(--ca-soft);color:var(--ca-text);}
+.client-assignment-dialog .ca-options {overflow:auto;min-height:80px;max-height:310px;scrollbar-width:thin;scrollbar-color:#ccd7e5 transparent;display:flex;flex-direction:column;gap:7px;padding:3px;}
+.client-assignment-dialog .ca-employee {display:flex;align-items:center;gap:11px;min-height:70px;flex-shrink:0;padding:12px;border:1px solid var(--ca-border);border-radius:11px;background:var(--ca-surface);cursor:pointer;margin:0;transition:background .15s,border-color .15s;}
+.client-assignment-dialog .ca-employee:hover {background:var(--ca-soft);}
+.client-assignment-dialog .ca-employee.is-selected {background:#f0f6ff;border-color:#8db9ff;}
+.client-assignment-dialog .ca-employee input {appearance:auto;width:17px;height:17px;flex:0 0 17px;margin:0;padding:0;accent-color:#2466df;}
+.client-assignment-dialog .ca-employee-avatar {display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#edf0ff;color:#5963ba;font-size:12px;font-weight:700;flex-shrink:0;}
+.client-assignment-dialog .ca-employee-copy {min-width:0;flex:1;}
+.client-assignment-dialog .ca-employee-copy strong {display:block;font-size:13px;font-weight:600;line-height:20px;overflow-wrap:anywhere;}
+.client-assignment-dialog .ca-employee-copy small {display:block;font-size:11px;line-height:18px;color:var(--ca-muted);overflow-wrap:anywhere;}
+.client-assignment-dialog .ca-status {font-size:10px;line-height:18px;font-weight:600;padding:2px 7px;border-radius:6px;color:#13745c;background:#eaf8f0;white-space:nowrap;}
+.client-assignment-dialog .ca-status.is-pending {background:#fff5df;color:#95631b;}
+.client-assignment-dialog .ca-footer {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;padding:18px 24px;border-top:1px solid var(--ca-border);background:var(--ca-soft);}
+.client-assignment-dialog .ca-selection {display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ca-muted);}
+.client-assignment-dialog .ca-selection svg {color:#2466df;}
+.client-assignment-dialog .ca-actions {display:flex;gap:8px;}
+.client-assignment-dialog button.ca-primary {background:#2466df;border-color:#2466df;color:#fff;box-shadow:0 2px 4px #2466df25;}
+.client-assignment-dialog button.ca-primary:hover:not(:disabled) {background:#1c55bd;border-color:#1c55bd;}
+.client-assignment-dialog .ca-error {margin:12px 0;padding:12px;border-radius:9px;background:#fff1f2;color:#a6273d;font-size:13px;}
+.client-assignment-dialog .ca-error button {margin-left:10px;}
+.client-assignment-dialog .ca-empty {padding:28px 12px;text-align:center;color:var(--ca-muted);font-size:13px;}
+.client-assignment-dialog .ca-empty>svg {display:block;margin:0 auto 12px;font-size:26px;}
+.client-assignment-dialog .ca-empty strong {display:block;color:var(--ca-text);}
+.client-assignment-dialog .ca-empty button {margin-top:12px;}
+.client-assignment-dialog .ca-sr-only {position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+@media(max-width:520px) {
+ dialog.client-assignment-dialog {width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:16px;}
+ .client-assignment-dialog .ca-heading {padding:18px 16px;gap:10px;}
+ .client-assignment-dialog h2 {font-size:18px;}
+ .client-assignment-dialog .ca-client {margin:0 16px 16px;}
+ .client-assignment-dialog .ca-body {padding:0 13px 16px;}
+ .client-assignment-dialog .ca-footer {padding:14px 16px;flex-wrap:wrap;}
+ .client-assignment-dialog .ca-actions {width:100%;}
+ .client-assignment-dialog .ca-actions button {flex:1;min-height:44px;}
+ .client-assignment-dialog .ca-employee-avatar {display:none;}
+}
+.dark .client-assignment-dialog,[data-theme="dark"] .client-assignment-dialog {--ca-surface:#182231;--ca-text:#e5edf7;--ca-muted:#a0b1c7;--ca-border:#334357;--ca-soft:#202e40;}
+.dark .client-assignment-dialog .ca-employee.is-selected,[data-theme="dark"] .client-assignment-dialog .ca-employee.is-selected {background:#233b5d;border-color:#6194e7;}
+@media(prefers-reduced-motion:reduce) {.client-assignment-dialog * {transition:none!important;}}

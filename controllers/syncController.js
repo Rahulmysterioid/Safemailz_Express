@@ -1,5 +1,111 @@
 const { db } = require('../db');
 const mailparser = require('mailparser');
+const { ImapFlow } = require('imapflow');
+
+// Helper to extract email addresses from a string
+function extractEmailsFromString(str) {
+    if (!str) return [];
+    const matches = str.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi);
+    return matches ? matches.map(e => e.toLowerCase().trim()) : [];
+}
+
+// Inbound Project Group Distribution Helper
+async function distributeInboundEmail(emailId, user, { toAddresses = '', ccAddresses = '', bccAddresses = '', senderEmail = '', subject = '' }) {
+    if (!emailId || !user) return;
+    const orgId = user.organization_id || 1;
+
+    try {
+        const projects = await new Promise((resolve) => {
+            db.all(
+                'SELECT id, project_id, project_name, leader, client, employee_name, project_email_id FROM projects WHERE organization_id = ?',
+                [orgId],
+                (err, rows) => resolve(err ? [] : (rows || []))
+            );
+        });
+
+        if (!projects || projects.length === 0) return;
+
+        const allRecipientsStr = `${toAddresses || ''} ${ccAddresses || ''} ${bccAddresses || ''}`.toLowerCase();
+        const subjectStr = String(subject || '').toLowerCase();
+        const senderStr = String(senderEmail || '').toLowerCase();
+
+        // 1. Identify if this incoming email belongs to any project
+        let matchedProject = null;
+        for (const p of projects) {
+            const pEmail = (p.project_email_id || '').toLowerCase().trim();
+            const pName = (p.project_name || '').toLowerCase().trim();
+            const pId = (p.project_id || '').toLowerCase().trim();
+
+            if (pEmail && (allRecipientsStr.includes(pEmail) || senderStr === pEmail)) {
+                matchedProject = p;
+                break;
+            }
+            if (pId && (subjectStr.includes(pId) || allRecipientsStr.includes(pId))) {
+                matchedProject = p;
+                break;
+            }
+            if (pName && (subjectStr.includes(`[${pName}]`) || subjectStr.includes(pName) || allRecipientsStr.includes(pName))) {
+                matchedProject = p;
+                break;
+            }
+            if (p.client && p.client.toLowerCase().includes(senderStr)) {
+                matchedProject = p;
+                break;
+            }
+        }
+
+        if (!matchedProject) return;
+
+        // Tag the email in `emails` table with project_id
+        await new Promise((resolve) => {
+            db.run(
+                'UPDATE emails SET project_id = ? WHERE id = ?',
+                [matchedProject.project_id || matchedProject.id, emailId],
+                () => resolve()
+            );
+        });
+
+        // 2. Distribute to all internal members of the project group
+        const memberEmails = [];
+        if (matchedProject.leader) memberEmails.push(...extractEmailsFromString(matchedProject.leader));
+        if (matchedProject.employee_name) memberEmails.push(...extractEmailsFromString(matchedProject.employee_name));
+        const uniqueMemberEmails = [...new Set(memberEmails)];
+
+        for (const mEmail of uniqueMemberEmails) {
+            // Find internal user account
+            const mUser = await new Promise((resolve) => {
+                db.get(
+                    'SELECT id, organization_id FROM users WHERE organization_id = ? AND LOWER(email) = ?',
+                    [orgId, mEmail],
+                    (err, row) => resolve(row)
+                );
+            });
+
+            if (mUser && mUser.id !== user.id) {
+                // Check if already in email_recipients
+                const exists = await new Promise((resolve) => {
+                    db.get(
+                        'SELECT id FROM email_recipients WHERE email_id = ? AND user_id = ?',
+                        [emailId, mUser.id],
+                        (err, row) => resolve(row)
+                    );
+                });
+
+                if (!exists) {
+                    await new Promise((resolve) => {
+                        db.run(
+                            `INSERT INTO email_recipients (email_id, user_id, organization_id, folder, is_read) VALUES (?, ?, ?, 'inbox', 0)`,
+                            [emailId, mUser.id, mUser.organization_id],
+                            () => resolve()
+                        );
+                    });
+                }
+            }
+        }
+    } catch (distErr) {
+        console.error('[Inbound Distribution Error]:', distErr);
+    }
+}
 
 // Helper to decode Base64URL
 function decodeBase64URL(str) {
@@ -95,7 +201,9 @@ exports.googleCallback = async (req, res) => {
             const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000)).toISOString();
             
             // Handle Signup / Signin Flows
-            if (userId === 'signup' || userId === 'signin') {
+            const isSignupFlow = userId === 'signup' || (typeof userId === 'string' && userId.startsWith('signup'));
+            const isSigninFlow = userId === 'signin';
+            if (isSignupFlow || isSigninFlow) {
                 try {
                     const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
                         headers: { Authorization: `Bearer ${tokenData.access_token}` }
@@ -105,23 +213,27 @@ exports.googleCallback = async (req, res) => {
                     const email = encodeURIComponent(rawEmail);
                     const name = encodeURIComponent(userInfo.name || '');
                     
-                    if (userId === 'signup' || userId === 'signin') {
-                        pendingAuth.set(rawEmail, {
-                            provider: 'google',
-                            access_token: tokenData.access_token,
-                            refresh_token: tokenData.refresh_token || null,
-                            expires_at: expiresAt
-                        });
-                        
-                        if (userId === 'signup') {
-                            return res.redirect(`${frontendUrl}/signup?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
-                        } else {
-                            return res.redirect(`${frontendUrl}/signin?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
+                    pendingAuth.set(rawEmail, {
+                        provider: 'google',
+                        access_token: tokenData.access_token,
+                        refresh_token: tokenData.refresh_token || null,
+                        expires_at: expiresAt
+                    });
+                    
+                    if (isSignupFlow) {
+                        if (typeof userId === 'string' && userId.startsWith('signup:invite:')) {
+                            const parts = userId.split(':');
+                            const inviteToken = parts[2] || '';
+                            const inviteEmail = decodeURIComponent(parts[3] || '');
+                            return res.redirect(`${frontendUrl}/signup?google_auth=success&email=${email}&name=${name}&token=${inviteToken}&invite_email=${encodeURIComponent(inviteEmail)}&oauth_token=${tokenData.access_token}`);
                         }
+                        return res.redirect(`${frontendUrl}/signup?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
+                    } else {
+                        return res.redirect(`${frontendUrl}/signin?google_auth=success&email=${email}&name=${name}&token=${tokenData.access_token}`);
                     }
                 } catch (err) {
                     console.error("Failed to fetch user info", err);
-                    return res.redirect(userId === 'signup' ? `${frontendUrl}/signup?error=google_auth_failed` : `${frontendUrl}/signin?error=google_auth_failed`);
+                    return res.redirect(isSignupFlow ? `${frontendUrl}/signup?error=google_auth_failed` : `${frontendUrl}/signin?error=google_auth_failed`);
                 }
             }
 
@@ -368,6 +480,9 @@ async function syncGoogleEmails(user, accessToken) {
                         senderEmail = match[2].trim();
                     }
 
+                    const toHeader = getGmailHeader(msgData.payload.headers, 'To');
+                    const ccHeader = getGmailHeader(msgData.payload.headers, 'Cc');
+                    const bccHeader = getGmailHeader(msgData.payload.headers, 'Bcc');
                     const subject = getGmailHeader(msgData.payload.headers, 'Subject') || 'No Subject';
                     const dateStr = getGmailHeader(msgData.payload.headers, 'Date');
                     const dateObj = dateStr ? new Date(dateStr) : new Date();
@@ -375,10 +490,16 @@ async function syncGoogleEmails(user, accessToken) {
                     const body = getGmailBody(msgData.payload) || preview;
                     const emailNo = Math.floor(10000 + Math.random() * 90000).toString();
 
+                    const isSnoozed = (user.is_inbox_snoozed === 1 || user.is_inbox_snoozed === true) &&
+                        user.snooze_until &&
+                        (new Date() < new Date(user.snooze_until));
+                    const deliveryStatus = isSnoozed ? 'HELD_BY_SNOOZE' : 'DELIVERED';
+                    const isVisibleInInbox = isSnoozed ? 0 : 1;
+
                     // Insert without transaction to allow safe parallel SQLite insertions
                     const insertResult = await dbRun(
-                        `INSERT INTO emails (email_no, sender_id, sender_org_id, external_sender_name, external_sender_email, external_id, subject, body, preview, created_at) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?)`,
-                        [emailNo, senderName, senderEmail, msg.id, subject, body, preview, dateObj.toISOString()]
+                        `INSERT INTO emails (email_no, sender_id, sender_org_id, external_sender_name, external_sender_email, external_id, subject, body, preview, created_at, to_address, cc, bcc, delivery_status, is_visible_in_inbox) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        [emailNo, senderName, senderEmail, msg.id, subject, body, preview, dateObj.toISOString(), toHeader || null, ccHeader || null, bccHeader || null, deliveryStatus, isVisibleInInbox]
                     );
                     
                     const isRead = msgData.labelIds && msgData.labelIds.includes('UNREAD') ? 0 : 1;
@@ -386,6 +507,15 @@ async function syncGoogleEmails(user, accessToken) {
                         `INSERT INTO email_recipients (email_id, user_id, organization_id, folder, is_read) VALUES (?, ?, ?, 'inbox', ?)`,
                         [insertResult.lastID, user.id, user.organization_id, isRead]
                     );
+
+                    // Distribute to all project members if email matches a project group
+                    await distributeInboundEmail(insertResult.lastID, user, {
+                        toAddresses: toHeader,
+                        ccAddresses: ccHeader,
+                        bccAddresses: bccHeader,
+                        senderEmail: senderEmail,
+                        subject: subject
+                    });
 
                     const gAttachments = extractGoogleAttachments(msgData.payload);
                     for (const att of gAttachments) {
@@ -464,16 +594,34 @@ async function syncMicrosoftEmails(user, accessToken) {
                     const preview = msg.bodyPreview || '';
                     const body = msg.body?.content || preview;
                     const emailNo = Math.floor(10000 + Math.random() * 90000).toString();
+                    const toAddresses = (msg.toRecipients || []).map(r => r.emailAddress?.address).filter(Boolean).join(', ');
+                    const ccAddresses = (msg.ccRecipients || []).map(r => r.emailAddress?.address).filter(Boolean).join(', ');
+                    const bccAddresses = (msg.bccRecipients || []).map(r => r.emailAddress?.address).filter(Boolean).join(', ');
+
+                    const isSnoozed = (user.is_inbox_snoozed === 1 || user.is_inbox_snoozed === true) &&
+                        user.snooze_until &&
+                        (new Date() < new Date(user.snooze_until));
+                    const deliveryStatus = isSnoozed ? 'HELD_BY_SNOOZE' : 'DELIVERED';
+                    const isVisibleInInbox = isSnoozed ? 0 : 1;
 
                     const insertResult = await dbRun(
-                        `INSERT INTO emails (email_no, sender_id, sender_org_id, external_sender_name, external_sender_email, external_id, subject, body, preview, created_at) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?)`,
-                        [emailNo, senderName, senderEmail, msg.id, subject, body, preview, dateObj.toISOString()]
+                        `INSERT INTO emails (email_no, sender_id, sender_org_id, external_sender_name, external_sender_email, external_id, subject, body, preview, created_at, to_address, cc, bcc, delivery_status, is_visible_in_inbox) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        [emailNo, senderName, senderEmail, msg.id, subject, body, preview, dateObj.toISOString(), toAddresses || null, ccAddresses || null, bccAddresses || null, deliveryStatus, isVisibleInInbox]
                     );
 
                     await dbRun(
                         `INSERT INTO email_recipients (email_id, user_id, organization_id, folder, is_read) VALUES (?, ?, ?, 'inbox', ?)`,
                         [insertResult.lastID, user.id, user.organization_id, msg.isRead ? 1 : 0]
                     );
+
+                    // Distribute to all project members if email matches a project group
+                    await distributeInboundEmail(insertResult.lastID, user, {
+                        toAddresses: toAddresses,
+                        ccAddresses: ccAddresses,
+                        bccAddresses: bccAddresses,
+                        senderEmail: senderEmail,
+                        subject: subject
+                    });
 
                     if (msg.hasAttachments) {
                         try {
@@ -508,6 +656,142 @@ async function syncMicrosoftEmails(user, accessToken) {
     }
 }
 
+// -----------------------------------------------------------------------------------
+// IMAP SYNC ENGINE & DISTRIBUTION
+// -----------------------------------------------------------------------------------
+
+async function syncImapEmails(user, imapConfig = {}) {
+    const util = require('util');
+    const dbGet = util.promisify(db.get.bind(db));
+    const dbRun = (query, params = []) => new Promise((resolve, reject) => {
+        db.run(query, params, function (err) {
+            if (err) reject(err);
+            else resolve(this);
+        });
+    });
+
+    const host = imapConfig.host || process.env.IMAP_HOST || (process.env.SMTP_EMAIL && process.env.SMTP_EMAIL.includes('@gmail') ? 'imap.gmail.com' : 'imap.gmail.com');
+    const port = parseInt(imapConfig.port || process.env.IMAP_PORT || '993', 10);
+    const secure = imapConfig.secure !== undefined ? imapConfig.secure : (process.env.IMAP_TLS !== 'false');
+    const userEmail = imapConfig.user || process.env.IMAP_USER || process.env.SMTP_EMAIL;
+    const password = imapConfig.password || process.env.IMAP_PASSWORD || process.env.SMTP_PASSWORD;
+
+    if (!userEmail || !password) {
+        return; // IMAP credentials not configured
+    }
+
+    let client = null;
+    try {
+        client = new ImapFlow({
+            host,
+            port,
+            secure,
+            auth: {
+                user: userEmail,
+                pass: password
+            },
+            logger: false
+        });
+
+        await client.connect();
+        const lock = await client.getMailboxLock('INBOX');
+
+        try {
+            const totalMessages = client.mailbox.exists || 0;
+            if (totalMessages > 0) {
+                const startSeq = Math.max(1, totalMessages - 19);
+                const messages = client.fetch(`${startSeq}:*`, {
+                    uid: true,
+                    envelope: true,
+                    source: true,
+                    flags: true
+                });
+
+                for await (const msg of messages) {
+                    try {
+                        const externalId = `imap-${userEmail}-${msg.uid}`;
+                        const existing = await dbGet('SELECT e.id as email_id, er.is_deleted FROM emails e LEFT JOIN email_recipients er ON e.id = er.email_id AND er.user_id = ? WHERE e.external_id = ?', [user.id, externalId]);
+
+                        if (existing) {
+                            if (existing.is_deleted === 1) {
+                                await dbRun('UPDATE email_recipients SET is_deleted = 0, folder = "inbox" WHERE email_id = ? AND user_id = ?', [existing.email_id, user.id]);
+                            } else if (existing.is_deleted === null) {
+                                const isUnread = !msg.flags || !msg.flags.has('\\Seen');
+                                await dbRun(`INSERT INTO email_recipients (email_id, user_id, organization_id, folder, is_read) VALUES (?, ?, ?, 'inbox', ?)`,
+                                    [existing.email_id, user.id, user.organization_id, isUnread ? 0 : 1]);
+                            }
+                            continue;
+                        }
+
+                        // Parse raw MIME source
+                        const parsed = await mailparser.simpleParser(msg.source);
+                        const senderName = parsed.from?.value?.[0]?.name || parsed.from?.value?.[0]?.address || 'Unknown';
+                        const senderEmail = parsed.from?.value?.[0]?.address || userEmail;
+                        const subject = parsed.subject || 'No Subject';
+                        const dateObj = parsed.date || new Date();
+                        const body = parsed.html || parsed.textAsHtml || parsed.text || '';
+                        const preview = (parsed.text || '').replace(/\s+/g, ' ').substring(0, 100);
+                        const emailNo = Math.floor(10000 + Math.random() * 90000).toString();
+                        const toHeader = parsed.to ? (Array.isArray(parsed.to) ? parsed.to.map(t => t.text).join(', ') : parsed.to.text) : '';
+                        const ccHeader = parsed.cc ? (Array.isArray(parsed.cc) ? parsed.cc.map(t => t.text).join(', ') : parsed.cc.text) : '';
+                        const bccHeader = parsed.bcc ? (Array.isArray(parsed.bcc) ? parsed.bcc.map(t => t.text).join(', ') : parsed.bcc.text) : '';
+
+                        const isSnoozed = (user.is_inbox_snoozed === 1 || user.is_inbox_snoozed === true) &&
+                            user.snooze_until &&
+                            (new Date() < new Date(user.snooze_until));
+                        const deliveryStatus = isSnoozed ? 'HELD_BY_SNOOZE' : 'DELIVERED';
+                        const isVisibleInInbox = isSnoozed ? 0 : 1;
+
+                        const insertResult = await dbRun(
+                            `INSERT INTO emails (email_no, sender_id, sender_org_id, external_sender_name, external_sender_email, external_id, subject, body, preview, created_at, to_address, cc, bcc, delivery_status, is_visible_in_inbox) VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                            [emailNo, senderName, senderEmail, externalId, subject, body, preview, dateObj.toISOString(), toHeader || null, ccHeader || null, bccHeader || null, deliveryStatus, isVisibleInInbox]
+                        );
+
+                        const isRead = msg.flags && msg.flags.has('\\Seen') ? 1 : 0;
+                        await dbRun(
+                            `INSERT INTO email_recipients (email_id, user_id, organization_id, folder, is_read) VALUES (?, ?, ?, 'inbox', ?)`,
+                            [insertResult.lastID, user.id, user.organization_id, isRead]
+                        );
+
+                        // Attachments
+                        if (parsed.attachments && parsed.attachments.length > 0) {
+                            for (const att of parsed.attachments) {
+                                try {
+                                    const base64Data = att.content ? att.content.toString('base64') : '';
+                                    await dbRun(
+                                        `INSERT INTO email_attachments (email_id, filename, content_type, size, data) VALUES (?, ?, ?, ?, ?)`,
+                                        [insertResult.lastID, att.filename || 'attachment', att.contentType, att.size || 0, base64Data]
+                                    );
+                                } catch (attErr) {
+                                    console.error('Error saving IMAP attachment:', attErr);
+                                }
+                            }
+                        }
+
+                        // Distribute to all project members if email matches a project group
+                        await distributeInboundEmail(insertResult.lastID, user, {
+                            toAddresses: toHeader,
+                            ccAddresses: ccHeader,
+                            bccAddresses: bccHeader,
+                            senderEmail,
+                            subject
+                        });
+
+                    } catch (msgErr) {
+                        console.error('Error processing single IMAP message:', msgErr);
+                    }
+                }
+            }
+        } finally {
+            lock.release();
+        }
+
+        await client.logout();
+    } catch (imapErr) {
+        console.error('IMAP Sync Error:', imapErr.message || imapErr);
+    }
+}
+
 async function performSync(userId) {
     const util = require('util');
     const dbGet = util.promisify(db.get.bind(db));
@@ -519,17 +803,18 @@ async function performSync(userId) {
     });
 
     try {
-        const user = await dbGet(`SELECT id, organization_id, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at FROM users WHERE id = ?`, [userId]);
+        const user = await dbGet(`SELECT id, organization_id, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at, is_inbox_snoozed, snooze_until FROM users WHERE id = ?`, [userId]);
         
-        if (!user || !user.sync_provider) return false;
-
-        const token = await getValidAccessToken(user);
-        if (!token) return false;
+        if (!user) return false;
 
         if (user.sync_provider === 'google') {
-            await syncGoogleEmails(user, token);
+            const token = await getValidAccessToken(user);
+            if (token) await syncGoogleEmails(user, token);
         } else if (user.sync_provider === 'microsoft') {
-            await syncMicrosoftEmails(user, token);
+            const token = await getValidAccessToken(user);
+            if (token) await syncMicrosoftEmails(user, token);
+        } else if (user.sync_provider === 'imap' || process.env.SMTP_EMAIL || process.env.IMAP_HOST) {
+            await syncImapEmails(user, {});
         }
 
         // Update sync time
@@ -546,10 +831,39 @@ async function performSync(userId) {
 // -----------------------------------------------------------------------------------
 
 exports.refreshSync = async (req, res) => {
-    const userId = req.headers['x-user-id'];
-    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const rawEmpId = req.query.employeeId || req.body?.employeeId || req.headers['x-employee-id'];
+    const callerId = req.headers['x-user-id'];
+    const targetEmail = (req.query.email || req.query.employeeEmail || req.body?.email || req.headers['x-employee-email'] || req.headers['x-email'] || '').trim();
+    const hasEmployeeParam = !!(targetEmail || rawEmpId);
 
-    const success = await performSync(userId);
+    const util = require('util');
+    const dbGet = util.promisify(db.get.bind(db));
+
+    let verifiedUserId = null;
+
+    if (targetEmail) {
+        try {
+            const userRow = await dbGet('SELECT id FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1', [targetEmail]);
+            if (userRow) verifiedUserId = userRow.id;
+        } catch (e) {}
+    }
+
+    if (!verifiedUserId && rawEmpId && !isNaN(parseInt(rawEmpId, 10))) {
+        try {
+            const userRow = await dbGet("SELECT id FROM users WHERE id = ? AND LOWER(role) = 'employee' LIMIT 1", [parseInt(rawEmpId, 10)]);
+            if (userRow) verifiedUserId = userRow.id;
+        } catch (e) {}
+    }
+
+    // If an employee was explicitly targeted but has no DB user record, do NOT sync admin's mailbox
+    if (hasEmployeeParam && !verifiedUserId) {
+        return res.json({ message: 'No sync provider configured for this employee', isSynced: false });
+    }
+
+    const userIdToSync = verifiedUserId || callerId;
+    if (!userIdToSync) return res.status(401).json({ error: 'Unauthorized' });
+
+    const success = await performSync(userIdToSync);
     if (success) {
         res.json({ message: 'Sync complete' });
     } else {
@@ -605,3 +919,5 @@ exports.disconnectSync = async (req, res) => {
 };
 
 exports.getValidAccessToken = getValidAccessToken;
+exports.syncImapEmails = syncImapEmails;
+exports.distributeInboundEmail = distributeInboundEmail;

@@ -32,25 +32,26 @@
     --global-radius: var(--custom-border-radius, 16px);
 }
 
+html.dark,
 [data-theme="dark"] {
-    --primary: #3B82F6;
-    --primary-hover: #60A5FA;
-    --primary-light: rgba(59, 130, 246, 0.1);
+    --primary: var(--accent-primary, #0078d4);
+    --primary-hover: var(--accent-hover, #106ebe);
+    --primary-light: var(--accent-soft-bg, rgba(0, 120, 212, 0.15));
 
-    --surface: #1F2937;
-    --surface-sidebar: #111827;
-    --surface-list: #374151;
-    --surface-hover: #374151;
-    --surface-active: rgba(59, 130, 246, 0.15);
+    --surface: #0f0f0f;
+    --surface-sidebar: #181818;
+    --surface-list: #141414;
+    --surface-hover: #262626;
+    --surface-active: var(--accent-soft-bg, rgba(0, 120, 212, 0.18));
 
-    --text-primary: #F9FAFB;
-    --text-secondary: #D1D5DB;
-    --text-muted: #9CA3AF;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
 
-    --border-light: #4B5563;
+    --border-light: #2b2b2b;
 
-    --badge-bg: rgba(59, 130, 246, 0.2);
-    --badge-text: #93C5FD;
+    --badge-bg: var(--accent-soft-bg, rgba(0, 120, 212, 0.2));
+    --badge-text: var(--accent-primary, #60a5fa);
 }
 
 body {
@@ -278,10 +279,14 @@ body {
         width: 100% !important;
     }
 
-    .topbar-logo span:nth-child(2),
-    .topbar-logo span:nth-child(3) {
+    .topbar-brand-tagline {
         display: none;
-        /* Hide logo text to save space */
+        /* Hide tagline on tablet/mobile to save space */
+    }
+
+    .topbar-left .grid-icon,
+    .topbar-left .topbar-divider {
+        display: none !important;
     }
 
     /* Stack Mail View */
@@ -494,42 +499,42 @@ body {
 }
 
 #readingThreadHeader {
-    font-size: calc(var(--reading-pane-font-size, 0.925rem) * 1.014) !important;
-    font-weight: 500 !important;
-    color: #334155 !important;
-    padding: 12px 24px !important;
-    border-bottom: 1px solid #E2E8F0 !important;
-    margin: 0 !important;
-    line-height: 1.4 !important;
-    background-color: #ffffff !important;
+    font-size: calc(var(--reading-pane-font-size, 0.925rem) * 1.014);
+    font-weight: 500;
+    color: #334155;
+    padding: 12px 24px;
+    border-bottom: 1px solid #E2E8F0;
+    margin: 0;
+    line-height: 1.4;
+    background-color: #ffffff;
 }
 
 #readingSubjectLine {
-    font-size: calc(var(--reading-pane-font-size, 0.925rem) * 1.014) !important;
-    font-weight: 500 !important;
-    color: #0F172A !important;
-    padding: 12px 24px !important;
-    border-bottom: 1px solid #E2E8F0 !important;
-    margin: 0 !important;
-    line-height: 1.4 !important;
-    background-color: #ffffff !important;
+    font-size: calc(var(--reading-pane-font-size, 0.925rem) * 1.014);
+    font-weight: 500;
+    color: #0F172A;
+    padding: 12px 24px;
+    border-bottom: 1px solid #E2E8F0;
+    margin: 0;
+    line-height: 1.4;
+    background-color: #ffffff;
 }
 
 #readingEmailNo {
-    display: block !important;
-    font-size: calc(var(--reading-pane-font-size, 0.925rem) * 0.946) !important;
-    font-weight: 700 !important;
-    color: #2563eb !important;
-    background: #F8FAFC !important;
-    border: none !important;
-    border-bottom: 1px solid #E2E8F0 !important;
-    border-radius: 0 !important;
-    padding: 12px 24px !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    width: auto !important;
-    height: auto !important;
-    line-height: 1.4 !important;
+    display: block;
+    font-size: calc(var(--reading-pane-font-size, 0.925rem) * 0.946);
+    font-weight: 700;
+    color: #2563eb;
+    background: #F8FAFC;
+    border: none;
+    border-bottom: 1px solid #E2E8F0;
+    border-radius: 0;
+    padding: 12px 24px;
+    margin: 0;
+    box-shadow: none;
+    width: auto;
+    height: auto;
+    line-height: 1.4;
 }
 
 .reading-sender-info {
@@ -855,11 +860,11 @@ input:focus-visible {
 }
 
 .reading-body {
-    background-color: var(--surface-sidebar) !important;
-    border-radius: 12px;
-    margin: 24px !important;
-    padding: 24px !important;
-    border: 1px solid var(--border-light) !important;
+    background-color: #ffffff !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 20px 24px !important;
+    border: none !important;
 }
 
 /* Style for injected CTAs if they exist in HTML emails */
@@ -1003,13 +1008,11 @@ input:focus-visible {
 
 /* Left Sidebar */
 .email-folder,
-.sidebar-actions button,
 .sidebar-admin-list .admin-item {
     transition: background-color 0.2s ease, transform 0.1s ease !important;
 }
 
 .email-folder:hover,
-.sidebar-actions button:hover,
 .sidebar-admin-list .admin-item:hover {
     background-color: rgba(37, 99, 235, 0.05) !important;
 }
@@ -2053,7 +2056,7 @@ textarea {
 .reading-body:has(.threaded-container) {
     margin: 0 !important;
     padding: 0 !important;
-    background: #f3f2f1 !important;
+    background: #ffffff !important;
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
@@ -3005,7 +3008,7 @@ textarea {
     font-size: calc(var(--reading-pane-font-size, 0.925rem) * 0.843) !important;
     color: #64748b !important;
     letter-spacing: .055em !important;
-    text-transform: uppercase;
+    text-transform: none !important;
 }
 
 .reading-subject-line {

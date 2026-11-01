@@ -1,3 +1,4 @@
+import { rememberCurrentSession, saveAccountSession } from '../utils/accountSession';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LandingHeader from '../components/layout/LandingHeader';
@@ -19,14 +20,19 @@ export default function SignIn() {
 
     // ── Handle Google / Microsoft OAuth callback redirect ────────────────────
     useEffect(() => {
+        rememberCurrentSession();
         const params = new URLSearchParams(location.search);
 
         const googleAuth = params.get('google_auth');
         const msAuth = params.get('ms_auth');
         const errorParam = params.get('error');
+        if (params.get('email') && !googleAuth && !msAuth) setEmail(params.get('email'));
 
         if (errorParam === 'blocked') {
             setGlobalError('You are blocked. Please contact your admin.');
+            return;
+        } else if (errorParam === 'session_expired') {
+            setGlobalError('Your session has expired or your account permissions changed. Please sign in again.');
             return;
         } else if (errorParam) {
             setGlobalError('OAuth authentication failed. Please try again.');
@@ -48,7 +54,12 @@ export default function SignIn() {
                         if (data.user) {
                             localStorage.setItem('currentUser', JSON.stringify(data.user));
                             localStorage.setItem('token', data.token || data.user?.token || 'authenticated');
-                            navigate('/dashboard');
+                            saveAccountSession(data.user, data.token || data.user?.token);
+                            if (data.mustChangePassword === true || data.user?.mustChangePassword === true) {
+                                navigate('/force-change-password');
+                            } else {
+                                navigate('/dashboard');
+                            }
                         } else {
                             setGlobalError(data.error || 'Google sign in failed. Please try again.');
                         }
@@ -73,7 +84,12 @@ export default function SignIn() {
                         if (data.user) {
                             localStorage.setItem('currentUser', JSON.stringify(data.user));
                             localStorage.setItem('token', data.token || data.user?.token || 'authenticated');
-                            navigate('/dashboard');
+                            saveAccountSession(data.user, data.token || data.user?.token);
+                            if (data.mustChangePassword === true || data.user?.mustChangePassword === true) {
+                                navigate('/force-change-password');
+                            } else {
+                                navigate('/dashboard');
+                            }
                         } else {
                             setGlobalError(data.error || 'Microsoft sign in failed. Please try again.');
                         }
@@ -126,7 +142,12 @@ export default function SignIn() {
                 }
                 const token = data.token || data.user?.token || 'authenticated';
                 localStorage.setItem('token', token);
-                navigate('/dashboard');
+                saveAccountSession(data.user, token);
+                if (data.mustChangePassword === true || data.user?.mustChangePassword === true) {
+                    navigate('/force-change-password');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 setGlobalError(data.error || 'Failed to sign in. Please try again.');
             }

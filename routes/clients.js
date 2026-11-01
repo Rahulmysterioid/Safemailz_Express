@@ -11,6 +11,7 @@ const getUserContext = (req) => {
 };
 
 const router = express.Router();
+router.use('/assignments', require('./clientAssignments').createClientAssignmentsRouter(require('../db').client, process.env.JWT_SECRET || 'safemailz-jwt-secret-key'));
 
 // GET /api/clients
 // Fetch all clients for the logged-in user's organization
@@ -159,75 +160,134 @@ router.delete('/:id', (req, res) => {
 });
 
 // POST /api/clients/import
-// Bulk import clients from JSON array
-router.post('/import', (req, res) => {
+// Bulk import clients from JSON array with clean import and deduplication
+router.post('/import', async (req, res) => {
     const context = getUserContext(req);
     if (!context) return res.status(401).json({ error: 'Unauthorized' });
 
-    const clients = req.body.clients;
-    if (!Array.isArray(clients)) {
-        return res.status(400).json({ error: 'Invalid data format' });
+    const { clients, replaceExisting = true } = req.body;
+
+    if (!clients || !Array.isArray(clients) || clients.length === 0) {
+        return res.status(400).json({ error: 'No client data provided in CSV.' });
     }
 
-    if (clients.length === 0) {
-        return res.json({ success: true, message: 'No clients to import' });
-    }
-
-    let imported = 0;
-    let errors = 0;
-
-    const processNext = (index) => {
-        if (index >= clients.length) {
-            return res.json({ success: true, imported, errors, message: `Import complete. Imported/Updated: ${imported}, Errors: ${errors}` });
+    try {
+        // 1. If replace option is enabled, remove old client data
+        if (replaceExisting) {
+            await new Promise((resolve, reject) => {
+                db.run('DELETE FROM clients WHERE organization_id = ?', [context.orgId], function(err) {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
         }
 
-        const row = clients[index];
-        const name = row['Client Name'] || '';
-        const email = row['Client Email ID'] || '';
-        const address = row['Address'] || '';
-        const phone = row['Phone No'] || '';
-        const displayName = name;
+        // 2. Fetch existing clients from DB matching imported emails
+        const importedEmails = clients
+            .map(c => (c.email || c["CLIENT EMAIL ID"] || c["Client Email ID"] || c["Client Email"] || c["Email"] || "").toLowerCase().trim())
+            .filter(Boolean);
 
-        if (!name || !email) {
-            errors++;
-            return processNext(index + 1);
+        let existingEmailSet = new Set();
+        
+        if (!replaceExisting && importedEmails.length > 0) {
+            const placeholders = importedEmails.map(() => '?').join(',');
+            const query = `SELECT email FROM clients WHERE organization_id = ? AND email IN (${placeholders})`;
+            const existingClients = await new Promise((resolve, reject) => {
+                db.all(query, [context.orgId, ...importedEmails], (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows || []);
+                });
+            });
+            existingClients.forEach(c => existingEmailSet.add(c.email.toLowerCase().trim()));
         }
 
-        db.get('SELECT id, client_id FROM clients WHERE email = ? AND organization_id = ?', [email, context.orgId], (err, existing) => {
-            if (err) {
-                errors++;
-                return processNext(index + 1);
+        const newClientsToInsert = [];
+        let skippedCount = 0;
+
+        // 3. Filter out existing & in-file duplicate clients
+        for (const clientData of clients) {
+            const email = (
+                clientData.email || 
+                clientData["CLIENT EMAIL ID"] || 
+                clientData["Client Email ID"] || 
+                clientData["Client Email"] || 
+                clientData["Email"] || 
+                ""
+            ).toLowerCase().trim();
+
+            // Skip if email is missing OR already exists in DB / current batch
+            if (!email || existingEmailSet.has(email)) {
+                skippedCount++;
+                continue;
             }
 
-            let clientId = row['Client ID'] || '';
-            if (!clientId) {
-                if (existing && existing.client_id) {
-                    clientId = existing.client_id;
-                } else {
-                    const baseName = name.replace(/\s+/g, ' ').trim();
-                    const randomNum = Math.floor(10000 + Math.random() * 90000);
-                    clientId = baseName + '-Client-' + randomNum;
-                }
-            }
+            // Add to set to prevent duplicate entries within the same CSV file
+            existingEmailSet.add(email);
 
-            if (existing) {
-                // Skip overwriting existing client
-                processNext(index + 1);
-            } else {
-                db.run(
-                    'INSERT INTO clients (organization_id, display_name, name, email, phone, address, client_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [context.orgId, displayName, name, email, phone, address, clientId],
-                    (insertErr) => {
-                        if (insertErr) errors++;
-                        else imported++;
-                        processNext(index + 1);
-                    }
-                );
-            }
+            const name = (
+                clientData.name || 
+                clientData["CLIENT NAME"] || 
+                clientData["Client Name"] || 
+                clientData.displayName || 
+                clientData["Display Name"] || 
+                "Client"
+            ).trim();
+            const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, '');
+            const randomDigits = Math.floor(10000 + Math.random() * 90000);
+            
+            newClientsToInsert.push({
+                organization_id: context.orgId,
+                display_name: name,
+                name: name,
+                email: email,
+                phone: clientData.phone || clientData["PHONE NUMBER"] || clientData["Phone Number"] || clientData["Phone No"] || "",
+                address: clientData.address || clientData["ADDRESS"] || clientData["Address"] || "",
+                client_id: clientData.clientId || clientData["Client ID"] || clientData["CLIENT ID"] || `${sanitizedName}-Client-${randomDigits}`
+            });
+        }
+
+        // 4. Insert only new unique records
+        if (newClientsToInsert.length > 0) {
+            const insertPromises = newClientsToInsert.map(client => {
+                return new Promise((resolve, reject) => {
+                    db.run(
+                        'INSERT INTO clients (organization_id, display_name, name, email, phone, address, client_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                        [
+                            client.organization_id,
+                            client.display_name,
+                            client.name,
+                            client.email,
+                            client.phone,
+                            client.address,
+                            client.client_id
+                        ],
+                        (err) => {
+                            if (err) reject(err);
+                            else resolve();
+                        }
+                    );
+                });
+            });
+            await Promise.all(insertPromises);
+        }
+
+        return res.status(200).json({
+            success: true,
+            importedCount: newClientsToInsert.length,
+            skippedCount: skippedCount,
+            errorCount: 0,
+            message: `Import complete. Imported: ${newClientsToInsert.length}, Skipped (Duplicates): ${skippedCount}`,
+            data: newClientsToInsert
         });
-    };
 
-    processNext(0);
+    } catch (error) {
+        console.error('[DB Error importing clients]:', error);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Failed to process client import.", 
+            error: error.message 
+        });
+    }
 });
 
 module.exports = router;

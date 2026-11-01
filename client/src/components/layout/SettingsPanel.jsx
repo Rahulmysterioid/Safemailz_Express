@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from "react";
 import SignatureEditorModal from "../dashboard/SignatureEditorModal";
+import AutomaticRepliesSection from "../settings/AutomaticRepliesSection";
+import CategoriesSection from "../settings/CategoriesSection";
+import StorageSection from "../settings/StorageSection";
+import LanguageTimeSection from "../settings/LanguageTimeSection";
+import AppearanceSection from "../settings/AppearanceSection";
+import NotificationsSection from "../settings/NotificationsSection";
+import AccessibilitySection from "../settings/AccessibilitySection";
+import PrivacyDataSection from "../settings/PrivacyDataSection";
+import SearchSection from "../settings/SearchSection";
 
 const SETTINGS_SUBMENUS = {
     account: [
-        { id: "settingsAccountInfo",     label: "Account Info" },
-        { id: "settingsSignatures",      label: "Signatures" },
-        { id: "settingsOrgInfo",         label: "Organization" },
-        { id: "settingsSignupDetails",   label: "Signup Details" },
-        { id: "settingsAccountSettings", label: "Settings" },
-        { id: "settingsPassword",        label: "Security" },
-        { id: "settingsLiveSync",        label: "Live Sync" },
-        { id: "settingsDangerZone",      label: "Danger Zone" },
+        { id: "settingsAccountInfo",        label: "Account Info" },
+        { id: "settingsAutomaticReplies",   label: "Automatic replies" },
+        { id: "settingsSignatures",         label: "Signatures" },
+        { id: "settingsCategories",         label: "Categories" },
+        { id: "settingsStorage",            label: "Storage" },
+        { id: "settingsOrgInfo",            label: "Organization" },
+        { id: "settingsSignupDetails",      label: "Signup Details" },
+        { id: "settingsAccountSettings",    label: "Settings" },
+        { id: "settingsPassword",           label: "Security" },
+        { id: "settingsLiveSync",           label: "Live Sync" },
+        { id: "settingsDangerZone",         label: "Danger Zone" },
     ],
     general: [
-        { id: "settingsLayout",     label: "Layout" },
-        { id: "settingsAppearance", label: "Appearance" },
-        { id: "settingsLanguage",   label: "Language & Region" },
+        { id: "settingsLanguageTime",  label: "Language and time" },
+        { id: "settingsAppearance",    label: "Appearance" },
+        { id: "settingsNotifications", label: "Notifications" },
+        { id: "settingsAccessibility", label: "Accessibility" },
+        { id: "settingsPrivacyData",   label: "Privacy and data" },
+        { id: "settingsSearch",        label: "Search" },
     ],
     mail: [
+        { id: "settingsMailLayout",       label: "Layout" },
         { id: "settingsCompose",          label: "Compose" },
         { id: "settingsSmartSuggestions", label: "Smart Suggestions" },
         { id: "settingsRules",            label: "Rules" },
@@ -25,20 +41,36 @@ const SETTINGS_SUBMENUS = {
 };
 
 const SECTION_TO_TAB = {
-    settingsAccountInfo:     "account",
-    settingsSignatures:      "account",
-    settingsOrgInfo:         "account",
-    settingsSignupDetails:   "account",
-    settingsAccountSettings: "account",
-    settingsPassword:        "account",
-    settingsLiveSync:        "account",
-    settingsDangerZone:      "account",
-    settingsLayout:          "general",
-    settingsAppearance:      "general",
-    settingsLanguage:        "general",
-    settingsCompose:         "mail",
-    settingsSmartSuggestions:"mail",
-    settingsRules:           "mail",
+    // Account Tab
+    settingsAccountInfo:        "account",
+    settingsAutomaticReplies:   "account",
+    settingsSignatures:         "account",
+    settingsCategories:         "account",
+    settingsStorage:            "account",
+    settingsOrgInfo:            "account",
+    settingsSignupDetails:      "account",
+    settingsAccountSettings:    "account",
+    settingsPassword:           "account",
+    settingsLiveSync:           "account",
+    settingsDangerZone:         "account",
+
+    // General Tab (All 6 Outlook Items)
+    settingsLanguageTime:       "general",
+    settingsAppearance:         "general",
+    settingsNotifications:      "general",
+    settingsAccessibility:      "general",
+    settingsPrivacyData:        "general",
+    settingsSearch:             "general",
+
+    // Legacy Aliases for General
+    settingsLanguage:           "general",
+
+    // Mail Tab
+    settingsMailLayout:         "mail",
+    settingsLayout:             "mail", // Legacy alias for relocated Mail Layout
+    settingsCompose:            "mail",
+    settingsSmartSuggestions:   "mail",
+    settingsRules:              "mail",
 };
 
 function getHeaders() {
@@ -102,7 +134,7 @@ function Section({ id, active, children }) {
 function TabBtn({ label, tab, active, onClick }) {
     return (
         <button
-            className={"settings-float-tab" + (active ? " active" : "")}
+            className={`settings-float-tab ${active ? "active text-[var(--accent-primary)] font-semibold" : "text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-[#292929]"}`}
             data-settings-tab={tab} onClick={onClick}
         >
             {label}
@@ -111,8 +143,9 @@ function TabBtn({ label, tab, active, onClick }) {
 }
 
 export default function SettingsPanel({ isOpen, initialSection, onClose }) {
-    const [activeTab, setActiveTab]         = useState("account");
-    const [activeSection, setActiveSection] = useState("settingsAccountInfo");
+    const [activeTab, setActiveTab]         = useState("general");
+    const [activeSection, setActiveSection] = useState("settingsLanguageTime");
+    const [searchQuery, setSearchQuery]     = useState("");
     const [profile, setProfile]   = useState(null);
     const [loading, setLoading]   = useState(false);
     const [pwCurrent, setPwCurrent]   = useState("");
@@ -144,10 +177,17 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
         document.body.style.overflow = "hidden";
         if (initialSection && SECTION_TO_TAB[initialSection]) {
             setActiveTab(SECTION_TO_TAB[initialSection]);
-            setActiveSection(initialSection);
+            // Normalize legacy section IDs
+            let targetSection = initialSection;
+            if (initialSection === "settingsLanguage") {
+                targetSection = "settingsLanguageTime";
+            } else if (initialSection === "settingsLayout") {
+                targetSection = "settingsMailLayout";
+            }
+            setActiveSection(targetSection);
         } else {
-            setActiveTab("account");
-            setActiveSection("settingsAccountInfo");
+            setActiveTab("general");
+            setActiveSection("settingsLanguageTime");
         }
         fetchProfile();
         loadSignatures();
@@ -294,58 +334,120 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
         }
     }
 
+    const allSections = [
+        ...SETTINGS_SUBMENUS.account.map(i => ({ ...i, tab: "account" })),
+        ...SETTINGS_SUBMENUS.general.map(i => ({ ...i, tab: "general" })),
+        ...SETTINGS_SUBMENUS.mail.map(i => ({ ...i, tab: "mail" })),
+    ];
+    const allSectionsMap = {
+        ...Object.fromEntries(allSections.map(s => [s.id, s.label])),
+        settingsLanguage: "Language and time",
+        settingsLayout: "Layout",
+    };
+
+    const isSearching = searchQuery.trim().length > 0;
     const submenuItems = SETTINGS_SUBMENUS[activeTab] || [];
-    const activeSectionLabel = submenuItems.find(i => i.id === activeSection)?.label || "Settings";
+    const displayedItems = isSearching
+        ? allSections.filter(i => i.label.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+        : submenuItems;
+
+    const activeSectionLabel = allSectionsMap[activeSection] || "Settings";
     const tabHeaderMap = { account: "Account", general: "General", mail: "Mail" };
+
+    const handleSelectSection = (item) => {
+        if (item.tab && item.tab !== activeTab) {
+            setActiveTab(item.tab);
+        }
+        setActiveSection(item.id);
+    };
 
     if (!isOpen) return null;
 
     return (
         <>
             <div className="settings-overlay active" id="settingsOverlay" onClick={onClose} />
-            <div className="settings-floating-panel active" id="settingsFloatingPanel">
+            <div className="settings-floating-panel active bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-[#333333]" id="settingsFloatingPanel">
                 <div className="settings-float-body">
 
                     {/* LEFT: title + search + tabs */}
-                    <div className="settings-float-left">
-                        <h2 className="settings-float-title">Settings</h2>
+                    <div className="settings-float-left bg-slate-50 dark:bg-[#141414] border-r border-slate-200 dark:border-[#2d2d2d]">
+                        <h2 className="settings-float-title text-slate-900 dark:text-white">Settings</h2>
                         <div className="settings-float-search">
-                            <div className="settings-float-search-wrapper">
+                            <div className="settings-float-search-wrapper" style={{ position: "relative" }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                                 </svg>
-                                <input type="text" placeholder="Search settings" />
+                                <input
+                                    type="text"
+                                    placeholder="Search settings"
+                                    className="bg-white dark:bg-[#292929] border border-slate-200 dark:border-[#3d3d3d] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded px-3 py-1.5 w-full text-xs"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && displayedItems.length > 0) {
+                                            handleSelectSection(displayedItems[0]);
+                                        }
+                                    }}
+                                />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchQuery("")}
+                                        style={{
+                                            position: "absolute",
+                                            right: "8px",
+                                            top: "50%",
+                                            transform: "translateY(-50%)",
+                                            background: "transparent",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            padding: "2px 6px",
+                                            color: "#94a3b8",
+                                            fontSize: "14px",
+                                            lineHeight: 1
+                                        }}
+                                        title="Clear search"
+                                    >
+                                        ×
+                                    </button>
+                                )}
                             </div>
                         </div>
                         <div className="settings-float-tabs">
-                            <TabBtn label="Account" tab="account" active={activeTab === "account"} onClick={() => switchTab("account")} />
-                            <TabBtn label="General" tab="general" active={activeTab === "general"} onClick={() => switchTab("general")} />
-                            <TabBtn label="Mail"    tab="mail"    active={activeTab === "mail"}    onClick={() => switchTab("mail")} />
+                            <TabBtn label="Account" tab="account" active={activeTab === "account"} onClick={() => { setSearchQuery(""); switchTab("account"); }} />
+                            <TabBtn label="General" tab="general" active={activeTab === "general"} onClick={() => { setSearchQuery(""); switchTab("general"); }} />
+                            <TabBtn label="Mail"    tab="mail"    active={activeTab === "mail"}    onClick={() => { setSearchQuery(""); switchTab("mail"); }} />
                         </div>
                     </div>
 
                     {/* MIDDLE: submenu */}
-                    <div className="settings-float-submenu-pane">
-                        <div className="settings-float-submenu-header" id="settingsSubmenuHeader">
-                            {tabHeaderMap[activeTab]}
+                    <div className="settings-float-submenu-pane bg-slate-100/70 dark:bg-[#1a1a1a] border-r border-slate-200 dark:border-[#2d2d2d]">
+                        <div className="settings-float-submenu-header text-slate-900 dark:text-white" id="settingsSubmenuHeader">
+                            {isSearching ? `Search Results (${displayedItems.length})` : tabHeaderMap[activeTab]}
                         </div>
                         <div className="settings-float-submenu" id="settingsSubmenu">
-                            {submenuItems.map(item => (
-                                <button key={item.id}
-                                    className={"settings-float-submenu-item" + (activeSection === item.id ? " active" : "")}
-                                    data-section={item.id}
-                                    onClick={() => setActiveSection(item.id)}>
-                                    {item.label}
-                                </button>
-                            ))}
+                            {displayedItems.length === 0 ? (
+                                <div style={{ padding: "16px 20px", color: "#64748b", fontSize: "0.8125rem" }}>
+                                    No settings found
+                                </div>
+                            ) : (
+                                displayedItems.map(item => (
+                                    <button key={item.id}
+                                        className={`settings-float-submenu-item ${activeSection === item.id ? "active text-[var(--accent-primary)] bg-white/80 dark:bg-[#292929] border-l-4 border-[var(--accent-primary)] font-semibold" : "text-slate-700 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-[#292929]"}`}
+                                        data-section={item.id}
+                                        onClick={() => handleSelectSection(item)}>
+                                        {item.label}
+                                    </button>
+                                ))
+                            )}
                         </div>
                     </div>
 
                     {/* RIGHT: content pane */}
-                    <div className="settings-float-content-pane">
+                    <div className="settings-float-content-pane bg-white dark:bg-[#1f1f1f]">
                         <div className="settings-float-content-top">
-                            <h3 className="settings-float-content-title" id="settingsContentTitle">{activeSectionLabel}</h3>
-                            <button className="settings-float-close-btn" onClick={onClose} aria-label="Close settings">
+                            <h3 className="settings-float-content-title text-slate-900 dark:text-white" id="settingsContentTitle">{activeSectionLabel}</h3>
+                            <button className="settings-float-close-btn text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#292929]" onClick={onClose} aria-label="Close settings">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                                 </svg>
@@ -367,6 +469,11 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
                                     <InfoRow label="Status"        value={profile?.user?.status} />
                                     <InfoRow label="Joined Date"   value={profile?.user?.joined_date} />
                                 </div>}
+                            </Section>
+
+                            {/* Automatic replies */}
+                            <Section id="settingsAutomaticReplies" active={activeSection === "settingsAutomaticReplies"}>
+                                <AutomaticRepliesSection />
                             </Section>
 
                             {/* Signatures */}
@@ -470,6 +577,16 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
                                 )}
                             </Section>
 
+                            {/* Categories */}
+                            <Section id="settingsCategories" active={activeSection === "settingsCategories"}>
+                                <CategoriesSection />
+                            </Section>
+
+                            {/* Storage */}
+                            <Section id="settingsStorage" active={activeSection === "settingsStorage"}>
+                                <StorageSection />
+                            </Section>
+
                             {/* Organization Info */}
                             <Section id="settingsOrgInfo" active={activeSection === "settingsOrgInfo"}>
                                 <h3 className="settings-float-section-title">Organization Information</h3>
@@ -569,34 +686,72 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
                                 </div>
                             </Section>
 
-                            {/* GENERAL TAB */}
-                            <Section id="settingsLayout" active={activeSection === "settingsLayout"}>
-                                <h3 className="settings-float-section-title">Layout</h3>
-                                <p className="settings-float-section-desc">Customize the dashboard layout preferences.</p>
-                                <PlaceholderSection title="Layout" />
-                            </Section>
-                            <Section id="settingsAppearance" active={activeSection === "settingsAppearance"}>
-                                <h3 className="settings-float-section-title">Appearance</h3>
-                                <p className="settings-float-section-desc">Theme and visual preferences.</p>
-                                <PlaceholderSection title="Appearance" />
-                            </Section>
-                            <Section id="settingsLanguage" active={activeSection === "settingsLanguage"}>
-                                <h3 className="settings-float-section-title">Language &amp; Region</h3>
-                                <p className="settings-float-section-desc">Language and regional format preferences.</p>
-                                <PlaceholderSection title="Language & Region" />
+                            {/* =========================================================================
+                                GENERAL TAB SECTIONS (Outlook 365 Architecture)
+                                ========================================================================= */}
+
+                            {/* 1. Language and time (Milestone 2) */}
+                            <Section id="settingsLanguageTime" active={activeSection === "settingsLanguageTime" || activeSection === "settingsLanguage"}>
+                                <h3 className="settings-float-section-title">Language and time</h3>
+                                <LanguageTimeSection />
                             </Section>
 
-                            {/* MAIL TAB */}
+                            {/* 2. Appearance */}
+                            <Section id="settingsAppearance" active={activeSection === "settingsAppearance"}>
+                                <h3 className="settings-float-section-title">Appearance</h3>
+                                <AppearanceSection />
+                            </Section>
+
+                            {/* 3. Notifications */}
+                            <Section id="settingsNotifications" active={activeSection === "settingsNotifications"}>
+                                <h3 className="settings-float-section-title">Notifications</h3>
+                                <NotificationsSection />
+                            </Section>
+
+                            {/* 4. Accessibility */}
+                            <Section id="settingsAccessibility" active={activeSection === "settingsAccessibility"}>
+                                <h3 className="settings-float-section-title">Accessibility</h3>
+                                <AccessibilitySection />
+                            </Section>
+
+                            {/* 5. Privacy and data */}
+                            <Section id="settingsPrivacyData" active={activeSection === "settingsPrivacyData"}>
+                                <h3 className="settings-float-section-title">Privacy and data</h3>
+                                <PrivacyDataSection />
+                            </Section>
+
+                            {/* 6. Search */}
+                            <Section id="settingsSearch" active={activeSection === "settingsSearch"}>
+                                <h3 className="settings-float-section-title">Search</h3>
+                                <SearchSection />
+                            </Section>
+
+                            {/* =========================================================================
+                                MAIL TAB SECTIONS
+                                ========================================================================= */}
+
+                            {/* Relocated Mail Layout */}
+                            <Section id="settingsMailLayout" active={activeSection === "settingsMailLayout" || activeSection === "settingsLayout"}>
+                                <h3 className="settings-float-section-title">Layout</h3>
+                                <p className="settings-float-section-desc">Customize reading pane and email list layout preferences.</p>
+                                <PlaceholderSection title="Layout" />
+                            </Section>
+
+                            {/* Mail Compose */}
                             <Section id="settingsCompose" active={activeSection === "settingsCompose"}>
                                 <h3 className="settings-float-section-title">Compose</h3>
                                 <p className="settings-float-section-desc">Email composition preferences.</p>
                                 <PlaceholderSection title="Compose" />
                             </Section>
+
+                            {/* Smart Suggestions */}
                             <Section id="settingsSmartSuggestions" active={activeSection === "settingsSmartSuggestions"}>
                                 <h3 className="settings-float-section-title">Smart Suggestions</h3>
                                 <p className="settings-float-section-desc">AI-powered email suggestions.</p>
                                 <PlaceholderSection title="Smart Suggestions" />
                             </Section>
+
+                            {/* Rules */}
                             <Section id="settingsRules" active={activeSection === "settingsRules"}>
                                 <h3 className="settings-float-section-title">Rules</h3>
                                 <p className="settings-float-section-desc">Email filtering and automation rules.</p>

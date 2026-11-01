@@ -1,0 +1,33 @@
+#mailListPanel #formatToolbar.expanded-ribbon{--cr-bg:#fff;--cr-text:#243247;--cr-muted:#596b82;--cr-border:#dce3ed;--cr-hover:#edf3fc;--cr-active:#ddecff;display:flex!important;flex-wrap:wrap!important;gap:8px 0!important;padding:10px 12px!important;background:var(--cr-bg)!important;border:1px solid var(--cr-border)!important;border-radius:12px!important;color:var(--cr-text)!important;overflow:visible!important;height:auto!important;min-height:96px;box-shadow:0 2px 8px #14294208}
+:is(html.dark,body.dark,[data-theme="dark"]) #mailListPanel #formatToolbar{--cr-bg:#151b25;--cr-text:#e5edf8;--cr-muted:#a7b6ca;--cr-border:#334155;--cr-hover:#25344a;--cr-active:#173e5b}
+#mailListPanel #formatToolbar .ribbon-group{flex:0 0 auto!important;border-color:var(--cr-border)!important;padding:0 10px!important;gap:5px!important;min-height:74px}
+#mailListPanel #formatToolbar .ribbon-group-content{gap:5px!important}
+#mailListPanel #formatToolbar .ribbon-group-label{color:var(--cr-muted)!important;font-size:11px!important;font-weight:500!important;letter-spacing:.025em;line-height:16px}
+#mailListPanel #formatToolbar .email-composer-toolbar-btn{color:var(--cr-text)!important;min-width:28px!important;min-height:28px!important;border-radius:5px!important;cursor:pointer;opacity:1!important}
+#mailListPanel #formatToolbar .email-composer-toolbar-btn :is(strong,em,b){color:inherit!important}
+#mailListPanel #formatToolbar .email-composer-toolbar-btn:hover{background:var(--cr-hover)!important}
+#mailListPanel #formatToolbar .email-composer-toolbar-btn:is(.active,[aria-pressed="true"]){background:var(--cr-active)!important;color:var(--cr-text)!important;box-shadow:inset 0 0 0 1px #3285c9}
+#mailListPanel #formatToolbar button:focus-visible{outline:2px solid #2589ec!important;outline-offset:2px!important}
+#mailListPanel #formatToolbar .stacked-btn{min-width:52px!important;min-height:55px!important}
+#mailListPanel #formatToolbar .stacked-btn-text{color:inherit!important;font-size:12px!important}
+#mailListPanel #formatToolbar :is(.email-composer-dropdown-menu,.email-composer-color-palette){background:var(--cr-bg)!important;color:var(--cr-text)!important;border:1px solid var(--cr-border)!important;box-shadow:0 12px 32px #0003;z-index:1000;max-height:240px;overflow-y:auto}
+#mailListPanel #formatToolbar .email-composer-dropdown-menu button{color:var(--cr-text)!important;min-height:32px}
+#mailListPanel #formatToolbar .email-composer-dropdown-menu button:hover{background:var(--cr-hover)!important}
+#mailListPanel #formatToolbar :is(#editorFontBtn,#editorFontSizeBtn){background:var(--cr-hover)!important;border-color:var(--cr-border)!important;color:var(--cr-text)!important}
+.mail-toolbar-container:has(#formatToolbar){overflow:visible!important;flex-shrink:0}
+.email-composer-editor{overflow-wrap:anywhere}
+.email-composer-editor img{max-width:100%;height:auto}
+@media(max-width:700px){#mailListPanel #formatToolbar.expanded-ribbon{padding:8px!important;gap:8px!important}#mailListPanel #formatToolbar .ribbon-group{padding:0 6px!important}}
+#mailListPanel #formatToolbar .ribbon-group{height:auto!important;align-self:stretch;justify-content:space-between}
+#mailListPanel #formatToolbar .ribbon-group-label{position:static!important;transform:none!important;margin:3px 0 0!important}
+.mail-toolbar-container:has(#formatToolbar){position:relative!important;z-index:50!important}
+#mailListPanel #formatToolbar{position:relative!important;z-index:51!important}
+
+#mailListPanel #formatToolbar.expanded-ribbon{flex-direction:row!important;align-items:stretch!important;align-content:flex-start!important;flex-shrink:0!important}
+
+/* Keep the final Print action with the rest of the desktop ribbon. */
+@media (min-width: 1500px){
+  #mailListPanel #formatToolbar.expanded-ribbon{flex-wrap:nowrap!important;padding-inline:8px!important}
+  #mailListPanel #formatToolbar .ribbon-group{padding-inline:4px!important}
+}
+

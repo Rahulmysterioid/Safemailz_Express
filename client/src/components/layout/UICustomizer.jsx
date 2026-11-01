@@ -217,6 +217,8 @@ export default function UICustomizer() {
                 </svg>
             </button>
 
+
+
             {isOpen && localSettings && (
                 <div className="ui-customizer-modal-overlay">
                     <div className="ui-customizer-modal" style={isMinimized ? { height: '54px' } : {}}>

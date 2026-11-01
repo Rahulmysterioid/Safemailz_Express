@@ -9,6 +9,63 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      (function() {
+        try {
+          var themeRaw = localStorage.getItem('safemailz_theme');
+          var genRaw = localStorage.getItem('safemailz_general_settings');
+          var app = null;
+          if (themeRaw) {
+            try { app = JSON.parse(themeRaw); } catch(e) {}
+          }
+          if (!app && genRaw) {
+            try { var g = JSON.parse(genRaw); app = g && g.appearance; } catch(e) {}
+          }
+          var mode = (app && (app.theme || app.mode)) || 'light';
+          var isDark = false;
+          if (mode === 'dark') {
+            isDark = true;
+          } else if (mode === 'system') {
+            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          }
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
+            root.setAttribute('data-theme', 'dark');
+          } else {
+            root.classList.remove('dark');
+            root.setAttribute('data-theme', 'light');
+          }
+          var accentHex = (app && app.accentHex) || '#0078d4';
+          var accentName = (app && app.accentColor) || 'Classic Blue';
+          root.setAttribute('data-accent', accentName);
+          root.style.setProperty('--primary', accentHex);
+          root.style.setProperty('--primary-color', accentHex);
+          root.style.setProperty('--accent-primary', accentHex);
+          root.style.setProperty('--accent-text', accentHex);
+          var hoverMap = {
+            'Classic Blue': '#106ebe',
+            'Emerald Green': '#0e7048',
+            'Purple': '#4f277a',
+            'Slate': '#273444',
+            'Crimson': '#8e1923',
+            'Teal': '#005b5c'
+          };
+          var softMap = {
+            'Classic Blue': isDark ? 'rgba(0, 120, 212, 0.22)' : 'rgba(0, 120, 212, 0.12)',
+            'Emerald Green': isDark ? 'rgba(16, 124, 65, 0.25)' : 'rgba(16, 124, 65, 0.12)',
+            'Purple': isDark ? 'rgba(92, 45, 145, 0.25)' : 'rgba(92, 45, 145, 0.12)',
+            'Slate': isDark ? 'rgba(49, 65, 84, 0.25)' : 'rgba(49, 65, 84, 0.12)',
+            'Crimson': isDark ? 'rgba(164, 38, 44, 0.25)' : 'rgba(164, 38, 44, 0.12)',
+            'Teal': isDark ? 'rgba(0, 130, 133, 0.25)' : 'rgba(0, 130, 133, 0.12)'
+          };
+          root.style.setProperty('--accent-hover', hoverMap[accentName] || '#106ebe');
+          root.style.setProperty('--accent-soft-bg', softMap[accentName] || (isDark ? 'rgba(0, 120, 212, 0.22)' : 'rgba(0, 120, 212, 0.12)'));
+          var density = (app && app.density) || 'cozy';
+          root.setAttribute('data-density', density);
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

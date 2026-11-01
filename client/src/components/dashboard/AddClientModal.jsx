@@ -18,12 +18,17 @@ export default function AddClientModal() {
 
     const isEdit = editingClientIndex !== null;
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        saveClient();
+    };
+
     return (
-        <div 
-            className="modal-overlay" 
-            id="addClientModal" 
-            role="dialog" 
-            aria-modal="true" 
+        <div
+            className="modal-overlay client-modal-overlay"
+            id="addClientModal"
+            role="dialog"
+            aria-modal="true"
             aria-labelledby="addClientTitle"
             onClick={closeModal}
             style={{
@@ -32,167 +37,145 @@ export default function AddClientModal() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                backgroundColor: 'rgba(10, 14, 23, 0.65)',
+                backdropFilter: 'blur(6px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 9999,
+                padding: '1rem',
                 opacity: 1,
                 visibility: 'visible'
             }}
         >
-            <div 
-                className="modal-card form-modal-content"
-                style={{ 
-                    width: '100%', 
-                    maxWidth: '520px', 
-                    padding: '1.75rem 2rem', 
-                    borderRadius: '12px', 
-                    background: '#fff', 
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
-                    border: '1px solid #E2E8F0',
-                    position: 'relative'
-                }}
+            <div
+                className="modal-card form-modal-content client-modal-card"
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* Top Accent Bar */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '3px',
+                        background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #38bdf8 100%)'
+                    }}
+                />
+
                 {/* Modal Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h2 
-                        id="addClientTitle"
-                        style={{ fontSize: '1.1rem', fontWeight: 700, color: '#111827', margin: 0, fontFamily: "'Inter', sans-serif" }}
-                    >
-                        {isEdit ? 'Edit client details' : 'Enter clients details'}
-                    </h2>
-                    <button 
+                <div className="client-modal-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div className="client-modal-header-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <line x1="19" y1="8" x2="19" y2="14"></line>
+                                <line x1="22" y1="11" x2="16" y2="11"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 id="addClientTitle" className="client-modal-title">
+                                {isEdit ? 'Edit client details' : 'Enter clients details'}
+                            </h2>
+                            <p className="client-modal-subtitle">
+                                {isEdit ? 'Update contact information for this client record' : 'Add a new client to your organization directory'}
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
                         onClick={closeModal}
-                        style={{ 
-                            background: 'transparent', 
-                            border: 'none', 
-                            fontSize: '1.35rem', 
-                            cursor: 'pointer', 
-                            color: '#6B7280', 
-                            lineHeight: 1, 
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
+                        className="client-modal-close-btn"
                         aria-label="Close modal"
                     >
-                        &times;
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
                     </button>
                 </div>
 
                 {/* Form Fields */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                        <label htmlFor="newClientName" style={{ color: '#111827', fontSize: '0.8rem', fontWeight: 600 }}>
-                            Client name
+                <form onSubmit={handleSubmit} className="client-modal-form">
+                    <div className="form-modal-row client-modal-field">
+                        <label htmlFor="newClientName" className="client-modal-label">
+                            Client name <span style={{ color: '#ef4444' }}>*</span>
                         </label>
-                        <input 
-                            type="text" 
-                            id="newClientName" 
-                            className="form-input"
-                            placeholder="Enter client name"
+                        <input
+                            type="text"
+                            id="newClientName"
+                            className="form-input client-modal-input"
+                            placeholder="Enter client name (e.g. Rahul Singh)"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            style={{ width: '100%', height: '40px', border: '1px solid #D1D5DB', borderRadius: '8px', background: '#fff', color: '#0F172A', fontSize: '0.875rem', padding: '0 0.85rem', fontFamily: "'Inter', sans-serif", boxSizing: 'border-box', outline: 'none' }} 
+                            autoFocus
                         />
                     </div>
 
-                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                        <label htmlFor="newClientAddress" style={{ color: '#111827', fontSize: '0.8rem', fontWeight: 600 }}>
-                            Address
-                        </label>
-                        <input 
-                            type="text" 
-                            id="newClientAddress" 
-                            className="form-input"
-                            placeholder="Enter address"
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            style={{ width: '100%', height: '40px', border: '1px solid #D1D5DB', borderRadius: '8px', background: '#fff', color: '#0F172A', fontSize: '0.875rem', padding: '0 0.85rem', fontFamily: "'Inter', sans-serif", boxSizing: 'border-box', outline: 'none' }} 
-                        />
-                    </div>
-
-                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                        <label htmlFor="newClientEmail" style={{ color: '#111827', fontSize: '0.8rem', fontWeight: 600 }}>
+                    <div className="form-modal-row client-modal-field">
+                        <label htmlFor="newClientEmail" className="client-modal-label">
                             Client Email ID
                         </label>
-                        <input 
-                            type="email" 
-                            id="newClientEmail" 
-                            className="form-input"
-                            placeholder="Enter email"
+                        <input
+                            type="email"
+                            id="newClientEmail"
+                            className="form-input client-modal-input"
+                            placeholder="Enter email address (e.g. client@company.com)"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            style={{ width: '100%', height: '40px', border: '1px solid #D1D5DB', borderRadius: '8px', background: '#fff', color: '#0F172A', fontSize: '0.875rem', padding: '0 0.85rem', fontFamily: "'Inter', sans-serif", boxSizing: 'border-box', outline: 'none' }} 
                         />
                     </div>
 
-                    <div className="form-modal-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                        <label htmlFor="newClientPhone" style={{ color: '#111827', fontSize: '0.8rem', fontWeight: 600 }}>
-                            Phone number
-                        </label>
-                        <input 
-                            type="tel" 
-                            id="newClientPhone" 
-                            className="form-input"
-                            placeholder="Enter phone number"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            style={{ width: '100%', height: '40px', border: '1px solid #D1D5DB', borderRadius: '8px', background: '#fff', color: '#0F172A', fontSize: '0.875rem', padding: '0 0.85rem', fontFamily: "'Inter', sans-serif", boxSizing: 'border-box', outline: 'none' }} 
-                        />
-                    </div>
-                </div>
+                    <div className="client-modal-two-col">
+                        <div className="form-modal-row client-modal-field">
+                            <label htmlFor="newClientPhone" className="client-modal-label">
+                                Phone number
+                            </label>
+                            <input
+                                type="tel"
+                                id="newClientPhone"
+                                className="form-input client-modal-input"
+                                placeholder="Enter phone number"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            />
+                        </div>
 
-                {/* Actions Footer */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.75rem' }}>
-                    <button 
-                        type="button"
-                        onClick={closeModal}
-                        style={{ 
-                            height: '38px', 
-                            padding: '0 1.5rem', 
-                            borderRadius: '8px', 
-                            fontSize: '0.85rem', 
-                            fontWeight: 600, 
-                            cursor: 'pointer', 
-                            fontFamily: "'Inter', sans-serif",
-                            background: '#fff',
-                            color: '#2563EB',
-                            border: '1.5px solid #2563EB',
-                            transition: 'background-color 0.15s ease'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#EFF6FF'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fff'}
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        id="saveClientBtn" 
-                        type="button"
-                        onClick={saveClient}
-                        style={{ 
-                            height: '38px', 
-                            padding: '0 1.75rem', 
-                            borderRadius: '8px', 
-                            fontSize: '0.85rem', 
-                            fontWeight: 600, 
-                            cursor: 'pointer', 
-                            fontFamily: "'Inter', sans-serif",
-                            background: '#2563EB',
-                            color: '#fff',
-                            border: 'none',
-                            transition: 'background-color 0.15s ease'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1D4ED8'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-                    >
-                        {isEdit ? 'Update' : 'Save'}
-                    </button>
-                </div>
+                        <div className="form-modal-row client-modal-field">
+                            <label htmlFor="newClientAddress" className="client-modal-label">
+                                Address / Location
+                            </label>
+                            <input
+                                type="text"
+                                id="newClientAddress"
+                                className="form-input client-modal-input"
+                                placeholder="Enter city or address"
+                                value={formData.address}
+                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Actions Footer */}
+                    <div className="client-modal-footer">
+                        <button
+                            type="button"
+                            onClick={closeModal}
+                            className="client-modal-btn-cancel"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            id="saveClientBtn"
+                            type="submit"
+                            className="client-modal-btn-save"
+                        >
+                            {isEdit ? 'Update' : 'Save'}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );

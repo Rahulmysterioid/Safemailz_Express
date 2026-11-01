@@ -1,0 +1,2 @@
+/* Subscription uses the same EmployeeSidebarCard markup and global employee styles. */
+#emailIdsSidebar.subscription-sidebar .sidebar-emp-card{flex-shrink:0}
