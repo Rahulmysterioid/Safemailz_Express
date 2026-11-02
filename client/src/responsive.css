@@ -199,3 +199,13 @@ img,video,canvas{max-width:100%}
  #emailIdsView #emailIdsTabTableBody .btn-copy-email{width:36px;min-width:36px;height:36px;min-height:36px}
  #emailIdsView .email-ids-table-footer{border-radius:12px}
 }
+
+/* Give the menu and brand separate layout slots on touch screens. */
+@media(max-width:900px){
+ .dashboard-body .topbar .topbar-left{display:flex!important;align-items:center!important;gap:10px!important;overflow:visible}
+ .dashboard-body .topbar .topbar-left .mobile-menu-btn{position:static!important;inset:auto!important;transform:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 40px!important;width:40px!important;min-width:40px!important;max-width:40px!important;height:44px!important;padding:8px!important;margin:0!important}
+ .dashboard-body .topbar .topbar-brand-wrap{position:relative!important;display:flex!important;flex:0 1 auto;min-width:0;margin:0!important}
+ .dashboard-body .topbar .topbar-logo{position:static!important;transform:none!important;margin:0!important;display:flex!important;align-items:center!important;gap:6px!important}
+ .dashboard-body .topbar .mobile-menu-btn svg{width:24px;height:24px;flex-shrink:0}
+}
+@media(max-width:359px){.dashboard-body .topbar .topbar-left{gap:6px!important}}

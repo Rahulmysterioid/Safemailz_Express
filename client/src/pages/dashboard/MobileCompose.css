@@ -1,0 +1,246 @@
+/* Mobile composition is intentionally separate from the desktop ribbon. */
+.mobile-compose-format-toggle,
+.mobile-compose-formatting { display: none; }
+
+#inlineComposerContent .cc-bcc-trigger-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .dashboard-body,
+  .dashboard-body #root,
+  .dashboard-shell,
+  .dashboard-wrapper,
+  .dashboard-shell .main-content,
+  #mailListPanel {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .dashboard-body .dashboard-shell .topbar {
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 0 12px !important;
+  }
+  .dashboard-body .topbar .topbar-left { gap: 6px !important; }
+  .dashboard-body .topbar .topbar-logo-badge { width: 24px !important; height: 24px !important; flex-basis: 24px !important; }
+  .dashboard-body .topbar .topbar-brand-name { font-size: 10px !important; }
+  .dashboard-body .topbar .topbar-right { gap: 4px !important; }
+  .dashboard-body .responsive-sidebar-host.is-open,
+  .dashboard-body .responsive-sidebar-backdrop { top: 56px; }
+
+  .dashboard-shell .mobile-page-selector {
+    height: 35px;
+    min-height: 35px;
+    padding: 2px 12px;
+    gap: 8px;
+  }
+  .dashboard-shell .mobile-page-selector > span { font-size: 11px; }
+  .dashboard-shell .mobile-page-selector select {
+    flex: 0 1 180px;
+    width: auto;
+    height: 30px;
+    padding: 2px 28px 2px 12px;
+    border-radius: 20px !important;
+    font-size: 14px !important;
+    background-color: var(--surface, #f5f8fc);
+  }
+
+  /* All advanced tools remain available, but take no space while writing. */
+  #mailListPanel.is-composing > .mail-toolbar-container { display: none; }
+  #mailListPanel.is-composing.mobile-advanced-formatting-open > .mail-toolbar-container:has(#formatToolbar) {
+    display: block;
+    padding: 4px 8px !important;
+  }
+  #mailListPanel.is-composing #formatToolbar.expanded-ribbon {
+    margin: 0 !important;
+    /* A backdrop filter makes fixed dropdowns clip to this scrolling panel. */
+    backdrop-filter: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: min(220px, 32dvh) !important;
+    flex-wrap: wrap !important;
+    overflow: auto !important;
+    touch-action: pan-y;
+    gap: 8px !important;
+  }
+  #mailListPanel.is-composing #formatToolbar .ribbon-group {
+    flex: 1 1 220px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--cr-border) !important;
+    padding: 4px !important;
+  }
+  #mailListPanel.is-composing #formatToolbar .ribbon-group-content,
+  #mailListPanel.is-composing #formatToolbar .ribbon-group-content div:not(.email-composer-dropdown-menu):not(.email-composer-color-palette) {
+    min-width: 0 !important;
+    max-width: 100%;
+    flex-wrap: wrap !important;
+  }
+  #mailListPanel.is-composing #formatToolbar .email-composer-toolbar-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+  #mailListPanel.is-composing #formatToolbar .email-composer-dropdown-menu button { min-height: 44px; }
+
+  #mailListPanel.is-composing #inlineComposerContent {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #inlineComposerContent .email-composer-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    flex-shrink: 0;
+    padding: 0 !important;
+  }
+  #mailListPanel.is-composing .composer-header-action-bar {
+    flex-wrap: nowrap;
+    min-height: 60px;
+    padding: 8px 12px !important;
+    gap: 8px;
+  }
+  #inlineComposerContent .composer-primary-actions {
+    flex: 1;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+  #inlineComposerContent .composer-header-actions-right { flex: 0 0 44px; align-self: flex-start; }
+  #inlineComposerContent .composer-send-split-btn { height: 44px; flex-shrink: 0; border-radius: 10px; }
+  #inlineComposerContent .btn-composer-send { min-height: 44px; padding: 0 16px; font-size: 14px; }
+  /* The existing split arrow has no action; mobile uses the real Send action. */
+  #inlineComposerContent .btn-composer-send-options,
+  #inlineComposerContent .split-divider { display: none; }
+  #inlineComposerContent .composer-top-attachment-btn,
+  #inlineComposerContent .composer-top-delete-btn,
+  #inlineComposerContent .mobile-compose-format-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px !important;
+    min-width: 44px;
+    height: 44px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: transparent;
+    color: var(--text-primary, #334155);
+    font: inherit;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  #inlineComposerContent .composer-top-attachment-btn span { display: none; }
+  #inlineComposerContent .composer-top-attachment-btn svg,
+  #inlineComposerContent .composer-top-delete-btn svg { width: 20px; height: 20px; }
+  #inlineComposerContent .composer-status-toast,
+  #inlineComposerContent .composer-importance-badge { max-width: 100%; overflow-wrap: anywhere; }
+
+  #inlineComposerContent .mobile-compose-formatting:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 4px;
+    padding: 4px 12px;
+    border-bottom: 1px solid var(--border-light, #e2e8f0);
+    background: var(--surface, #f8fafc);
+  }
+  #inlineComposerContent .mobile-compose-formatting button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    min-height: 44px;
+    flex: 0 0 44px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-primary, #334155);
+    font-size: 17px;
+    cursor: pointer;
+  }
+  #inlineComposerContent :is(.mobile-compose-formatting button, .mobile-compose-format-toggle)[aria-expanded="true"],
+  #inlineComposerContent .mobile-compose-formatting button[aria-pressed="true"] {
+    color: var(--primary, #0078d4);
+    background: var(--primary-light, #e8f2ff);
+  }
+  #inlineComposerContent :is(button, input):focus-visible {
+    outline: 2px solid var(--primary, #0078d4) !important;
+    outline-offset: -2px;
+  }
+
+  #inlineComposerContent .email-composer-fields-wrap { flex: 1 0 auto !important; min-height: min-content !important; }
+  #inlineComposerContent .email-composer-field {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    flex-shrink: 0;
+    gap: 8px !important;
+    padding: 2px 16px !important;
+  }
+  #inlineComposerContent .from-row-wrapper { min-height: 40px; }
+  #inlineComposerContent .composer-field-label-btn {
+    flex: 0 0 34px;
+    min-width: 34px !important;
+    width: 34px;
+    margin: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--text-secondary, #64748b) !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    text-align: left !important;
+    cursor: default !important;
+  }
+  #inlineComposerContent .composer-from-email-val { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
+  #inlineComposerContent .composer-recipient-line { min-width: 0; gap: 8px !important; }
+  #inlineComposerContent .email-composer-field input {
+    min-width: 0 !important;
+    width: 0;
+    flex: 1 1 0 !important;
+    min-height: 40px;
+    font-size: 16px !important;
+  }
+  #inlineComposerContent .cc-bcc-triggers { flex: 0 0 auto; gap: 4px !important; }
+  #inlineComposerContent .cc-bcc-trigger-btn { min-width: 40px; min-height: 44px; padding: 0 4px; font-size: 13px; }
+  #inlineComposerContent .to-row-wrapper:focus-within { box-shadow: inset 0 -1px var(--primary, #0078d4); }
+  #inlineComposerContent .email-composer-editor-wrap { min-height: 180px !important; }
+  #mailListPanel.is-composing .email-composer-editor {
+    width: 100%;
+    min-width: 0;
+    padding: 16px !important;
+    font-size: 16px !important;
+    line-height: 1.65 !important;
+    overflow-wrap: anywhere;
+    overflow-x: auto;
+  }
+  #inlineComposerContent .email-composer-attachments { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px; }
+  #inlineComposerContent .email-attachment-card { max-width: 100%; min-width: 0; }
+  #inlineComposerContent .email-attachment-card > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  #inlineComposerContent .email-attachment-card button { flex-shrink: 0; min-width: 36px; min-height: 36px; }
+  #inlineComposerContent .project-group-banner,
+  #inlineComposerContent .project-group-banner > div { flex-wrap: wrap; min-width: 0; max-width: 100%; gap: 6px; overflow-wrap: anywhere; }
+}

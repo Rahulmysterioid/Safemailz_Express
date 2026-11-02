@@ -135,7 +135,7 @@ export default function DashboardLayout() {
                     <AdminProvider>
                         {/* overflow: 'clip' (not 'hidden') so programmatic scrolls (e.g. scrollIntoView in sidebars) can never shift the Topbar out of view */}
                         {/* height: 100% (not 100vh) because html has zoom: 1.1 — 100vh would overflow the viewport and push the Topbar off-screen */}
-                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1, minHeight: 0, overflow: 'clip' }}>
+                        <div className="dashboard-shell" style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1, minHeight: 0, overflow: 'clip' }}>
                             <Topbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} mobileMenuOpen={mobileMenuOpen} onToggleMobileMenu={()=>setMobileMenuOpen(open=>!open)} />
                             <div
                                 className={`dashboard-wrapper ${sidebarCollapsed ? 'employee-sidebar-collapsed' : ''}`}

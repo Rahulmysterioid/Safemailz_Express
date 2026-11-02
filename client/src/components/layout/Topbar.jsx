@@ -181,7 +181,7 @@ export default function Topbar({ searchQuery, setSearchQuery , mobileMenuOpen, o
                     <div className="topbar-divider" aria-hidden="true" />
 
                     {/* Brand Lockup: Horizontal Logo Badge + 2-Line Text Stack */}
-                    <div className="flex items-center" style={{ position: 'relative' }}>
+                    <div className="topbar-brand-wrap flex items-center" style={{ position: 'relative' }}>
                         <Link 
                             to="/dashboard" 
                             className="topbar-logo group flex items-center no-underline select-none" 

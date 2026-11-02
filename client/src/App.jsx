@@ -33,6 +33,7 @@ import { GeneralSettingsProvider } from './context/GeneralSettingsContext'
 import { SidebarUIProvider } from './context/SidebarUIContext'
 
 import './responsive.css'
+import './pages/dashboard/MobileCompose.css'
 
 function App() {
   return (

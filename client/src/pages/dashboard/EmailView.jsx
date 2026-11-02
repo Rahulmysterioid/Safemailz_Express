@@ -1,6 +1,6 @@
 import './EmailLightPolish.css';
 import './ComposerRibbon.css';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { useParams, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { useUI } from '../../context/UIContext';
@@ -346,7 +346,9 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
     // jump-to-date logic replaced with actual filtering
 
     // Composer State
-    const [isComposing, setIsComposing] = useState(false);
+    const [isComposing, setComposing] = useState(false);
+    const [mobileFormattingOpen, setMobileFormattingOpen] = useState(false);
+    const [mobileAdvancedFormattingOpen, setMobileAdvancedFormattingOpen] = useState(false);
     const [composeTo, setComposeTo] = useState('');
     const [composeCc, setComposeCc] = useState('');
     const [composeBcc, setComposeBcc] = useState('');
@@ -359,6 +361,29 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
 
     // Dropdown toggles & formatting states for format toolbar
     const [openDropdown, setOpenDropdown] = useState(null);
+    const setIsComposing = useCallback(value => {
+        setComposing(value);
+        setMobileFormattingOpen(false);
+        setMobileAdvancedFormattingOpen(false);
+        setOpenDropdown(null);
+    }, []);
+    useEffect(() => {
+        if (!mobileFormattingOpen) return;
+        const closeFormatting = event => {
+            if (event.key !== 'Escape' || openDropdown || !window.matchMedia('(max-width: 700px)').matches) return;
+            event.preventDefault();
+            event.stopPropagation();
+            if (mobileAdvancedFormattingOpen) {
+                setMobileAdvancedFormattingOpen(false);
+                document.querySelector('#mobileComposeFormatting [aria-controls="formatToolbar"]')?.focus();
+            } else {
+                setMobileFormattingOpen(false);
+                document.querySelector('.mobile-compose-format-toggle')?.focus();
+            }
+        };
+        document.addEventListener('keydown', closeFormatting, true);
+        return () => document.removeEventListener('keydown', closeFormatting, true);
+    }, [mobileFormattingOpen, mobileAdvancedFormattingOpen, openDropdown]);
     const [currentFont, setCurrentFont] = useState('Aptos');
     const [currentFontSize, setCurrentFontSize] = useState('12');
     const [currentLineSpacing, setCurrentLineSpacing] = useState('1.5');
@@ -394,7 +419,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
             if(sel?.rangeCount && editor?.contains(sel.anchorNode) && editor.contains(sel.focusNode)){
                 composerRangeRef.current=sel.getRangeAt(0).cloneRange();
                 const commands={Bold:'bold',Italic:'italic',Underline:'underline',Strikethrough:'strikeThrough',Subscript:'subscript',Superscript:'superscript','Bullet List':'insertUnorderedList','Numbered List':'insertOrderedList','Align Left':'justifyLeft',Center:'justifyCenter','Align Right':'justifyRight',Justify:'justifyFull'};
-                document.querySelectorAll('#formatToolbar button[title]').forEach(btn=>{if(commands[btn.title])btn.setAttribute('aria-pressed',String(document.queryCommandState(commands[btn.title])));});
+                document.querySelectorAll('#formatToolbar button[title], #mobileComposeFormatting button[title]').forEach(btn=>{if(commands[btn.title])btn.setAttribute('aria-pressed',String(document.queryCommandState(commands[btn.title])));});
             }
         };
         document.addEventListener('selectionchange',remember);
@@ -406,8 +431,8 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
         toolbar.querySelectorAll('.ribbon-group').forEach(group=>{group.setAttribute('role','group');group.setAttribute('aria-label',group.querySelector('.ribbon-group-label')?.textContent.trim() || 'Formatting');});
         const menus={editorFontBtn:['font','editorFontMenu'],editorFontSizeBtn:['fontSize','editorFontSizeMenu'],editorHighlightColorBtn:['highlight','editorHighlightColorMenu'],editorTextColorBtn:['textColor','editorTextColorMenu'],editorLineSpacingBtn:['lineSpacing','editorLineSpacingMenu']};
         Object.entries(menus).forEach(([id,[key,menu]])=>{const btn=document.getElementById(id);if(btn){btn.setAttribute('aria-expanded',String(openDropdown===key));btn.setAttribute('aria-controls',menu);}});
-        const escape=e=>{if(e.key==='Escape' && openDropdown){e.preventDefault();setOpenDropdown(null);}};
-        document.addEventListener('keydown',escape);return ()=>document.removeEventListener('keydown',escape);
+        const escape=e=>{if(e.key==='Escape' && openDropdown){e.preventDefault();e.stopPropagation();setOpenDropdown(null);}};
+        document.addEventListener('keydown',escape,true);return ()=>document.removeEventListener('keydown',escape,true);
     },[isComposing,openDropdown]);
 
 
@@ -422,7 +447,10 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
             const trigger = menu.parentElement?.querySelector('button');
             if (!trigger) return;
             const rect = trigger.getBoundingClientRect();
-            const previous = menu.getAttribute('style');
+            // Restore only positioning. Restoring the entire style attribute after
+            // React hides the menu would incorrectly set display:flex again.
+            const positionProperties = ['position', 'left', 'top', 'right', 'bottom', 'width', 'maxWidth', 'maxHeight', 'overflowY', 'zIndex'];
+            const previous = Object.fromEntries(positionProperties.map(property => [property, menu.style[property]]));
             const width = Math.min(Math.max(menu.offsetWidth, 160), window.innerWidth - 24);
             Object.assign(menu.style, {
                 position: 'fixed', left: `${Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))}px`,
@@ -430,7 +458,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                 maxWidth: 'calc(100vw - 24px)', maxHeight: `${Math.max(80, Math.min(240, window.innerHeight - rect.bottom - 24))}px`,
                 overflowY: 'auto', zIndex: '10000'
             });
-            restored.push(() => previous === null ? menu.removeAttribute('style') : menu.setAttribute('style', previous));
+            restored.push(() => Object.assign(menu.style, previous));
         });
         const close = () => setOpenDropdown(null);
         toolbar.addEventListener('scroll', close);
@@ -727,7 +755,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
             setIsComposing(false);
             setOpenDropdown(null);
         }
-    }, [folder]);
+    }, [folder, setIsComposing]);
 
     // Close formatting ribbon dropdowns on outside click
     useEffect(() => {
@@ -998,7 +1026,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
             window.removeEventListener('safemailz-compose', handleOpenCompose);
             window.removeEventListener('safemailz-close-modal', handleCloseModal);
         };
-    }, [folder, searchQuery, currentProjectParam]);
+    }, [folder, searchQuery, currentProjectParam, setIsComposing]);
 
     const getDateFilterRange = () => {
         if (!appliedDatePreset && !appliedCustomDate) return null;
@@ -2124,7 +2152,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
     }
 
     return (
-        <div className="mail-list-panel" id="mailListPanel" style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', minHeight: 0, overflow: 'hidden' }}>
+        <div className={`mail-list-panel ${isComposing ? 'is-composing' : ''} ${mobileAdvancedFormattingOpen ? 'mobile-advanced-formatting-open' : ''}`} id="mailListPanel" style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', minHeight: 0, overflow: 'hidden' }}>
 
             {/* Top Toolbar Container */}
             <div className="mail-toolbar-container">
@@ -3465,7 +3493,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                             {/* Composer Action Bar */}
                             <div className="email-composer-header">
                                 <div className="composer-header-action-bar">
-                                    <div style={{ display: 'flex', alignContent: 'center', alignItems: 'center', gap: '8px' }}>
+                                    <div className="composer-primary-actions" style={{ display: 'flex', alignContent: 'center', alignItems: 'center', gap: '8px' }}>
 
                                         {/* Send Split Button */}
                                         <div className="composer-send-split-btn">
@@ -3495,12 +3523,28 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                             type="button"
                                             onClick={() => composerAttachInputRef.current?.click()}
                                             title="Attach Files"
+                                            aria-label="Attach files"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                                             </svg>
                                             <span>Attach</span>
                                         </button>
+
+                                        <button
+                                            className="mobile-compose-format-toggle"
+                                            type="button"
+                                            title="Formatting"
+                                            aria-label="Formatting"
+                                            aria-expanded={mobileFormattingOpen}
+                                            aria-controls="mobileComposeFormatting"
+                                            onMouseDown={event => event.preventDefault()}
+                                            onClick={() => {
+                                                setMobileFormattingOpen(open => !open);
+                                                setMobileAdvancedFormattingOpen(false);
+                                                setOpenDropdown(null);
+                                            }}
+                                        >Aa</button>
 
                                         {composeImportance !== 'normal' && (
                                             <span
@@ -3525,6 +3569,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                         {composerToast && (
                                             <span
                                                 className="composer-status-toast"
+                                                role="status"
                                                 style={{
                                                     display: 'inline-flex',
                                                     alignItems: 'center',
@@ -3547,6 +3592,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                         <button
                                             className="composer-top-delete-btn"
                                             title={folder === 'support' ? 'Clear support message' : 'Discard draft'}
+                                            aria-label={folder === 'support' ? 'Clear support message' : 'Discard draft'}
                                             type="button"
                                             onClick={() => {
                                                 if (folder === 'support') {
@@ -3569,12 +3615,32 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                 </div>
                             </div>
 
+                            <div id="mobileComposeFormatting" className="mobile-compose-formatting" hidden={!mobileFormattingOpen}
+                                role="group" aria-label="Quick formatting"
+                                onMouseDownCapture={event => { if (event.target.closest('button')) event.preventDefault(); }}>
+                                <button type="button" title="Bold" aria-label="Bold" aria-pressed="false" onClick={() => formatDoc('bold')}><strong>B</strong></button>
+                                <button type="button" title="Italic" aria-label="Italic" aria-pressed="false" onClick={() => formatDoc('italic')}><em>I</em></button>
+                                <button type="button" title="Underline" aria-label="Underline" aria-pressed="false" onClick={() => formatDoc('underline')}><u>U</u></button>
+                                <button type="button" title="Bullet List" aria-label="Bullet List" aria-pressed="false" onClick={() => formatDoc('insertUnorderedList')}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1" /></svg>
+                                </button>
+                                <button type="button" title="Insert link" aria-label="Insert link" onClick={handleInsertLink}>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m10 13 4-4M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0M13 8l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" /></svg>
+                                </button>
+                                <button type="button" title="More formatting" aria-label="More formatting" aria-controls="formatToolbar" aria-expanded={mobileAdvancedFormattingOpen}
+                                    onClick={() => {
+                                        setMobileAdvancedFormattingOpen(open => !open);
+                                        setOpenDropdown(null);
+                                        if (!mobileAdvancedFormattingOpen) requestAnimationFrame(() => document.getElementById('editorFontBtn')?.focus());
+                                    }}>•••</button>
+                            </div>
+
                             {/* Composer Form Fields */}
                             <div className="email-composer-fields-wrap" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
 
                                 {/* From Row */}
                                 <div className="email-composer-field from-row-wrapper">
-                                    <button type="button" className="composer-field-label-btn" disabled>From</button>
+                                    <span className="composer-field-label-btn">From</span>
                                     <span className="composer-from-email-val">{user?.email || 'singhrahuldrill1@outlook.com'}</span>
                                 </div>
 
@@ -3594,10 +3660,14 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                         </div>
                                     )}
 
-                                    <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '8px' }}>
-                                        <button type="button" className="composer-field-label-btn">To</button>
+                                    <div className="composer-recipient-line" style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '8px' }}>
+                                        <label htmlFor="composeTo" className="composer-field-label-btn">To</label>
                                         <input
+                                            id="composeTo"
                                             type="text"
+                                            inputMode="email"
+                                            autoCapitalize="none"
+                                            spellCheck={false}
                                             placeholder="Add recipients"
                                             value={composeTo}
                                             onChange={(e) => setComposeTo(e.target.value)}
@@ -3605,18 +3675,22 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                             style={{ border: 'none', outline: 'none', flex: 1, fontSize: '0.85rem', padding: '6px 0', backgroundColor: 'transparent' }}
                                         />
                                         <div className="cc-bcc-triggers" style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', color: '#64748B' }}>
-                                            <span className={`cc-bcc-trigger-btn ${showCc ? 'cc-bcc-active' : ''}`} style={{ cursor: 'pointer', fontWeight: 500, padding: '2px 6px', borderRadius: '4px' }} onClick={() => setShowCc(!showCc)}>Cc</span>
-                                            <span className={`cc-bcc-trigger-btn ${showBcc ? 'cc-bcc-active' : ''}`} style={{ cursor: 'pointer', fontWeight: 500, padding: '2px 6px', borderRadius: '4px' }} onClick={() => setShowBcc(!showBcc)}>Bcc</span>
+                                            <button type="button" className={`cc-bcc-trigger-btn ${showCc ? 'cc-bcc-active' : ''}`} aria-expanded={showCc} aria-controls="composeCcRow" onClick={() => setShowCc(!showCc)}>Cc</button>
+                                            <button type="button" className={`cc-bcc-trigger-btn ${showBcc ? 'cc-bcc-active' : ''}`} aria-expanded={showBcc} aria-controls="composeBccRow" onClick={() => setShowBcc(!showBcc)}>Bcc</button>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Cc Row */}
                                 {showCc && (
-                                    <div className="email-composer-field cc-row-wrapper">
-                                        <button type="button" className="composer-field-label-btn">Cc</button>
+                                    <div id="composeCcRow" className="email-composer-field cc-row-wrapper">
+                                        <label htmlFor="composeCc" className="composer-field-label-btn">Cc</label>
                                         <input
+                                            id="composeCc"
                                             type="text"
+                                            inputMode="email"
+                                            autoCapitalize="none"
+                                            spellCheck={false}
                                             placeholder="Add Cc recipients (comma separated)"
                                             value={composeCc}
                                             onChange={(e) => setComposeCc(e.target.value)}
@@ -3627,10 +3701,14 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
 
                                 {/* Bcc Row */}
                                 {showBcc && (
-                                    <div className="email-composer-field bcc-row-wrapper">
-                                        <button type="button" className="composer-field-label-btn">Bcc</button>
+                                    <div id="composeBccRow" className="email-composer-field bcc-row-wrapper">
+                                        <label htmlFor="composeBcc" className="composer-field-label-btn">Bcc</label>
                                         <input
+                                            id="composeBcc"
                                             type="text"
+                                            inputMode="email"
+                                            autoCapitalize="none"
+                                            spellCheck={false}
                                             placeholder="Add Bcc recipients (comma separated)"
                                             value={composeBcc}
                                             onChange={(e) => setComposeBcc(e.target.value)}
@@ -3643,6 +3721,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
                                 <div className="email-composer-field subject-row-wrapper">
                                     <input
                                         type="text"
+                                        aria-label={folder === 'support' ? 'Reason' : 'Subject'}
                                         placeholder={folder === 'support' ? 'Reason' : 'Add a subject'}
                                         value={composeSubject}
                                         onChange={(e) => setComposeSubject(e.target.value)}
