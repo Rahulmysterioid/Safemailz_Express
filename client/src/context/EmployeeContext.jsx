@@ -136,7 +136,7 @@ export function EmployeeProvider({ children }) {
                 workDays: ['M', 'T', 'W', 'T', 'F', 'S'],
                 workMode: 'Remote',
                 workLocation: 'Gilgit Baltistan, Pakistan',
-                bio: 'Untoward person',
+                bio: '',
                 usedStorage: 0,
                 totalStorage: 15,
                 permissions: {
@@ -321,8 +321,8 @@ export function EmployeeProvider({ children }) {
                             // Fill seats from top to bottom
                             data.employees.forEach((emp, i) => {
                                 const names = (emp.name || emp.email.split('@')[0]).split(' ');
-                                const firstName = names[0] || 'Employee';
-                                const lastName = names.slice(1).join(' ') || '';
+                                const firstName = emp.firstName || emp.first_name || names[0] || 'Employee';
+                                const lastName = emp.lastName || emp.last_name || names.slice(1).join(' ') || '';
                                 const cover = emp.coverImage || emp.cover_image || (emp.id && savedCovers[String(emp.id)]) || (emp.email && savedCovers[String(emp.email).toLowerCase()]) || null;
 
                                 const empData = {
@@ -338,10 +338,10 @@ export function EmployeeProvider({ children }) {
                                     isPending: emp.isPending || false,
                                     subscriptionStatus: emp.subscription_status || 'active',
                                     subscriptionEndDate: emp.subscription_end_date,
-                                    workDays: ['M', 'T', 'W', 'T', 'F', 'S'],
-                                    workMode: 'Remote',
-                                    workLocation: 'Global',
-                                    bio: '',
+                                    workDays: emp.workDays || (emp.work_days ? (typeof emp.work_days === 'string' ? JSON.parse(emp.work_days || '[]') : emp.work_days) : ['M', 'T', 'W', 'T', 'F', 'S']),
+                                    workMode: emp.workMode || emp.work_mode || 'Remote',
+                                    workLocation: emp.workLocation || emp.work_location || 'Gilgit Baltistan, Pakistan',
+                                    bio: emp.bio || '',
                                     usedStorage: 0,
                                     totalStorage: 15,
                                     permissions: {
@@ -423,7 +423,7 @@ export function EmployeeProvider({ children }) {
             workDays: ['M', 'T', 'W', 'T', 'F', 'S'],
             workMode: 'Remote',
             workLocation: 'Gilgit Baltistan, Pakistan',
-            bio: 'Untoward person',
+            bio: '',
             usedStorage: 0,
             totalStorage: 15,
             permissions: {
@@ -568,7 +568,8 @@ export function EmployeeProvider({ children }) {
         return { success: true };
     };
 
-    const updateProfile = (index, field, value) => {
+    const updateProfile = async (index, field, value) => {
+        let targetEmp = null;
         setEmployees(prev => {
             const next = [...prev];
             if (next[index]) {
@@ -576,9 +577,30 @@ export function EmployeeProvider({ children }) {
                     ...next[index],
                     [field]: value
                 };
+                targetEmp = next[index];
             }
             return next;
         });
+
+        if (targetEmp) {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const identifier = targetEmp.id || targetEmp.email;
+                if (identifier) {
+                    await fetch(`/api/settings/employee/${identifier}/profile`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-user-id': String(currentUser.id || '1'),
+                            'x-org-id': String(currentUser.organization_id || '1')
+                        },
+                        body: JSON.stringify({ [field]: value })
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to sync employee profile to server:', err);
+            }
+        }
     };
 
     const updateEmployeeCover = async (indexOrId, coverValue) => {

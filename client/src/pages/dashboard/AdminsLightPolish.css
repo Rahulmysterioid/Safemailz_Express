@@ -34,6 +34,18 @@ html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]
  #adminsSidebar .sidebar-admin-storage-wrap{border-color:#dce5ef!important}
  #adminsSidebar .admin-kebab-btn{color:#526982!important;min-width:28px;min-height:28px}
  #adminsSidebar #btnAddAdmin{background:#0875d1!important;color:#fff!important;border-radius:9px!important;min-height:40px}
+ #adminsView .admins-header-bar{border-color:#dce5ef!important;padding-bottom:16px!important;gap:16px}
+ #adminsView .admins-page-title{color:#20344e!important;font-size:24px!important;line-height:1.3}
+ #adminsView .admins-page-subtitle{color:#61748c!important;font-size:14px!important;line-height:1.6}
+ #adminsView .admins-count-pill{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
+ #adminsView .admins-main-search-input{background:#fff!important;border:1px solid #d4dfec!important;color:#24364d!important;min-height:40px;border-radius:9px!important}
+ #adminsView .admins-main-search-input::placeholder{color:#70829a!important}
+ #adminsView #adminDetailsEmptyState,
+ #adminsView .admins-empty-state{background:#fff!important;border:1px dashed #c8d6e7!important;width:100%!important;max-width:none!important}
+ #adminsSidebar #adminsExportBtn:disabled{opacity:0.5!important;pointer-events:none!important;cursor:not-allowed!important}
+ #adminsSidebar #adminsSidebarSearchBtn:hover,
+ #adminsView #mainAdminsSearchBtn:hover{background:rgba(8,117,209,0.08)!important;color:#0875d1!important}
+ #adminsSidebar .sidebar-empty-box{background:#f8fafc!important;border-color:#dce5ef!important;color:#61748c!important}
  :is(#adminsView,#adminsSidebar) :is(button,input,[tabindex]):focus-visible{outline:2px solid #0875d1!important;outline-offset:3px!important}
 }
 @media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #adminsView{padding:16px!important}#adminsView .admin-action-footer{flex-wrap:wrap;gap:12px}}
@@ -41,12 +53,169 @@ html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]
 #adminsSidebar .sidebar-admin-card>div:first-child>div:first-child{min-width:0;flex:1}
 #adminsSidebar .sidebar-admin-card>div:first-child{align-items:flex-start}
 
-/* Explicit sizing: these views do not compile arbitrary Tailwind utility classes. */
-#adminsView.admins-empty-page {display:flex;align-items:center;justify-content:center;min-height:400px;overflow:auto;padding:32px;}
-#adminsView #adminDetailsEmptyState {display:flex;flex-direction:column;align-items:center;text-align:center;box-sizing:border-box;width:100%;max-width:540px;padding:32px 28px;background:var(--surface,#fff);border:1px solid var(--border,#dce5ef);border-radius:18px;box-shadow:0 8px 30px #243b5308;}
-#adminsView #adminDetailsEmptyState img {display:block;width:160px;max-width:100%;height:160px;object-fit:contain;margin:0 0 20px;flex-shrink:0;}
-#adminsView #adminDetailsEmptyState h2 {margin:0;font-size:22px;font-weight:700;line-height:1.3;color:var(--text-primary,#20344e);}
-#adminsView #adminDetailsEmptyState p {max-width:380px;margin:12px 0 24px;font-size:14px;line-height:1.6;color:var(--text-secondary,#61748c);}
-#adminsView #adminDetailsEmptyState button {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:11px 20px;border:0;border-radius:9px;background:#0875d1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
-#adminsView #adminDetailsEmptyState button:hover {background:#0665b6;}
-@media(max-width:600px){#adminsView #adminDetailsEmptyState {padding:24px 18px;}#adminsView #adminDetailsEmptyState img {width:120px;height:120px;}#adminsView.admins-empty-page {min-height:340px;}}
+/* Explicit layout & alignment for Admins View Container */
+#adminsView {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+}
+
+/* Sidebar empty state box specifications */
+#adminsSidebar .sidebar-empty-box {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 32px 16px !important;
+  min-height: 96px !important;
+  border: 1px dashed #dce5ef !important;
+  border-radius: 12px !important;
+  background: #f8fafc !important;
+  color: #61748c !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+
+/* Explicit sizing and styling for Admins empty state */
+#adminsView #adminDetailsEmptyState,
+#adminsView .admins-empty-state {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 380px !important;
+  padding: 48px 24px !important;
+  background: var(--surface, #fff);
+  border: 1px dashed var(--border, #dce5ef) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+#adminsView .admins-empty-icon {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+  border-radius: 9999px !important;
+  background: rgba(239, 246, 255, 0.8) !important;
+  border: 1px solid #dbeafe !important;
+  color: #2563eb !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 20px !important;
+}
+
+#adminsView #adminDetailsEmptyState h2 {
+  margin: 0 0 6px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  color: var(--text-primary, #0f172a) !important;
+}
+
+#adminsView #adminDetailsEmptyState p {
+  max-width: 384px !important;
+  margin: 0 0 24px !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: var(--text-secondary, #64748b) !important;
+}
+
+#adminsView #adminDetailsEmptyState button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 40px !important;
+  padding: 10px 20px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+#adminsView #adminDetailsEmptyState button:hover {
+  background: #1d4ed8 !important;
+}
+
+@media(max-width:600px){
+  #adminsView #adminDetailsEmptyState,
+  #adminsView .admins-empty-state {
+    padding: 32px 16px !important;
+    min-height: 320px !important;
+  }
+}
+
+/* Dark mode overrides for Admins empty state & sidebar */
+html.dark #adminsSidebar .sidebar-empty-box,
+[data-theme="dark"] #adminsSidebar .sidebar-empty-box,
+body.dark #adminsSidebar .sidebar-empty-box {
+  background: rgba(20, 24, 33, 0.6) !important;
+  border: 1px dashed #222938 !important;
+  color: #94a3b8 !important;
+}
+
+html.dark #adminsSidebar #adminsExportBtn:disabled,
+[data-theme="dark"] #adminsSidebar #adminsExportBtn:disabled,
+body.dark #adminsSidebar #adminsExportBtn:disabled {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+
+html.dark #adminsView #adminDetailsEmptyState,
+html.dark #adminsView .admins-empty-state,
+[data-theme="dark"] #adminsView #adminDetailsEmptyState,
+[data-theme="dark"] #adminsView .admins-empty-state,
+body.dark #adminsView #adminDetailsEmptyState,
+body.dark #adminsView .admins-empty-state {
+  background: #141821 !important;
+  border: 1px dashed #242c3d !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark #adminsView .admins-empty-icon,
+[data-theme="dark"] #adminsView .admins-empty-icon,
+body.dark #adminsView .admins-empty-icon {
+  background: #132842 !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark #adminsView #adminDetailsEmptyState h2,
+[data-theme="dark"] #adminsView #adminDetailsEmptyState h2,
+body.dark #adminsView #adminDetailsEmptyState h2 {
+  color: #f1f5f9 !important;
+}
+
+html.dark #adminsView #adminDetailsEmptyState p,
+[data-theme="dark"] #adminsView #adminDetailsEmptyState p,
+body.dark #adminsView #adminDetailsEmptyState p {
+  color: #94a3b8 !important;
+}
+
+html.dark #adminsSidebar #adminsSidebarSearchBtn:hover,
+[data-theme="dark"] #adminsSidebar #adminsSidebarSearchBtn:hover,
+body.dark #adminsSidebar #adminsSidebarSearchBtn:hover,
+html.dark #adminsView #mainAdminsSearchBtn:hover,
+[data-theme="dark"] #adminsView #mainAdminsSearchBtn:hover,
+body.dark #adminsView #mainAdminsSearchBtn:hover {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+

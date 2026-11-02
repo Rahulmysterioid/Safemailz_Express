@@ -7,6 +7,7 @@ html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]
   #clientsView .clients-count-pill{background:#e7f2ff!important;color:#0964b5!important;border-color:#bdd8f5!important}
   #clientsView .clients-main-search-input,#clientsSidebar #clientsSidebarSearch{background:#fff!important;border:1px solid #d4dfec!important;color:#24364d!important;min-height:40px;border-radius:9px!important}
   #clientsView .clients-main-search-input::placeholder,#clientsSidebar #clientsSidebarSearch::placeholder{color:#70829a!important}
+  #clientsView .clients-main-search-input:disabled,#clientsSidebar #clientsSidebarSearch:disabled{background:#f1f5f9!important;opacity:.55!important;cursor:not-allowed!important}
   #clientsView .client-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:14px!important;box-shadow:0 3px 12px #243b5308!important;padding:22px!important;overflow:visible!important}
   #clientsView .client-card-accent-bar{height:3px!important;border-radius:14px 14px 0 0;opacity:.75}
   #clientsView .client-card-header{border-color:#e7edf5!important;padding-bottom:16px!important;margin-bottom:18px!important}
@@ -25,6 +26,9 @@ html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]
   #clientsSidebar{background:#f7f9fc!important;border-color:#dce5ef!important}
   #clientsSidebar .clients-sidebar-stats{background:#fff!important;border-color:#dce5ef!important;color:#354c67!important}
   #clientsSidebar .clients-sidebar-action-btn{background:#fff!important;border-color:#d4dfec!important;color:#425a76!important;min-height:36px}
+  #clientsSidebar .clients-sidebar-action-btn:disabled{opacity:.5!important;cursor:not-allowed!important}
+  #clientsSidebar .clients-sidebar-action-btn:disabled:hover{background:#fff!important;border-color:#d4dfec!important;cursor:not-allowed!important}
+  #clientsSidebar .clients-sidebar-empty{background:rgba(241,245,249,0.6)!important;border-color:#d4dfec!important;color:#64748b!important}
   #clientsSidebar .clients-directory-heading{color:#6b7e96!important;letter-spacing:.08em}
   #clientsSidebar .sidebar-client-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:10px!important;box-shadow:0 2px 6px #243b5306!important;padding:14px 12px!important}
   #clientsSidebar .sidebar-client-card:hover{background:#f0f6ff!important;border-color:#b5d1f0!important}

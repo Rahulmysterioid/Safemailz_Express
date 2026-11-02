@@ -1,6 +1,7 @@
 import './SubscriptionLightPolish.css';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useEmployee } from '../../context/EmployeeContext';
+import { useAdmin } from '../../context/AdminContext';
 
 const DEFAULT_SEARCH_POS = {
     verticalPlacement: 'top-inline', // 'top-inline', 'above-renew', 'below-renew'
@@ -94,7 +95,9 @@ function computeSeatSubMeta(emp) {
 
 export default function SubscriptionView() {
     const { filledEmployees, setEmployees } = useEmployee();
+    const { admins } = useAdmin();
     const [searchQuery, setSearchQuery] = useState('');
+    const subSearchInputRef = useRef(null);
     const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'attention' | 'free'
     const [targetRenewEmails, setTargetRenewEmails] = useState([]);
     const [viewState, setViewState] = useState(1); // 1: List, 2: Plan, 3: Success
@@ -141,7 +144,64 @@ export default function SubscriptionView() {
         }
     }, [viewState]);
 
-    // Compute KPI statistics across all filled employees
+    // All provisioned subscription seats: employees + administrative privilege accounts
+    const allSeats = useMemo(() => {
+        const seats = [...filledEmployees];
+        const existingEmails = new Set(seats.map(s => (s.email || '').toLowerCase()));
+
+        // Add org owner / current admin if not in seat list
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (currentUser && currentUser.email && !existingEmails.has(currentUser.email.toLowerCase())) {
+                const roleLower = (currentUser.role || '').toLowerCase();
+                const isOwnerOrAdmin = roleLower === 'org_owner' || roleLower === 'admin' || roleLower === 'org owner';
+                if (isOwnerOrAdmin) {
+                    const fullName = (currentUser.admin_name || currentUser.name || 'Admin Owner').trim();
+                    const names = fullName.split(/\s+/);
+                    seats.unshift({
+                        id: currentUser.id || 'owner-seat',
+                        status: 'filled',
+                        firstName: names[0] || 'Admin',
+                        lastName: names.slice(1).join(' ') || 'Owner',
+                        email: currentUser.email,
+                        role: currentUser.role || 'Admin',
+                        usedStorage: 1.2,
+                        totalStorage: 50,
+                        subscriptionStatus: 'active',
+                        isExpired: false
+                    });
+                    existingEmails.add(currentUser.email.toLowerCase());
+                }
+            }
+        } catch (e) {}
+
+        // Add admins from AdminContext if not in seat list
+        if (Array.isArray(admins)) {
+            admins.forEach((adm, i) => {
+                if (adm.email && !existingEmails.has(adm.email.toLowerCase())) {
+                    const fullName = (adm.name || 'Administrator').trim();
+                    const names = fullName.split(/\s+/);
+                    seats.push({
+                        id: adm.id || `admin-${i}`,
+                        status: 'filled',
+                        firstName: names[0] || 'Admin',
+                        lastName: names.slice(1).join(' ') || '',
+                        email: adm.email,
+                        role: 'Admin',
+                        usedStorage: parseFloat(adm.storageUsed) || 1.18,
+                        totalStorage: parseFloat(adm.storageTotal || adm.storageLimit) || 50,
+                        subscriptionStatus: 'active',
+                        isExpired: false
+                    });
+                    existingEmails.add(adm.email.toLowerCase());
+                }
+            });
+        }
+
+        return seats;
+    }, [filledEmployees, admins]);
+
+    // Compute KPI statistics across all subscription seats
     const subStats = useMemo(() => {
         let activeCount = 0;
         let attentionCount = 0; // expiring <= 7 days or expired
@@ -150,7 +210,7 @@ export default function SubscriptionView() {
         let totalUsedGb = 0;
         let totalCapacityGb = 0;
 
-        filledEmployees.forEach(emp => {
+        allSeats.forEach(emp => {
             const meta = computeSeatSubMeta(emp);
             const used = Number(emp.usedStorage) || 0;
             const cap = Number(emp.totalStorage) || 15;
@@ -172,7 +232,7 @@ export default function SubscriptionView() {
         });
 
         return {
-            total: filledEmployees.length,
+            total: allSeats.length,
             activeCount,
             attentionCount,
             expiredCount,
@@ -180,10 +240,10 @@ export default function SubscriptionView() {
             totalUsedGb: Math.round(totalUsedGb * 10) / 10,
             totalCapacityGb
         };
-    }, [filledEmployees]);
+    }, [allSeats]);
 
     const filteredEmployees = useMemo(() => {
-        return filledEmployees.filter(emp => {
+        return allSeats.filter(emp => {
             const meta = computeSeatSubMeta(emp);
             if (statusFilter === 'active' && meta.isCurrentlyExpired) return false;
             if (statusFilter === 'attention' && !meta.isCurrentlyExpired && !meta.isExpiringSoon) return false;
@@ -194,12 +254,18 @@ export default function SubscriptionView() {
             const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase();
             const email = (emp.email || '').toLowerCase();
             const role = (emp.role || '').toLowerCase();
-            return fullName.includes(q) || email.includes(q) || role.includes(q);
+            const isAdmin = meta.isAdminOrOwner || role.includes('admin') || role.includes('owner');
+            const matchesAdminQuery = (q === 'admin' || q === 'admins' || q === 'administrator' || q === 'owner' || q === 'org owner' || q === 'free') && isAdmin;
+            return fullName.includes(q) || email.includes(q) || role.includes(q) || matchesAdminQuery;
         });
-    }, [filledEmployees, searchQuery, statusFilter]);
+    }, [allSeats, searchQuery, statusFilter]);
 
     const handleRenewAll = () => {
-        const targetList = filteredEmployees.length > 0 ? filteredEmployees : filledEmployees;
+        const targetList = (filteredEmployees.length > 0 ? filteredEmployees : allSeats).filter(e => !computeSeatSubMeta(e).isAdminOrOwner);
+        if (targetList.length === 0) {
+            showToast('All selected seats are admin privileges (free tier) and do not require renewal.', 'info');
+            return;
+        }
         setTargetRenewEmails(targetList.map(emp => emp.email));
         setViewState(2);
     };
@@ -264,16 +330,21 @@ export default function SubscriptionView() {
 
     const handleExportSubscriptionsCsv = () => {
         if (!filteredEmployees.length) return;
-        const headers = ['Seat #', 'Employee Name', 'Email', 'Role', 'Status', 'Used Storage (GB)', 'Total Storage (GB)'];
+        const headers = ['Seat #', 'Employee Name', 'Email', 'Role', 'Status', 'Work Mode', 'Work Location', 'Work Days', 'DOB', 'Bio', 'Used Storage (GB)', 'Total Storage (GB)'];
         const rows = [
             headers.join(','),
             ...filteredEmployees.map((emp, i) => {
-                const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || 'Employee';
+                const fullName = emp.name || `${emp.firstName || emp.first_name || ''} ${emp.lastName || emp.last_name || ''}`.trim() || emp.admin_name || 'Employee';
                 const meta = computeSeatSubMeta(emp);
                 const statusLabel = meta.isAdminOrOwner ? 'Free (Admin)' : meta.daysLeftText;
                 const used = emp.usedStorage || 0;
                 const total = emp.totalStorage || 15;
-                return [i + 1, fullName, emp.email || '', emp.role || 'Employee', statusLabel, used, total]
+                const mode = emp.workMode || emp.work_mode || 'Remote';
+                const loc = emp.workLocation || emp.work_location || 'Gilgit Baltistan, Pakistan';
+                const daysVal = Array.isArray(emp.workDays) ? emp.workDays.join(' ') : (Array.isArray(emp.work_days) ? emp.work_days.join(' ') : (emp.workDays || emp.work_days || 'M T W T F S'));
+                const dob = emp.dob || '';
+                const bio = emp.bio || '';
+                return [i + 1, fullName, emp.email || '', emp.role || 'Employee', statusLabel, mode, loc, daysVal, dob, bio, used, total]
                     .map(v => `"${String(v ?? '').replace(/"/g, '""')}"`)
                     .join(',');
             })
@@ -483,6 +554,7 @@ export default function SubscriptionView() {
                         alignStyle = { margin: '0 auto', width: '100%', maxWidth: '620px' };
                     }
 
+                    const isSearchingAdmin = searchQuery.toLowerCase().trim() === 'admin' || statusFilter === 'free';
                     return (
                         <div
                             id="subSearchContainer"
@@ -493,42 +565,76 @@ export default function SubscriptionView() {
                                 transform: `translate(${searchPos.offsetX}px, ${searchPos.offsetY}px)`,
                                 transition: 'transform 0.1s ease-out',
                                 zIndex: 5,
+                                display: 'flex',
+                                alignItems: 'center',
                                 ...alignStyle,
                                 ...customStyle
                             }}
                         >
-                            <svg
-                                className="sub-search-icon"
+                            <button
+                                type="button"
+                                id="subSearchBtn"
+                                aria-label="Search subscriptions"
+                                title="Search subscriptions (Click to focus)"
+                                onClick={() => {
+                                    if (subSearchInputRef.current) {
+                                        subSearchInputRef.current.focus();
+                                    } else {
+                                        document.getElementById('subSearchBoxInput')?.focus();
+                                    }
+                                }}
                                 style={{
                                     position: 'absolute',
-                                    left: '14px',
+                                    left: '8px',
                                     top: '50%',
                                     transform: 'translateY(-50%)',
-                                    width: '16px',
-                                    height: '16px',
-                                    pointerEvents: 'none'
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '9999px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    color: '#94a3b8',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    zIndex: 2
                                 }}
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
                             >
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
+                                <svg
+                                    className="sub-search-icon"
+                                    style={{
+                                        width: '16px',
+                                        height: '16px'
+                                    }}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
                             <input
+                                ref={subSearchInputRef}
                                 type="text"
-                                placeholder="Search employee subscription by name, email, or role..."
+                                placeholder="Search employee or admin subscription by name, email, or role..."
                                 id="subSearchBoxInput"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Escape') setSearchQuery('');
+                                    if (e.key === 'Enter') subSearchInputRef.current?.blur();
+                                }}
                                 style={{
                                     width: '100%',
                                     height: '42px',
-                                    padding: '0 2.5rem 0 2.5rem',
+                                    padding: '0 5rem 0 2.5rem',
                                     borderRadius: '10px',
                                     fontSize: '0.85rem',
                                     outline: 'none',
@@ -536,16 +642,65 @@ export default function SubscriptionView() {
                                     boxSizing: 'border-box'
                                 }}
                             />
-                            {searchQuery && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    right: '8px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    zIndex: 2
+                                }}
+                            >
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchQuery('')}
+                                        className="sub-search-clear-btn"
+                                        aria-label="Clear search query"
+                                        title="Clear search query"
+                                        style={{ position: 'static', transform: 'none' }}
+                                    >
+                                        &times;
+                                    </button>
+                                )}
                                 <button
                                     type="button"
-                                    onClick={() => setSearchQuery('')}
-                                    className="sub-search-clear-btn"
-                                    aria-label="Clear search query"
+                                    id="subSearchAdminBtn"
+                                    className={`sub-search-admin-circle-btn ${isSearchingAdmin ? 'active' : ''}`}
+                                    aria-label="Filter or search admin accounts"
+                                    title={isSearchingAdmin ? 'Reset Admin filter' : 'Filter / Search Admins'}
+                                    onClick={() => {
+                                        if (isSearchingAdmin) {
+                                            setSearchQuery('');
+                                            setStatusFilter('all');
+                                        } else {
+                                            setSearchQuery('admin');
+                                            subSearchInputRef.current?.focus();
+                                        }
+                                    }}
+                                    style={{
+                                        width: '26px',
+                                        height: '26px',
+                                        borderRadius: '9999px',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: isSearchingAdmin ? '1.5px solid #0875d1' : '1px solid #d4dfec',
+                                        background: isSearchingAdmin ? 'rgba(8,117,209,0.12)' : 'transparent',
+                                        color: isSearchingAdmin ? '#0875d1' : '#64748b',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        transition: 'all 0.15s ease'
+                                    }}
                                 >
-                                    &times;
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    </svg>
                                 </button>
-                            )}
+                            </div>
                         </div>
                     );
                 };
@@ -559,8 +714,8 @@ export default function SubscriptionView() {
                                     <h2 className="sub-page-title">Subscription &amp; Seat Billing</h2>
                                     <span className="sub-page-count-pill">
                                         {searchQuery || statusFilter !== 'all'
-                                            ? `${filteredEmployees.length} of ${filledEmployees.length} Seats`
-                                            : `${filledEmployees.length} Active Seats`}
+                                            ? `${filteredEmployees.length} of ${allSeats.length} Seats`
+                                            : `${allSeats.length} Active Seats`}
                                     </span>
                                     {statusFilter !== 'all' && (
                                         <span className="sub-active-filter-chip">
@@ -707,7 +862,7 @@ export default function SubscriptionView() {
                                                 { id: 'all', label: 'All' },
                                                 { id: 'active', label: 'Active' },
                                                 { id: 'attention', label: 'Expiring / Expired' },
-                                                { id: 'free', label: 'Free Tier' }
+                                                { id: 'free', label: 'Admin (Free)' }
                                             ].map(tab => (
                                                 <button
                                                     key={tab.id}
@@ -736,7 +891,7 @@ export default function SubscriptionView() {
                                                     onClick={() => setStatusFilter(id)}
                                                     className={`sub-filter-pill ${statusFilter === id ? 'active' : ''}`}
                                                 >
-                                                    {id === 'all' ? 'All' : id === 'active' ? 'Active' : id === 'attention' ? 'Expiring' : 'Free'}
+                                                    {id === 'all' ? 'All' : id === 'active' ? 'Active' : id === 'attention' ? 'Expiring' : 'Admin (Free)'}
                                                 </button>
                                             ))}
                                         </div>
@@ -784,7 +939,7 @@ export default function SubscriptionView() {
                                 </div>
                             ) : (
                                 filteredEmployees.map((emp, index) => {
-                                    const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || 'Employee';
+                                    const fullName = emp.name || `${emp.firstName || emp.first_name || ''} ${emp.lastName || emp.last_name || ''}`.trim() || emp.admin_name || 'Employee';
                                     const initials = getInitials(fullName);
                                     const avatarBg = AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length];
                                     const meta = computeSeatSubMeta(emp);
@@ -873,6 +1028,38 @@ export default function SubscriptionView() {
                                                                 </span>
                                                             )}
                                                         </div>
+                                                        {/* Onboarding Profile Attributes (Work Mode, Location, DOB, Bio) */}
+                                                        <div className="sub-card-onboarding-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', fontSize: '0.76rem' }}>
+                                                            {(emp.workMode || emp.work_mode) && (
+                                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#F1F5F9', color: '#1E293B', padding: '2px 7px', borderRadius: '4px', fontWeight: 600 }}>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                                                    {emp.workMode || emp.work_mode}
+                                                                </span>
+                                                            )}
+                                                            {(emp.workLocation || emp.work_location) && (
+                                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#F1F5F9', color: '#475569', padding: '2px 7px', borderRadius: '4px' }}>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                                                    {emp.workLocation || emp.work_location}
+                                                                </span>
+                                                            )}
+                                                            {emp.dob && emp.dob !== 'Pending Signup' && (
+                                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#F8FAFC', color: '#64748B', padding: '2px 7px', borderRadius: '4px' }}>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                                    DOB: {emp.dob}
+                                                                </span>
+                                                            )}
+                                                            {(emp.workDays || emp.work_days) && (
+                                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#F8FAFC', color: '#64748B', padding: '2px 7px', borderRadius: '4px' }}>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                                                    Days: {Array.isArray(emp.workDays) ? emp.workDays.join(' ') : (Array.isArray(emp.work_days) ? emp.work_days.join(' ') : emp.workDays || emp.work_days)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {emp.bio ? (
+                                                            <div style={{ marginTop: '5px', fontSize: '0.78rem', color: '#64748B', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '420px' }} title={emp.bio}>
+                                                                "{emp.bio}"
+                                                            </div>
+                                                        ) : null}
                                                     </div>
                                                 </div>
 

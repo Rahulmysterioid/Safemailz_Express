@@ -40,8 +40,15 @@ router.get('/profile', (req, res) => {
         SELECT 
             u.id as user_id, 
             u.admin_name, 
+            u.first_name,
+            u.last_name,
             u.email, 
             u.role,
+            u.dob,
+            u.work_mode,
+            u.work_location,
+            u.bio,
+            u.work_days,
             u.marketing_opt_in,
             u.terms_accepted,
             u.created_at as user_joined,
@@ -59,14 +66,33 @@ router.get('/profile', (req, res) => {
         if (err) return res.status(500).json({ error: 'Database error' });
         if (!row) return res.status(404).json({ error: 'Profile not found' });
 
+        let parsedWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+        if (row.work_days) {
+            try {
+                parsedWorkDays = typeof row.work_days === 'string' ? JSON.parse(row.work_days) : row.work_days;
+            } catch (e) {}
+        }
         res.json({
             success: true,
             profile: {
                 user: {
                     id: row.user_id,
                     admin_name: row.admin_name,
+                    name: row.admin_name,
+                    first_name: row.first_name || (row.admin_name ? row.admin_name.split(' ')[0] : ''),
+                    last_name: row.last_name || (row.admin_name ? row.admin_name.split(' ').slice(1).join(' ') : ''),
+                    firstName: row.first_name || (row.admin_name ? row.admin_name.split(' ')[0] : ''),
+                    lastName: row.last_name || (row.admin_name ? row.admin_name.split(' ').slice(1).join(' ') : ''),
                     email: row.email,
                     role: row.role === 'employee' ? 'Employee' : 'Admin',
+                    dob: row.dob || null,
+                    work_mode: row.work_mode || 'Remote',
+                    workMode: row.work_mode || 'Remote',
+                    work_location: row.work_location || 'Gilgit Baltistan, Pakistan',
+                    workLocation: row.work_location || 'Gilgit Baltistan, Pakistan',
+                    bio: row.bio || '',
+                    work_days: parsedWorkDays,
+                    workDays: parsedWorkDays,
                     status: 'Active',
                     marketing_opt_in: row.marketing_opt_in ? true : false,
                     terms_accepted: row.terms_accepted ? true : false,
@@ -93,8 +119,15 @@ router.get('/employee/:email', (req, res) => {
 
     const query = `
         SELECT 
+            u.admin_name,
+            u.first_name,
+            u.last_name,
             u.created_at,
             u.dob,
+            u.work_mode,
+            u.work_location,
+            u.bio,
+            u.work_days,
             u.role
         FROM users u
         WHERE u.email = ? AND u.organization_id = ?
@@ -106,8 +139,15 @@ router.get('/employee/:email', (req, res) => {
 
         res.json({
             success: true,
+            name: row.admin_name,
+            firstName: row.first_name || (row.admin_name ? row.admin_name.split(' ')[0] : ''),
+            lastName: row.last_name || (row.admin_name ? row.admin_name.split(' ').slice(1).join(' ') : ''),
             joined_date: row.created_at,
             dob: row.dob || 'Not provided',
+            workMode: row.work_mode || 'Remote',
+            workLocation: row.work_location || 'Gilgit Baltistan, Pakistan',
+            bio: row.bio || '',
+            workDays: row.work_days,
             role: row.role || 'employee'
         });
     });
@@ -503,7 +543,7 @@ router.get('/employees', (req, res) => {
     if (!context) return res.status(401).json({ error: 'Unauthorized' });
 
     db.all(
-        'SELECT id, admin_name as name, email, role, created_at, dob, is_blocked, subscription_status, subscription_end_date, canViewRealEmailsAndSignatures, canSendEmails, canReplyToEmails, cover_image FROM users WHERE organization_id = ? AND role != \'org_owner\' ORDER BY created_at ASC',
+        'SELECT id, admin_name as name, first_name, last_name, email, role, created_at, dob, work_mode, work_location, bio, work_days, is_blocked, subscription_status, subscription_end_date, canViewRealEmailsAndSignatures, canSendEmails, canReplyToEmails, cover_image FROM users WHERE organization_id = ? AND role != \'org_owner\' ORDER BY created_at ASC',
         [context.orgId],
         (err, rows) => {
             if (err) {
@@ -513,7 +553,7 @@ router.get('/employees', (req, res) => {
 
             // Also fetch pending invitations so they don't disappear if localStorage is cleared
             db.all(
-                'SELECT id, email, created_at, cover_image FROM invitations WHERE organization_id = ? AND status = \'pending\' ORDER BY created_at ASC',
+                'SELECT id, email, first_name, last_name, dob, work_mode, work_location, bio, work_days, created_at, cover_image FROM invitations WHERE organization_id = ? AND status = \'pending\' ORDER BY created_at ASC',
                 [context.orgId],
                 (err, invites) => {
                     if (err) {
@@ -521,25 +561,72 @@ router.get('/employees', (req, res) => {
                         return res.json({ success: true, employees: rows }); // Return just users if invites fail
                     }
 
-                    const pendingInvites = invites.map(inv => ({
-                        id: 'invite_' + inv.id,
-                        name: inv.email.split('@')[0], // Fallback name for pending invites
-                        email: inv.email,
-                        role: 'employee (pending)',
-                        created_at: inv.created_at,
-                        isPending: true,
-                        coverImage: inv.cover_image || null
-                    }));
-
-                    const mappedRows = rows.map(r => ({
-                        ...r,
-                        coverImage: r.cover_image || null,
-                        permissions: {
-                            viewRealEmailIds: r.canViewRealEmailsAndSignatures === 1 || r.canViewRealEmailsAndSignatures === true,
-                            sendEmails: r.canSendEmails === null ? true : (r.canSendEmails === 1 || r.canSendEmails === true),
-                            replyEmails: r.canReplyToEmails === null ? true : (r.canReplyToEmails === 1 || r.canReplyToEmails === true)
+                    const pendingInvites = invites.map(inv => {
+                        const displayName = (inv.first_name || inv.last_name)
+                            ? `${inv.first_name || ''} ${inv.last_name || ''}`.trim()
+                            : inv.email.split('@')[0];
+                        let parsedWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+                        if (inv.work_days) {
+                            try {
+                                parsedWorkDays = typeof inv.work_days === 'string' ? JSON.parse(inv.work_days) : inv.work_days;
+                            } catch (e) {}
                         }
-                    }));
+                        return {
+                            id: 'invite_' + inv.id,
+                            name: displayName,
+                            admin_name: displayName,
+                            firstName: inv.first_name || inv.email.split('@')[0],
+                            first_name: inv.first_name || inv.email.split('@')[0],
+                            lastName: inv.last_name || '',
+                            last_name: inv.last_name || '',
+                            email: inv.email,
+                            role: 'employee (pending)',
+                            created_at: inv.created_at,
+                            isPending: true,
+                            dob: inv.dob || 'Pending Signup',
+                            workMode: inv.work_mode || 'Remote',
+                            work_mode: inv.work_mode || 'Remote',
+                            workLocation: inv.work_location || 'Gilgit Baltistan, Pakistan',
+                            work_location: inv.work_location || 'Gilgit Baltistan, Pakistan',
+                            bio: inv.bio || '',
+                            workDays: parsedWorkDays,
+                            work_days: parsedWorkDays,
+                            coverImage: inv.cover_image || null
+                        };
+                    });
+
+                    const mappedRows = rows.map(r => {
+                        const names = (r.name || '').split(' ');
+                        const fName = r.first_name || names[0] || '';
+                        const lName = r.last_name || names.slice(1).join(' ') || '';
+                        let parsedWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+                        if (r.work_days) {
+                            try {
+                                parsedWorkDays = typeof r.work_days === 'string' ? JSON.parse(r.work_days) : r.work_days;
+                            } catch (e) {}
+                        }
+                        return {
+                            ...r,
+                            admin_name: r.name,
+                            firstName: fName,
+                            first_name: fName,
+                            lastName: lName,
+                            last_name: lName,
+                            workMode: r.work_mode || 'Remote',
+                            work_mode: r.work_mode || 'Remote',
+                            workLocation: r.work_location || 'Gilgit Baltistan, Pakistan',
+                            work_location: r.work_location || 'Gilgit Baltistan, Pakistan',
+                            bio: r.bio || '',
+                            workDays: parsedWorkDays,
+                            work_days: parsedWorkDays,
+                            coverImage: r.cover_image || null,
+                            permissions: {
+                                viewRealEmailIds: r.canViewRealEmailsAndSignatures === 1 || r.canViewRealEmailsAndSignatures === true,
+                                sendEmails: r.canSendEmails === null ? true : (r.canSendEmails === 1 || r.canSendEmails === true),
+                                replyEmails: r.canReplyToEmails === null ? true : (r.canReplyToEmails === 1 || r.canReplyToEmails === true)
+                            }
+                        };
+                    });
 
                     // Combine and sort by creation date
                     const allEmployees = [...mappedRows, ...pendingInvites].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
@@ -690,6 +777,99 @@ router.put('/employees/:identifier/cover', handleUpdateCover);
 router.patch('/:identifier/cover', handleUpdateCover);
 router.post('/:identifier/cover', handleUpdateCover);
 router.put('/:identifier/cover', handleUpdateCover);
+
+// PUT / PATCH / POST /api/employees/:identifier/profile or /api/settings/employee/:identifier/profile
+const handleUpdateEmployeeProfile = (req, res) => {
+    const context = getUserContext(req);
+    if (!context) return res.status(401).json({ error: 'Unauthorized' });
+
+    const identifier = req.params.identifier || req.params.email || req.params.id;
+    const { firstName, lastName, admin_name, dob, workMode, workLocation, bio, workDays } = req.body;
+
+    const parsedId = identifier && !isNaN(parseInt(identifier, 10)) ? parseInt(identifier, 10) : null;
+    const isInvite = typeof identifier === 'string' && identifier.startsWith('invite_');
+    const inviteId = isInvite ? parseInt(identifier.replace('invite_', ''), 10) : null;
+
+    if (isInvite && inviteId) {
+        db.run(
+            'UPDATE invitations SET first_name = COALESCE(?, first_name), last_name = COALESCE(?, last_name) WHERE id = ? AND organization_id = ?',
+            [firstName || null, lastName || null, inviteId, context.orgId],
+            function(err) {
+                if (err) return res.status(500).json({ error: 'Database error updating invitation profile' });
+                return res.json({ success: true, message: 'Invite profile updated' });
+            }
+        );
+        return;
+    }
+
+    const newAdminName = admin_name || ((firstName || lastName) ? `${firstName || ''} ${lastName || ''}`.trim() : null);
+    const workDaysJson = Array.isArray(workDays) ? JSON.stringify(workDays) : (typeof workDays === 'string' ? workDays : null);
+
+    const userSql = `
+        UPDATE users 
+        SET admin_name = COALESCE(?, admin_name),
+            first_name = COALESCE(?, first_name),
+            last_name = COALESCE(?, last_name),
+            dob = COALESCE(?, dob),
+            work_mode = COALESCE(?, work_mode),
+            work_location = COALESCE(?, work_location),
+            bio = COALESCE(?, bio),
+            work_days = COALESCE(?, work_days)
+        WHERE (LOWER(email) = LOWER(?) OR (id = ? AND ? IS NOT NULL)) AND organization_id = ?
+    `;
+
+    db.run(userSql, [
+        newAdminName,
+        firstName || null,
+        lastName || null,
+        dob || null,
+        workMode || null,
+        workLocation || null,
+        bio !== undefined ? bio : null,
+        workDaysJson,
+        identifier,
+        parsedId,
+        parsedId,
+        context.orgId
+    ], function(userErr) {
+        if (userErr) {
+            console.error('[DB Error updating employee profile]:', userErr);
+            return res.status(500).json({ error: 'Database error updating employee profile' });
+        }
+
+        if (this.changes === 0) {
+            db.run(
+                'UPDATE invitations SET first_name = COALESCE(?, first_name), last_name = COALESCE(?, last_name) WHERE LOWER(email) = LOWER(?) AND organization_id = ?',
+                [firstName || null, lastName || null, identifier, context.orgId],
+                function(invErr) {
+                    return res.json({ success: true, message: 'Profile updated' });
+                }
+            );
+            return;
+        }
+
+        return res.json({
+            success: true,
+            message: 'Profile updated successfully',
+            profile: {
+                firstName: firstName || null,
+                lastName: lastName || null,
+                workMode: workMode || null,
+                workLocation: workLocation || null,
+                bio: bio !== undefined ? bio : null,
+                dob: dob || null,
+                workDays: workDays || null
+            }
+        });
+    });
+};
+
+router.put('/employee/:identifier/profile', handleUpdateEmployeeProfile);
+router.patch('/employee/:identifier/profile', handleUpdateEmployeeProfile);
+router.put('/employees/:identifier/profile', handleUpdateEmployeeProfile);
+router.patch('/employees/:identifier/profile', handleUpdateEmployeeProfile);
+router.put('/:identifier/profile', handleUpdateEmployeeProfile);
+router.patch('/:identifier/profile', handleUpdateEmployeeProfile);
 
 
 // GET /api/settings/employees/export

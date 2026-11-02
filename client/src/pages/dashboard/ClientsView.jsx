@@ -68,6 +68,7 @@ export default function ClientsView() {
         openAddModal,
         openEditModal,
         deleteClient,
+        handleImport,
         showToast
     } = useClient();
 
@@ -111,8 +112,8 @@ export default function ClientsView() {
         >
             <div className="clients-view-inner w-full max-w-[1440px] mx-auto">
                 {/* Top Header Bar */}
-                <div className="clients-header-bar flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 pb-4 border-b border-slate-200/80 dark:border-[#1e2636]">
-                    <div className="flex flex-col gap-1">
+                <div className="clients-header-bar flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 w-full pb-4 border-b border-slate-200/80 dark:border-[#1e2636]">
+                    <div className="flex flex-col">
                         <div className="flex items-center gap-2.5">
                             <h2 className="clients-page-title text-xl font-bold text-slate-900 dark:text-slate-100 m-0 tracking-tight">
                                 All Clients
@@ -121,10 +122,10 @@ export default function ClientsView() {
                                 id="clientsCountHeader"
                                 className="clients-count-pill bg-blue-50 dark:bg-[#132842] text-blue-600 dark:text-sky-400 text-xs font-bold px-2.5 py-0.5 rounded-full border border-blue-200/60 dark:border-sky-500/30"
                             >
-                                {searchQuery ? `${filteredClients.length} of ${clients.length}` : filteredClients.length}
+                                {clients.length === 0 ? 0 : searchQuery ? `${filteredClients.length} of ${clients.length}` : filteredClients.length}
                             </span>
                         </div>
-                        <p className="clients-page-subtitle text-xs text-slate-500 dark:text-slate-400 m-0">
+                        <p className="clients-page-subtitle max-w-md text-sm text-slate-500 dark:text-slate-400 mt-1 m-0">
                             Manage client profiles, contact directory, and organization identifiers
                         </p>
                     </div>
@@ -132,7 +133,7 @@ export default function ClientsView() {
                     {/* Right-aligned Search & Quick Action */}
                     <div className="flex items-center gap-3 w-full sm:w-auto">
                         <div
-                            className="clients-main-search-wrap relative w-full sm:w-80 md:w-96 flex items-center"
+                            className="clients-main-search-wrap relative w-full sm:w-80 flex items-center"
                             style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
                         >
                             <svg
@@ -156,9 +157,10 @@ export default function ClientsView() {
                                 type="text"
                                 placeholder="Search clients by name, email, or client ID..."
                                 id="mainClientsSearchInput"
+                                disabled={clients.length === 0}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="clients-main-search-input w-full h-9 pl-10 pr-8 text-xs rounded-lg bg-white dark:bg-[#141821] border border-slate-200 dark:border-[#242c3d] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs focus:border-blue-500 focus:outline-none transition-all"
+                                className="clients-main-search-input w-full h-9 pl-10 pr-8 text-xs rounded-lg bg-white dark:bg-[#141821] border border-slate-200 dark:border-[#242c3d] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs focus:border-blue-500 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50 dark:disabled:bg-[#10141d]"
                                 style={{ paddingLeft: '40px', paddingRight: searchQuery ? '32px' : '14px', boxSizing: 'border-box' }}
                             />
                             {searchQuery && (
@@ -210,45 +212,72 @@ export default function ClientsView() {
                             <button type="button" className="btn-add-client" onClick={fetchClients}>Retry</button>
                         </div>
                     ) : filteredClients.length === 0 ? (
-                        <div className="clients-empty-state text-center py-14 px-6 bg-white dark:bg-[#141821] border-2 border-dashed border-slate-200 dark:border-[#242c3d] rounded-2xl">
-                            <div className="clients-empty-icon w-12 h-12 rounded-full bg-slate-50 dark:bg-[#1c2230] border border-slate-200/80 dark:border-[#2c364c] flex items-center justify-center mx-auto mb-3 text-slate-400 dark:text-sky-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
+                        clients.length === 0 ? (
+                            <div className="clients-empty-state w-full min-h-[380px] bg-white dark:bg-[#141821] border border-dashed border-slate-200 dark:border-[#242c3d] rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-xs">
+                                <div className="clients-empty-icon w-16 h-16 rounded-full bg-blue-50/80 dark:bg-[#132842] border border-blue-100 dark:border-sky-500/30 flex items-center justify-center text-blue-600 dark:text-sky-400 mb-5 shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                    No clients added yet
+                                </h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
+                                    Get started by adding your first client to organize contact details and project assignments.
+                                </p>
+                                <div className="flex flex-col sm:flex-row items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={openAddModal}
+                                        className="btn-add-client inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-xs transition-all cursor-pointer border-0"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>Add First Client</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        id="clientsEmptyImportBtn"
+                                        onClick={handleImport}
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white dark:bg-[#141821] hover:bg-slate-50 dark:hover:bg-[#1c2230] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#222938] text-sm font-medium shadow-2xs transition-all cursor-pointer"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        <span>or Import from CSV</span>
+                                    </button>
+                                </div>
                             </div>
-                            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-1">
-                                {searchQuery ? 'No matching clients found' : 'No clients added yet'}
-                            </h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto m-0 mb-4">
-                                {searchQuery
-                                    ? `No client records match "${searchQuery}". Try adjusting or clearing your search filter.`
-                                    : 'Get started by adding your first client to organize contact details and project assignments.'}
-                            </p>
-                            {searchQuery ? (
+                        ) : (
+                            <div className="clients-empty-state w-full min-h-[320px] bg-white dark:bg-[#141821] border border-dashed border-slate-200 dark:border-[#242c3d] rounded-2xl p-8 sm:p-12 flex flex-col items-center justify-center text-center shadow-xs">
+                                <div className="clients-empty-icon w-14 h-14 rounded-full bg-slate-100 dark:bg-[#1c2230] border border-slate-200/80 dark:border-[#2c364c] flex items-center justify-center mb-4 text-slate-400 dark:text-sky-400 shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                    No matching clients found
+                                </h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
+                                    No client records match "{searchQuery}". Try adjusting or clearing your search filter.
+                                </p>
                                 <button
                                     type="button"
                                     onClick={() => setSearchQuery('')}
-                                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-[#132842] hover:bg-blue-100 border border-blue-200/60 dark:border-sky-500/30 transition-colors cursor-pointer"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-[#132842] hover:bg-blue-100 border border-blue-200/60 dark:border-sky-500/30 transition-colors cursor-pointer"
                                 >
                                     <span>Clear search filter</span>
                                 </button>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={openAddModal}
-                                    className="btn-add-client inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-all cursor-pointer border-0"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    </svg>
-                                    <span>Add First Client</span>
-                                </button>
-                            )}
-                        </div>
+                            </div>
+                        )
                     ) : (
                         filteredClients.map((c, index) => {
                             const name = c.displayName || c.name || `Client ${index + 1}`;
@@ -284,7 +313,7 @@ export default function ClientsView() {
                                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', paddingBottom: '0.875rem', marginBottom: '1rem' }}
                                     >
                                         <div
-                                            className="flex items-center flex-wrap gap-3 min-w-0"
+                                            className="client-card-identity flex items-center flex-wrap gap-3 min-w-0"
                                             style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', minWidth: 0 }}
                                         >
                                             <div
@@ -328,7 +357,7 @@ export default function ClientsView() {
                                         </div>
 
                                         {/* Right Action Controls: Quick Edit + Kebab Menu */}
-                                        <div className="flex items-center gap-2 shrink-0">
+                                        <div className="client-card-actions flex items-center gap-2 shrink-0">
                                             <button
                                                 type="button"
                                                 onClick={(e) => {

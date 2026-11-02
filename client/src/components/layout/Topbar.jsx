@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import SettingsPanel from "./SettingsPanel";
 import { DEFAULT_LOGO_CONFIG, LOGO_CONFIG_STORAGE_KEY } from "./LogoUiControllerPopover";
 
-export default function Topbar({ searchQuery, setSearchQuery }) {
+export default function Topbar({ searchQuery, setSearchQuery , mobileMenuOpen, onToggleMobileMenu }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [user, setUser] = useState(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -73,12 +73,23 @@ export default function Topbar({ searchQuery, setSearchQuery }) {
         return () => document.removeEventListener("mousedown", handleOutsideSearch);
     }, []);
 
-    // Load user from localStorage
+    // Load user from localStorage and listen to updates
     useEffect(() => {
-        const stored = localStorage.getItem("currentUser");
-        if (stored) {
-            try { setUser(JSON.parse(stored)); } catch (e) { console.error(e); }
-        }
+        const syncUser = () => {
+            const stored = localStorage.getItem("currentUser");
+            if (stored) {
+                try { setUser(JSON.parse(stored)); } catch (e) { console.error(e); }
+            }
+        };
+        syncUser();
+        window.addEventListener("storage", syncUser);
+        window.addEventListener("employeeStateUpdate", syncUser);
+        window.addEventListener("accountSessionChanged", syncUser);
+        return () => {
+            window.removeEventListener("storage", syncUser);
+            window.removeEventListener("employeeStateUpdate", syncUser);
+            window.removeEventListener("accountSessionChanged", syncUser);
+        };
     }, []);
 
     // Close dropdown when clicking outside (same as original window.addEventListener)
@@ -135,7 +146,10 @@ export default function Topbar({ searchQuery, setSearchQuery }) {
                     {/* Mobile Hamburger Menu */}
                     <button
                         className="mobile-menu-btn text-slate-700 dark:text-slate-200"
-                        aria-label="Open Menu"
+                        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={mobileMenuOpen}
+                        aria-controls="responsiveSidebar"
+                        onClick={onToggleMobileMenu}
                         style={{ display: "none", background: "none", border: "none", padding: "4px", cursor: "pointer", color: "inherit", marginRight: "8px" }}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -490,7 +504,7 @@ export default function Topbar({ searchQuery, setSearchQuery }) {
                                 {user && (
                                     <div className="px-3 py-2.5 mb-1 border-b border-slate-100 dark:border-[#282c35]">
                                         <div className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">
-                                            {user.admin_name || user.name || "Admin Account"}
+                                            {user.admin_name || user.name || `${user.firstName || user.first_name || ''} ${user.lastName || user.last_name || ''}`.trim() || user.email || (user.role?.toLowerCase() === 'employee' ? 'Employee' : 'Admin Account')}
                                         </div>
                                         {user.email && (
                                             <div className="text-[11px] text-slate-400 dark:text-slate-400 truncate mt-0.5">

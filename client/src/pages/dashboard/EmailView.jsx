@@ -411,6 +411,33 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
     },[isComposing,openDropdown]);
 
 
+    // Dropdowns escape the horizontally scrolling ribbon on narrow screens.
+    useEffect(() => {
+        if (!isComposing || !openDropdown || !window.matchMedia('(max-width: 992px)').matches) return;
+        const toolbar = document.getElementById('formatToolbar');
+        if (!toolbar) return;
+        const restored = [];
+        toolbar.querySelectorAll('.email-composer-dropdown-menu, .email-composer-color-palette').forEach(menu => {
+            if (getComputedStyle(menu).display === 'none') return;
+            const trigger = menu.parentElement?.querySelector('button');
+            if (!trigger) return;
+            const rect = trigger.getBoundingClientRect();
+            const previous = menu.getAttribute('style');
+            const width = Math.min(Math.max(menu.offsetWidth, 160), window.innerWidth - 24);
+            Object.assign(menu.style, {
+                position: 'fixed', left: `${Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))}px`,
+                top: `${rect.bottom + 6}px`, right: 'auto', bottom: 'auto', width: `${width}px`,
+                maxWidth: 'calc(100vw - 24px)', maxHeight: `${Math.max(80, Math.min(240, window.innerHeight - rect.bottom - 24))}px`,
+                overflowY: 'auto', zIndex: '10000'
+            });
+            restored.push(() => previous === null ? menu.removeAttribute('style') : menu.setAttribute('style', previous));
+        });
+        const close = () => setOpenDropdown(null);
+        toolbar.addEventListener('scroll', close);
+        window.addEventListener('resize', close);
+        return () => { restored.forEach(restore => restore()); toolbar.removeEventListener('scroll', close); window.removeEventListener('resize', close); };
+    }, [isComposing, openDropdown]);
+
     // Resizable Splitter State - synchronized with UIContext and local storage
     const [listColumnWidth, setListColumnWidth] = useState(() => {
         if (uiSettings?.mailList?.width) {
@@ -2920,7 +2947,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
 
             {/* Split View (Left: Mail List, Right: Reading Pane / Composer) */}
             <div
-                className="mail-split-view"
+                className={`mail-split-view ${selectedEmail || isComposing ? 'mobile-detail-open' : ''}`}
                 id="mailSplitView"
                 ref={splitViewRef}
                 style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}
@@ -3426,6 +3453,7 @@ export default function EmailView({ folder: folderProp, searchQuery: searchQuery
 
                 {/* Right: Reading Pane OR Inline Composer */}
                 <div className={`mail-reading-column ${isComposing ? 'composing' : ''}`} id="mailReadingColumn" style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+                    {!isComposing && selectedEmail && <button type="button" className="mobile-mail-back" onClick={()=>setSelectedEmail(null)}>← Back to messages</button>}
 
                     {/* 1. INLINE COMPOSER VIEW */}
                     {isComposing && (

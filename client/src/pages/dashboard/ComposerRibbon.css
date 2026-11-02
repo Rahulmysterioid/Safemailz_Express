@@ -31,3 +31,20 @@
   #mailListPanel #formatToolbar .ribbon-group{padding-inline:4px!important}
 }
 
+
+/* Keep formatting groups on one compact row on smaller screens. */
+@media(max-width:992px){
+ #mailListPanel #formatToolbar.expanded-ribbon{flex-wrap:nowrap!important;width:100%!important;max-width:100%!important;min-width:0!important;height:112px!important;min-height:112px!important;max-height:112px!important;padding:8px!important;gap:0!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;scrollbar-width:thin;touch-action:pan-x}
+ #mailListPanel #formatToolbar .ribbon-group{width:auto!important;min-width:max-content!important;flex:0 0 auto!important;min-height:84px!important;height:84px!important;padding:0 10px!important;align-items:center!important;justify-content:space-between!important;border-right:1px solid var(--cr-border)!important}
+ #mailListPanel #formatToolbar .ribbon-group:last-child{border-right:0!important}
+ #mailListPanel #formatToolbar .ribbon-group::after{display:none!important}
+ #mailListPanel #formatToolbar .ribbon-group-content{display:flex!important;flex-wrap:nowrap!important;height:auto!important;min-height:60px!important;margin:0!important;align-items:center!important}
+ #mailListPanel #formatToolbar .ribbon-group-label{margin:2px 0 0!important;padding:0!important;font-size:10px!important;text-align:center!important;width:100%}
+ #mailListPanel #formatToolbar .email-composer-toolbar-btn{min-height:28px!important;min-width:30px!important;flex-shrink:0}
+ #mailListPanel #formatToolbar .stacked-btn{min-height:56px!important}
+ #mailListPanel .mail-toolbar-container:has(#formatToolbar){width:100%;min-width:0;padding:6px!important;flex-shrink:0}
+ #mailListPanel #inlineComposerContent{width:100%!important;min-width:0!important;min-height:0!important;flex:1;overflow-y:auto!important}
+ #mailListPanel .composer-header-action-bar{display:flex;flex-wrap:wrap;gap:8px;padding:10px!important}
+ #mailListPanel .composer-header-actions-right{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+ #mailListPanel .email-composer-editor{min-height:180px!important;padding:14px!important}
+}

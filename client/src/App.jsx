@@ -32,6 +32,8 @@ import { UIProvider } from './context/UIContext'
 import { GeneralSettingsProvider } from './context/GeneralSettingsContext'
 import { SidebarUIProvider } from './context/SidebarUIContext'
 
+import './responsive.css'
+
 function App() {
   return (
     <UIProvider>
@@ -69,7 +71,11 @@ function App() {
             <Route path="emailIds" element={<AdminRoute><EmailIdsView /></AdminRoute>} />
             <Route path="tasks" element={<TasksView />} />
             <Route path="subscription" element={<AdminRoute><SubscriptionView /></AdminRoute>} />
+            <Route path="boost" element={<AdminRoute><SubscriptionView /></AdminRoute>} />
           </Route>
+
+          {/* Quick alias for /boost */}
+          <Route path="/boost" element={<Navigate to="/dashboard/subscription" replace />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/signin" replace />} />

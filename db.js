@@ -219,6 +219,8 @@ const initDb = async () => {
                 organization_id INTEGER NOT NULL,
                 email TEXT NOT NULL,
                 token TEXT NOT NULL UNIQUE,
+                first_name TEXT,
+                last_name TEXT,
                 status TEXT DEFAULT 'pending',
                 expires_at DATETIME NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -361,9 +363,21 @@ const initDb = async () => {
         await runMigration("ALTER TABLE users ADD COLUMN subscription_status TEXT DEFAULT 'active'");
         await runMigration("ALTER TABLE users ADD COLUMN is_inbox_snoozed BOOLEAN DEFAULT 0");
         await runMigration("ALTER TABLE users ADD COLUMN snooze_until DATETIME");
-        await runMigration("ALTER TABLE users ADD COLUMN snoozed_at DATETIME");
         await runMigration("ALTER TABLE users ADD COLUMN cover_image TEXT");
+        await runMigration("ALTER TABLE users ADD COLUMN first_name TEXT");
+        await runMigration("ALTER TABLE users ADD COLUMN last_name TEXT");
+        await runMigration("ALTER TABLE users ADD COLUMN work_mode TEXT DEFAULT 'Remote'");
+        await runMigration("ALTER TABLE users ADD COLUMN work_location TEXT DEFAULT 'Gilgit Baltistan, Pakistan'");
+        await runMigration("ALTER TABLE users ADD COLUMN bio TEXT DEFAULT ''");
+        await runMigration("ALTER TABLE users ADD COLUMN work_days TEXT DEFAULT '[\"M\",\"T\",\"W\",\"T\",\"F\",\"S\"]'");
         await runMigration("ALTER TABLE invitations ADD COLUMN cover_image TEXT");
+        await runMigration("ALTER TABLE invitations ADD COLUMN first_name TEXT");
+        await runMigration("ALTER TABLE invitations ADD COLUMN last_name TEXT");
+        await runMigration("ALTER TABLE invitations ADD COLUMN dob TEXT");
+        await runMigration("ALTER TABLE invitations ADD COLUMN work_mode TEXT DEFAULT 'Remote'");
+        await runMigration("ALTER TABLE invitations ADD COLUMN work_location TEXT DEFAULT 'Gilgit Baltistan, Pakistan'");
+        await runMigration("ALTER TABLE invitations ADD COLUMN bio TEXT DEFAULT ''");
+        await runMigration("ALTER TABLE invitations ADD COLUMN work_days TEXT DEFAULT '[\"M\",\"T\",\"W\",\"T\",\"F\",\"S\"]'");
 
         // Migrations for emails table
         await runMigration("ALTER TABLE emails ADD COLUMN external_sender_name TEXT");

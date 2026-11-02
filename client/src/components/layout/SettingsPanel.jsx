@@ -461,14 +461,29 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
                                 <h3 className="settings-float-section-title">Account / User Information</h3>
                                 <p className="settings-float-section-desc">Your personal account details.</p>
                                 {loading ? <div className="settings-float-card" style={{padding:"1rem",color:"var(--text-secondary)"}}>Loading...</div>
-                                : <div className="settings-float-card">
-                                    <InfoRow label="Admin Name"    value={profile?.user?.admin_name} />
-                                    <InfoRow label="Email Address" value={profile?.user?.email} />
-                                    <InfoRow label="User ID"       value={profile?.user?.id} />
-                                    <InfoRow label="Role"          value={profile?.user?.role} />
-                                    <InfoRow label="Status"        value={profile?.user?.status} />
-                                    <InfoRow label="Joined Date"   value={profile?.user?.joined_date} />
-                                </div>}
+                                : (() => {
+                                    const isEmp = profile?.user?.role?.toLowerCase() === 'employee';
+                                    const resName = profile?.user?.admin_name || profile?.user?.name || `${profile?.user?.firstName || profile?.user?.first_name || ''} ${profile?.user?.lastName || profile?.user?.last_name || ''}`.trim() || profile?.user?.email;
+                                    const wMode = profile?.user?.work_mode || profile?.user?.workMode;
+                                    const wLoc = profile?.user?.work_location || profile?.user?.workLocation;
+                                    const wDays = profile?.user?.workDays || profile?.user?.work_days;
+                                    const daysStr = Array.isArray(wDays) ? wDays.join(', ') : wDays;
+                                    return (
+                                        <div className="settings-float-card">
+                                            <InfoRow label={isEmp ? "Full Name" : "Admin Name"} value={resName} />
+                                            <InfoRow label="Email Address" value={profile?.user?.email} />
+                                            <InfoRow label="User ID"       value={profile?.user?.id} />
+                                            <InfoRow label="Role"          value={profile?.user?.role} />
+                                            {profile?.user?.dob && <InfoRow label="Date of Birth" value={profile.user.dob} />}
+                                            {wMode && <InfoRow label="Work Mode" value={wMode} />}
+                                            {wLoc && <InfoRow label="Work Location" value={wLoc} />}
+                                            {wDays && <InfoRow label="Work Days" value={daysStr} />}
+                                            {profile?.user?.bio && <InfoRow label="Bio" value={profile.user.bio} />}
+                                            <InfoRow label="Status"        value={profile?.user?.status} />
+                                            <InfoRow label="Joined Date"   value={profile?.user?.joined_date} />
+                                        </div>
+                                    );
+                                })()}
                             </Section>
 
                             {/* Automatic replies */}
@@ -606,16 +621,31 @@ export default function SettingsPanel({ isOpen, initialSection, onClose }) {
                                 <h3 className="settings-float-section-title">Signup Details</h3>
                                 <p className="settings-float-section-desc">All details collected during account registration.</p>
                                 {loading ? <div className="settings-float-card" style={{padding:"1rem",color:"var(--text-secondary)"}}>Loading...</div>
-                                : <div className="settings-float-card">
-                                    <InfoRow label="Organization Name" value={profile?.organization?.organization_name} />
-                                    <InfoRow label="Admin Name"        value={profile?.user?.admin_name} />
-                                    <InfoRow label="Email Address"     value={profile?.user?.email} />
-                                    <InfoRow label="Organization Size" value={profile?.organization?.organization_size} />
-                                    <InfoRow label="Backup Email"      value={profile?.organization?.backup_email || "Not provided"} />
-                                    <InfoRow label="Marketing Opt-in"  value={profile?.user?.marketing_opt_in ? "Yes" : "No"} />
-                                    <InfoRow label="Terms Accepted"    value={profile?.user?.terms_accepted ? "Yes" : "No"} />
-                                    <InfoRow label="Account Created"   value={profile?.user?.joined_date} />
-                                </div>}
+                                : (() => {
+                                    const isEmp = profile?.user?.role?.toLowerCase() === 'employee';
+                                    const resName = profile?.user?.admin_name || profile?.user?.name || `${profile?.user?.firstName || profile?.user?.first_name || ''} ${profile?.user?.lastName || profile?.user?.last_name || ''}`.trim() || profile?.user?.email;
+                                    const wMode = profile?.user?.work_mode || profile?.user?.workMode;
+                                    const wLoc = profile?.user?.work_location || profile?.user?.workLocation;
+                                    const wDays = profile?.user?.workDays || profile?.user?.work_days;
+                                    const daysStr = Array.isArray(wDays) ? wDays.join(', ') : wDays;
+                                    return (
+                                        <div className="settings-float-card">
+                                            <InfoRow label="Organization Name" value={profile?.organization?.organization_name} />
+                                            <InfoRow label={isEmp ? "Full Name" : "Admin Name"} value={resName} />
+                                            <InfoRow label="Email Address"     value={profile?.user?.email} />
+                                            {profile?.user?.dob && <InfoRow label="Date of Birth" value={profile.user.dob} />}
+                                            {wMode && <InfoRow label="Work Mode" value={wMode} />}
+                                            {wLoc && <InfoRow label="Work Location" value={wLoc} />}
+                                            {wDays && <InfoRow label="Work Days" value={daysStr} />}
+                                            {profile?.user?.bio && <InfoRow label="Bio" value={profile.user.bio} />}
+                                            <InfoRow label="Organization Size" value={profile?.organization?.organization_size} />
+                                            <InfoRow label="Backup Email"      value={profile?.organization?.backup_email || "Not provided"} />
+                                            <InfoRow label="Marketing Opt-in"  value={profile?.user?.marketing_opt_in ? "Yes" : "No"} />
+                                            <InfoRow label="Terms Accepted"    value={profile?.user?.terms_accepted ? "Yes" : "No"} />
+                                            <InfoRow label="Account Created"   value={profile?.user?.joined_date} />
+                                        </div>
+                                    );
+                                })()}
                             </Section>
 
                             {/* Account Settings */}

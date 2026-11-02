@@ -1,0 +1,201 @@
+/* Responsive rules shared by all public, authentication and dashboard routes. */
+*,*::before,*::after{box-sizing:border-box}
+#root{min-width:0}
+img,video,canvas{max-width:100%}
+.main-content,.dashboard-wrapper{min-width:0;min-height:0}
+.responsive-sidebar-host{display:contents}
+.responsive-sidebar-close,.responsive-sidebar-backdrop{display:none}
+.tabs-container,.profile-tabs{max-width:100%;overflow-x:auto!important;flex-wrap:nowrap!important;overscroll-behavior-x:contain;scrollbar-width:thin}
+.tabs-container>.tab,.profile-tabs>.profile-tab{flex-shrink:0}
+:is(input,textarea,select){max-width:100%}
+@media(max-width:1100px){
+ html{zoom:1!important}
+ .container{width:100%;max-width:100%;padding-inline:24px}
+ .features-grid,.pricing-grid,.footer-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .topbar-search{min-width:120px;margin-inline:12px!important}
+ .topbar-brand-tagline{display:none!important}
+ .client-data-grid,.admin-form-grid,.sub-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:900px){
+ body.dashboard-body{margin:0!important;padding:0!important;overflow:hidden}
+ .dashboard-body #root{height:100dvh;min-height:0}
+ .dashboard-wrapper{flex-direction:row!important;position:relative}
+ .topbar{height:64px!important;min-height:64px!important;padding:8px 12px!important;gap:8px;flex-shrink:0}
+ .topbar .mobile-menu-btn{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px;min-height:44px}
+ .topbar-left{min-width:0!important;width:auto!important;gap:4px!important}
+ .topbar .grid-icon,.topbar-divider{display:none!important}
+ .topbar-right{gap:4px!important;margin-left:auto}
+ .topbar-brand-name{font-size:14px!important}
+ .topbar-search{max-width:280px!important}
+ .responsive-sidebar-host{display:none!important}
+ .responsive-sidebar-host.is-open{display:flex!important;flex-direction:column;position:fixed;inset:64px auto 0 0;width:min(320px,88vw);z-index:2000;background:var(--surface-sidebar,#f8fafc);box-shadow:12px 0 40px #12243b33;overflow:auto}
+ .responsive-sidebar-host.is-open> :is(.sidebar,.email-sidebar,aside){position:static!important;display:flex!important;width:100%!important;min-width:0!important;max-width:none!important;height:auto!important;flex:1!important;transform:none!important;margin:0!important;visibility:visible!important;overflow:auto!important}
+ .responsive-sidebar-close{display:block;flex-shrink:0;min-height:44px;padding:12px 18px;text-align:right;border:0;border-bottom:1px solid #dce5ef;background:transparent;color:inherit;font:inherit;cursor:pointer}
+ .responsive-sidebar-backdrop{display:block;position:fixed;inset:64px 0 0;z-index:1999;border:0;background:#14283e66}
+ .main-content{width:100%!important;max-width:100%!important;margin:0!important}
+ .tabs-container{min-height:48px;flex-shrink:0;padding-inline:8px!important}
+ .tabs-container .tab{padding:14px 16px!important;font-size:13px!important}
+ #employeesView,#clientsView,#projectsView,#adminsView,#emailIdsView,#subscriptionView{width:100%!important;min-width:0!important;max-width:100%!important}
+ .profile-tabs{padding-inline:8px!important}
+ .profile-details-section,.profile-details-card{padding:18px!important}
+ .profile-form-grid,.client-data-grid,.admin-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .client-card-topbar,.profile-identity-bar,.admin-action-footer,.project-page-header{flex-wrap:wrap;gap:12px}
+ .task-row{flex-wrap:wrap;gap:12px}
+ .task-dates{margin-left:0!important}
+ .task-toolbar,.task-board-header,.task-stats{flex-wrap:wrap;gap:12px}
+ .mail-splitter{display:none!important}
+ #mailReadingColumn{min-width:0!important;max-width:100%}
+ .modal,.modal-dialog,.settings-panel,.settings-float-panel{max-width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow-y:auto}
+}
+@media(max-width:600px){
+ .container{padding-inline:16px}
+ .hero-title{font-size:clamp(30px,8vw,44px)!important;line-height:1.15!important}
+ .hero{padding-block:40px!important}
+ .section-title{font-size:26px!important}
+ .hero-actions,.form-actions{flex-wrap:wrap;gap:12px}
+ .features-grid,.pricing-grid,.footer-grid,.steps-grid,.testimonials-grid{grid-template-columns:minmax(0,1fr)!important}
+ .auth-container,.auth-card,.signup-container,.signin-container{width:100%!important;max-width:100%!important;margin-inline:auto!important;padding:20px!important}
+ .auth-container .form-row,.signup-container .form-row{display:flex!important;flex-direction:column;gap:16px}
+ .topbar-search{display:none!important}
+ .topbar-logo{gap:6px!important}
+ .topbar-logo-badge{width:32px!important;height:32px!important}
+ .topbar .icon-btn{min-width:40px;min-height:40px}
+ #clientsView,#projectsView,#adminsView,#emailIdsView,#subscriptionView{padding:16px!important}
+ .profile-form-grid,.client-data-grid,.admin-form-grid,.sub-kpi-grid,.admin-privileges-grid{grid-template-columns:minmax(0,1fr)!important}
+ .profile-cover{height:140px!important}
+ .profile-identity-bar{padding-left:0!important}
+ .profile-identity-name{font-size:22px!important;overflow-wrap:anywhere}
+ .profile-identity-title-row{flex-wrap:wrap}
+ .profile-identity-email{overflow-wrap:anywhere}
+ .mail-clients-panel,.mail-projects-panel{padding:16px!important}
+ .client-card-name,.project-card-title{overflow-wrap:anywhere}
+ .client-card-topbar,.project-card-head{flex-wrap:wrap;gap:12px}
+ .client-data-value{min-width:0;overflow-wrap:anywhere;white-space:normal}
+ .project-search,.employee-clients-search-box{width:100%!important;max-width:100%!important}
+ .task-row{padding:16px!important}
+ .task-row-detail{min-width:0;flex-basis:calc(100% - 60px)}
+ .task-title{overflow-wrap:anywhere;text-align:left}
+ .task-row-tags{flex-wrap:wrap}
+ .task-dates,.task-actions{flex-wrap:wrap}
+ .task-board-footer{flex-wrap:wrap;gap:8px}
+ .reading-meta,.reading-header,.reading-actions-top{flex-wrap:wrap!important}
+ .reading-body{padding:16px!important;overflow-x:auto}
+ .mail-toolbar,.mail-toolbar-container,.mail-filters-bar{max-width:100%;overflow-x:auto;flex-wrap:nowrap!important;flex-shrink:0}
+ .mail-toolbar button,.mail-filters-bar button{flex-shrink:0}
+ .modal-dialog,.modal-content{width:calc(100vw - 24px)!important;min-width:0!important;max-width:100%!important;margin-inline:auto!important}
+ .modal-body{padding:16px!important;overflow:auto}
+ .modal-footer{flex-wrap:wrap;gap:10px}
+ input,select,textarea{font-size:16px!important}
+ button,a,input,select{touch-action:manipulation}
+}
+
+.mobile-mail-back{display:none}
+@media(max-width:700px){
+ #mailSplitView{width:100%;min-width:0}
+ #mailSplitView .mail-list-column{width:100%!important;min-width:0!important;max-width:100%!important;flex:1 1 100%!important}
+ #mailSplitView:not(.mobile-detail-open) #mailReadingColumn{display:none!important}
+ #mailSplitView.mobile-detail-open .mail-list-column{display:none!important}
+ #mailSplitView.mobile-detail-open #mailReadingColumn{display:flex!important;width:100%!important;flex:1 1 100%!important}
+ .mobile-mail-back{display:block;flex-shrink:0;min-height:44px;padding:12px 16px;text-align:left;border:0;border-bottom:1px solid #dce5ef;background:var(--surface,#fff);color:var(--text-primary,#20344e);font:inherit;cursor:pointer}
+}
+
+/* Dashboard navigation adapts independently from page content. */
+.dashboard-page-nav{flex:0 0 auto;min-width:0;width:100%;background:var(--surface,#fff);border-bottom:1px solid var(--border,#dce5ef)}
+.mobile-page-selector{display:none}
+.dashboard-page-nav .tabs-container{width:100%;min-width:0;margin:0;scrollbar-width:thin}
+@media(min-width:701px) and (max-width:1200px){
+ .dashboard-page-nav .tabs-container .tab{padding:14px 13px!important;font-size:13px!important;min-height:48px}
+}
+@media(max-width:700px){
+ .dashboard-page-nav .tabs-container{display:none!important}
+ .mobile-page-selector{display:flex;align-items:center;gap:14px;padding:10px 14px;margin:0;min-height:64px}
+ .mobile-page-selector>span{font-size:12px;font-weight:600;color:var(--text-secondary,#61748c);flex-shrink:0}
+ .mobile-page-selector select{appearance:auto;flex:1;min-width:0;height:44px;padding:8px 12px;border:1px solid #cbdcf0;border-radius:9px;background:var(--surface,#f7faff);color:var(--text-primary,#20344e);font-weight:600;margin:0}
+ .mobile-page-selector select:focus-visible{outline:2px solid #0875d1;outline-offset:2px}
+ .dashboard-body .topbar{display:flex!important;justify-content:space-between;width:100%!important;padding:8px!important;gap:6px!important;box-sizing:border-box}
+ .dashboard-body .topbar-left{display:flex!important;flex:1 1 auto!important;min-width:0!important;gap:4px!important}
+ .dashboard-body .topbar-left .mobile-menu-btn{margin:0!important;flex:0 0 40px!important;width:40px!important;min-width:40px!important;height:44px!important;padding:8px!important}
+ .dashboard-body .topbar-logo{gap:6px!important;margin:0!important;padding:0!important}
+ .dashboard-body .topbar-logo-badge{flex:0 0 28px!important;width:28px!important;height:28px!important}
+ .dashboard-body .topbar-brand-name{font-size:12px!important;letter-spacing:0!important}
+ .dashboard-body .topbar-brand-tagline{display:none!important}
+ .dashboard-body .topbar-right{flex:0 0 auto!important;gap:4px!important;margin:0!important}
+ .dashboard-body .topbar-right .icon-btn{width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;padding:8px!important}
+ .dashboard-body .topbar-search{display:none!important}
+}
+@media(max-width:359px){.dashboard-body .topbar-logo-badge{display:none!important}.dashboard-body .topbar-brand-name{font-size:11px!important}}
+
+#clientsView .client-card-identity{flex:1;min-width:0}
+#clientsView .client-card-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+@media(max-width:800px){
+ #clientsView .client-card-header{flex-direction:column!important;align-items:stretch!important;gap:16px!important}
+ #clientsView .client-card-identity{width:100%;flex-wrap:nowrap!important;align-items:center!important}
+ #clientsView .client-card-identity>div:last-child{flex:1;min-width:0}
+ #clientsView .client-card-title{word-break:normal!important;overflow-wrap:break-word!important;line-height:1.4!important}
+ #clientsView .client-card-title>span{margin-right:5px}
+ #clientsView .client-card-actions{width:100%;flex-wrap:wrap;justify-content:flex-end}
+ #clientsView .client-card-actions button{min-height:40px!important}
+ #clientsView .client-location-pill{max-width:100%;margin-top:6px}
+}
+
+/* Small project cards need room for complete labels and project names. */
+@media(max-width:600px){
+ #projectsView .project-kpi-card{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;padding:16px!important;min-height:160px!important}
+ #projectsView .project-kpi-card>div:first-child{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:10px!important;width:100%;min-width:0}
+ #projectsView .project-kpi-card>div:first-child>div:last-child{width:100%;min-width:0}
+ #projectsView .project-kpi-label{display:block!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important;font-size:12px!important;line-height:1.4!important;margin-top:6px!important}
+ #projectsView .project-kpi-percent{align-self:flex-end;font-size:11px!important}
+ #projectsView .project-card-topbar{flex-direction:column!important;align-items:stretch!important;padding:16px!important;gap:14px!important}
+ #projectsView .project-card-topbar>div:first-child{width:100%;display:flex!important;align-items:flex-start!important;min-width:0;gap:12px!important}
+ #projectsView .project-card-topbar>div:first-child>div:last-child{display:flex!important;flex-direction:column!important;align-items:flex-start!important;flex:1;min-width:0;gap:10px!important}
+ #projectsView .project-card-title{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:normal!important;overflow-wrap:anywhere!important;width:100%;font-size:16px!important;line-height:1.45!important;margin:0!important}
+ #projectsView .project-card-topbar>div:last-child{align-self:flex-end}
+ #projectsView .project-status-pill{max-width:100%}
+}
+
+@media(max-width:600px){
+ #emailIdsView .email-ids-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-width:0;gap:12px!important}
+ #emailIdsView .email-ids-filter-group{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important}
+ #emailIdsView .email-ids-filter-pill{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:40px!important;padding:8px!important;white-space:normal!important}
+ #emailIdsView .email-ids-table-wrap{overflow:hidden!important;width:100%;min-width:0}
+ #emailIdsView .email-ids-table{display:block!important;width:100%!important;min-width:0!important;table-layout:fixed}
+ #emailIdsView .email-ids-table thead{display:none!important}
+ #emailIdsView .email-ids-table tbody{display:block!important;width:100%}
+ #emailIdsView .email-ids-table .email-ids-row{display:grid!important;grid-template-columns:minmax(0,1fr);width:100%;padding:16px;border-bottom:1px solid var(--ei-border,#dce5ef);gap:14px}
+ #emailIdsView .email-ids-table .email-ids-row td{display:block!important;position:static!important;width:100%!important;min-width:0!important;max-width:100%!important;padding:0!important;border:0!important;text-align:left!important;white-space:normal!important}
+ #emailIdsView .email-ids-row td::before{content:attr(data-label);display:block;margin-bottom:7px;color:var(--ei-muted,#61748c);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+ #emailIdsView .real-email-content{display:flex!important;align-items:flex-start!important;width:100%;min-width:0;gap:8px!important}
+ #emailIdsView .real-email-text{flex:1;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal;overflow:visible!important;text-overflow:clip!important;line-height:1.5}
+ #emailIdsView .real-email-icon-box,#emailIdsView .btn-copy-email{flex-shrink:0}
+ #emailIdsView .btn-copy-email{min-width:32px;min-height:32px;opacity:1!important;visibility:visible!important}
+ #emailIdsView .client-id-chip,#emailIdsView .project-name-text,#emailIdsView .leader-email-sub{max-width:100%;white-space:normal!important;overflow-wrap:anywhere!important}
+ #emailIdsView .email-ids-table-footer{display:flex;flex-wrap:wrap;gap:10px;padding:14px!important}
+}
+
+/* Compact mobile Email ID records; reset desktop table cell spacing. */
+@media(max-width:600px){
+ #emailIdsView .email-ids-table-wrap{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important}
+ #emailIdsView .email-ids-table-accent-bar{display:none}
+ #emailIdsView .email-ids-table{background:transparent!important;height:auto!important}
+ #emailIdsView #emailIdsTabTableBody{height:auto!important}
+ #emailIdsView #emailIdsTabTableBody .email-ids-row{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"email email" "client client" "project leader" "number status" "signature signature";align-items:start;align-content:start;gap:16px 12px;height:auto!important;min-height:0!important;padding:18px!important;margin-bottom:14px;border:1px solid var(--ei-border,#dce5ef)!important;border-radius:14px;background:var(--ei-surface,#fff)!important;box-shadow:0 3px 12px #243b5306}
+ #emailIdsView #emailIdsTabTableBody .email-ids-row td{height:auto!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;align-self:start}
+ #emailIdsView #emailIdsTabTableBody .email-ids-row td::before{margin-bottom:6px;font-size:9px;line-height:1.3;letter-spacing:.065em;font-weight:600;color:var(--ei-muted,#61748c)}
+ #emailIdsView #emailIdsTabTableBody .cell-real-email{grid-area:email;padding-bottom:14px!important;border-bottom:1px solid var(--ei-border,#e4ebf5)!important}
+ #emailIdsView #emailIdsTabTableBody .cell-client-id{grid-area:client}
+ #emailIdsView #emailIdsTabTableBody .cell-project-name{grid-area:project}
+ #emailIdsView #emailIdsTabTableBody .cell-project-leader{grid-area:leader}
+ #emailIdsView #emailIdsTabTableBody .cell-center{grid-area:number}
+ #emailIdsView #emailIdsTabTableBody .cell-status{grid-area:status}
+ #emailIdsView #emailIdsTabTableBody .cell-signature{grid-area:signature;padding-top:12px!important;border-top:1px solid var(--ei-border,#e4ebf5)!important}
+ #emailIdsView #emailIdsTabTableBody .real-email-content{gap:8px!important;align-items:center!important}
+ #emailIdsView #emailIdsTabTableBody .real-email-text{font-size:13px!important;line-height:1.55;font-weight:600!important}
+ #emailIdsView #emailIdsTabTableBody .real-email-icon-box{display:none}
+ #emailIdsView #emailIdsTabTableBody .client-id-chip-wrap{display:flex;align-items:center;gap:6px;min-width:0}
+ #emailIdsView #emailIdsTabTableBody .client-id-chip{min-width:0;flex:1;max-width:100%;padding:7px 8px!important;font-size:11px!important}
+ #emailIdsView #emailIdsTabTableBody .client-id-chip .truncate{white-space:normal!important;overflow-wrap:anywhere!important;overflow:visible!important;text-overflow:clip!important}
+ #emailIdsView #emailIdsTabTableBody .leader-name-primary,#emailIdsView #emailIdsTabTableBody .project-name-text{font-size:12px!important;line-height:1.5}
+ #emailIdsView #emailIdsTabTableBody .signature-chip{font-size:11px!important;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ #emailIdsView #emailIdsTabTableBody .btn-copy-email{width:36px;min-width:36px;height:36px;min-height:36px}
+ #emailIdsView .email-ids-table-footer{border-radius:12px}
+}

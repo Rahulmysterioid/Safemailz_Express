@@ -103,7 +103,8 @@ export default function ClientsSidebar() {
                     <button
                         type="button"
                         id="clientsExportBtn"
-                        className="sidebar-action-btn clients-sidebar-action-btn h-8 px-2.5 rounded-lg border border-slate-200 dark:border-[#222938] bg-white dark:bg-[#141821] hover:bg-slate-50 dark:hover:bg-[#1c2230] text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                        disabled={clients.length === 0}
+                        className="sidebar-action-btn clients-sidebar-action-btn h-8 px-2.5 rounded-lg border border-slate-200 dark:border-[#222938] bg-white dark:bg-[#141821] hover:bg-slate-50 dark:hover:bg-[#1c2230] text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#141821]"
                         aria-label="Export clients"
                         onClick={handleExportClients}
                     >
@@ -140,9 +141,10 @@ export default function ClientsSidebar() {
                         placeholder="Search Client..."
                         id="clientsSidebarSearch"
                         aria-label="Search client"
+                        disabled={clients.length === 0}
                         value={clientSearch}
                         onChange={(e) => setClientSearch(e.target.value)}
-                        className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-slate-200 dark:border-[#222938] bg-slate-50/60 dark:bg-[#141821] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-[#191f2b] focus:border-blue-500 focus:outline-none transition-all"
+                        className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-slate-200 dark:border-[#222938] bg-slate-50/60 dark:bg-[#141821] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-[#191f2b] focus:border-blue-500 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50/60 dark:disabled:bg-[#10141d]"
                         style={{ paddingLeft: '32px', paddingRight: clientSearch ? '28px' : '12px', boxSizing: 'border-box' }}
                     />
                     {clientSearch && (
@@ -193,16 +195,22 @@ export default function ClientsSidebar() {
                 </div>
 
                 {filteredClients.length === 0 ? (
-                    <div className="clients-sidebar-empty text-center py-8 px-4 text-slate-400 dark:text-slate-500 text-xs rounded-xl border border-dashed border-slate-200 dark:border-[#222938]">
-                        <p className="m-0 font-medium text-slate-500 dark:text-slate-400">No clients found</p>
-                        {clientSearch && (
-                            <button
-                                type="button"
-                                onClick={() => setClientSearch('')}
-                                className="mt-2 text-[11px] font-semibold text-blue-600 dark:text-sky-400 bg-transparent border-0 cursor-pointer underline"
-                            >
-                                Clear filter
-                            </button>
+                    <div className="clients-sidebar-empty py-8 px-4 text-center text-xs text-slate-400 dark:text-slate-400 bg-slate-50/60 dark:bg-[#141821]/60 rounded-xl border border-dashed border-slate-200 dark:border-[#222938]">
+                        {clients.length === 0 ? (
+                            <span>No clients in directory</span>
+                        ) : (
+                            <>
+                                <p className="m-0 font-medium text-slate-500 dark:text-slate-400">No clients found</p>
+                                {clientSearch && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setClientSearch('')}
+                                        className="mt-2 text-[11px] font-semibold text-blue-600 dark:text-sky-400 bg-transparent border-0 cursor-pointer underline"
+                                    >
+                                        Clear filter
+                                    </button>
+                                )}
+                            </>
                         )}
                     </div>
                 ) : (

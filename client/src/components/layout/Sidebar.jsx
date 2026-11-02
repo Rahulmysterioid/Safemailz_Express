@@ -55,7 +55,7 @@ export default function Sidebar({ collapsed = false }) {
     const isAdmins = location.pathname.startsWith('/dashboard/admins');
     const isEmailIds = location.pathname.startsWith('/dashboard/emailIds');
     const isTasks = location.pathname.startsWith('/dashboard/tasks');
-    const isSubscription = location.pathname.startsWith('/dashboard/subscription');
+    const isSubscription = location.pathname.startsWith('/dashboard/subscription') || location.pathname.startsWith('/dashboard/boost');
     // Email is for /dashboard/email/* and fallback / support
 
     // Custom Sidebar UI Context

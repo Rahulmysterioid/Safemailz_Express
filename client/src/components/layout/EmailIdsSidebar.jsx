@@ -16,7 +16,7 @@ export default function EmailIdsSidebar({
 }) {
     const location = useLocation();
     const isEmailIdsPage = location.pathname.startsWith('/dashboard/emailIds');
-    const isSubscriptionPage = location.pathname.startsWith('/dashboard/subscription');
+    const isSubscriptionPage = location.pathname.startsWith('/dashboard/subscription') || location.pathname.startsWith('/dashboard/boost');
     const projectCtx = useProject();
     const employeeCtx = useEmployee();
     const globalProjects = projectCtx?.projects || [];

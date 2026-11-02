@@ -1,5 +1,5 @@
 import './AdminsLightPolish.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 import AssignEmployeesModal from '../../components/dashboard/AssignEmployeesModal';
 
@@ -8,6 +8,8 @@ export default function AdminsView() {
         admins,
         selectedAdmin,
         selectedAdminIndex,
+        searchQuery,
+        setSearchQuery,
         updateAdminField,
         updateAdminPermission,
         setAllAdminPermissions,
@@ -21,6 +23,7 @@ export default function AdminsView() {
     const [assignedCount, setAssignedCount] = useState(0);
     const [copiedEmail, setCopiedEmail] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const mainSearchInputRef = useRef(null);
 
     const showToast = (text, type = 'success') => {
         setToastState({ text, type });
@@ -62,41 +65,194 @@ export default function AdminsView() {
     };
 
     if (!selectedAdmin || admins.length === 0) {
+        const isEmpty = admins.length === 0;
         return (
             <div
-                className="admins-empty-page"
+                className="content-area admins-view-container flex-1 overflow-y-auto px-8 py-6 bg-slate-50/30 h-full font-inter"
                 id="adminsView"
-                style={{ height: '100%', boxSizing: 'border-box' }}
+                style={{
+                    height: '100%',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    justifyContent: 'flex-start'
+                }}
             >
-                <div
-                    id="adminDetailsEmptyState"
-                    className="empty-state flex flex-col items-center justify-center text-center max-w-md p-8 rounded-2xl border border-dashed border-slate-200 dark:border-[#242c3d]"
-                >
-                    <img
-                        src="/images/empty_state.png"
-                        alt="No admin selected"
-                        className="max-w-[240px] mb-4 opacity-90"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 m-0">
-                        {admins.length ? 'Select an admin' : 'Build your admin team'}
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 mb-5 leading-relaxed">
-                        {admins.length ? 'Choose an admin from the directory to manage their permissions and assigned employees.' : 'Promote an employee to admin to help manage your team and share responsibilities.'}
-                    </p>
-                    {openAddAdminModal && (
-                        <button
-                            type="button"
-                            onClick={openAddAdminModal}
-                            className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs inline-flex items-center gap-1.5 cursor-pointer border-0 transition-all"
+                <div className="admins-view-inner w-full max-w-[1440px] mx-auto">
+                    {/* Top Header Row matching Clients page layout */}
+                    <div className="admins-header-bar flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 w-full pb-4 border-b border-slate-200/80 dark:border-[#1e2636]">
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-2.5">
+                                <h1 className="admins-page-title text-2xl font-bold text-slate-900 dark:text-slate-100 m-0 tracking-tight">
+                                    All Admins
+                                </h1>
+                                <span
+                                    id="adminsCountHeader"
+                                    className="admins-count-pill px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-50 text-blue-600 dark:bg-[#132842] dark:text-sky-400 border border-blue-200/60 dark:border-sky-500/30"
+                                >
+                                    {admins.length}
+                                </span>
+                            </div>
+                            <p className="admins-page-subtitle text-sm text-slate-500 dark:text-slate-400 mt-1 m-0">
+                                Manage administrator roles, system permissions, and team access controls
+                            </p>
+                        </div>
+
+                        {/* Right Column (Search Input) */}
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <div
+                                className="admins-main-search-wrap relative w-full sm:w-80 flex items-center"
+                                style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+                            >
+                                <button
+                                    type="button"
+                                    id="mainAdminsSearchBtn"
+                                    aria-label="Search admins"
+                                    title="Search admins"
+                                    onClick={() => {
+                                        if (mainSearchInputRef.current) {
+                                            mainSearchInputRef.current.focus();
+                                        } else {
+                                            document.getElementById('mainAdminsSearchInput')?.focus();
+                                        }
+                                    }}
+                                    style={{
+                                        position: 'absolute',
+                                        left: '8px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        width: '28px',
+                                        height: '28px',
+                                        borderRadius: '9999px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: 'none',
+                                        background: 'transparent',
+                                        color: '#94a3b8',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        zIndex: 2
+                                    }}
+                                >
+                                    <svg
+                                        width={16}
+                                        height={16}
+                                        className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0"
+                                        style={{ width: '16px', height: '16px' }}
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </button>
+                                <input
+                                    ref={mainSearchInputRef}
+                                    type="text"
+                                    placeholder="Search admins by name, email, or role..."
+                                    id="mainAdminsSearchInput"
+                                    value={searchQuery || ''}
+                                    onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Escape') setSearchQuery('');
+                                    }}
+                                    className="admins-main-search-input w-full h-9 pl-10 pr-3 text-xs rounded-lg bg-white dark:bg-[#141821] border border-slate-200 dark:border-[#242c3d] text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs focus:border-blue-500 focus:outline-none transition-all"
+                                    style={{ paddingLeft: '40px', paddingRight: searchQuery ? '32px' : '14px', boxSizing: 'border-box' }}
+                                />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchQuery('')}
+                                        aria-label="Clear search"
+                                        title="Clear search"
+                                        className="admins-main-search-clear"
+                                        style={{
+                                            position: 'absolute',
+                                            right: '8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            width: '20px',
+                                            height: '20px',
+                                            borderRadius: '9999px',
+                                            border: 'none',
+                                            background: 'rgba(148, 163, 184, 0.2)',
+                                            color: '#94a3b8',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            zIndex: 2
+                                        }}
+                                    >
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Standardized Main Empty State Card */}
+                    <div
+                        id="adminDetailsEmptyState"
+                        className="admins-empty-state w-full min-h-[380px] bg-white dark:bg-[#141821] border border-dashed border-slate-200 dark:border-[#242c3d] rounded-2xl p-8 sm:p-12 flex flex-col items-center justify-center text-center shadow-xs"
+                        style={{ boxSizing: 'border-box', borderStyle: 'dashed', minHeight: '380px', width: '100%' }}
+                    >
+                        {/* Visual / Icon Area: unified icon badge */}
+                        <div
+                            className="admins-empty-icon w-16 h-16 rounded-full bg-blue-50/80 dark:bg-[#132842] border border-blue-100 dark:border-sky-500/30 flex items-center justify-center text-blue-600 dark:text-sky-400 mb-5 shrink-0"
+                            style={{
+                                width: '64px',
+                                height: '64px',
+                                minWidth: '64px',
+                                minHeight: '64px',
+                                borderRadius: '9999px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: '20px'
+                            }}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                                <path d="m9 12 2 2 4-4" />
                             </svg>
-                            <span>Add Admin</span>
-                        </button>
-                    )}
+                        </div>
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1.5 m-0" style={{ fontSize: '18px', fontWeight: 600, marginBottom: '6px' }}>
+                            {isEmpty ? 'Build your admin team' : 'Select an admin'}
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed m-0" style={{ fontSize: '14px', maxWidth: '384px', marginBottom: '24px', lineHeight: 1.6 }}>
+                            {isEmpty
+                                ? 'Promote an employee to admin to help manage your team and share responsibilities.'
+                                : 'Choose an admin from the directory to manage their permissions and assigned employees.'}
+                        </p>
+                        {openAddAdminModal && (
+                            <button
+                                type="button"
+                                id="btnEmptyAddAdmin"
+                                onClick={openAddAdminModal}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-xs transition-all cursor-pointer border-0"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>Add Admin</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         );

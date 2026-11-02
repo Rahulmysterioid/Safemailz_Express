@@ -15,6 +15,7 @@ html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]
  #subscriptionView .badge-purple{background:#f0eaff!important;color:#7246ae!important}
  #subscriptionView .sub-toolbar-card{background:#fff!important;border:1px solid #dce5ef!important;border-radius:12px!important;padding:16px!important;box-shadow:0 2px 8px #243b5305!important}
  #subscriptionView #subSearchContainer{background:#f7f9fc!important;border:1px solid #d4dfec!important;border-radius:9px!important;min-height:42px}
+ #subscriptionView #subSearchBtn:hover{background:rgba(8,117,209,0.08)!important;color:#0875d1!important}
  #subscriptionView #subSearchBoxInput{color:#24364d!important}
  #subscriptionView #subSearchBoxInput::placeholder{color:#70829a!important}
  #subscriptionView .sub-filter-pills{background:#f7f9fc!important;border-color:#dce5ef!important;border-radius:9px!important}
@@ -43,3 +44,41 @@ html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]
 @media(max-width:700px){html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #subscriptionView{padding:16px!important}#subscriptionView .sub-card-actions{flex-wrap:wrap;gap:12px}}
 html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #subscriptionView .sub-kpi-card{flex-direction:column;align-items:flex-start;justify-content:space-between;min-height:124px}
 html:not(.dark):not([data-theme="dark"]) body:not(.dark):not([data-theme="dark"]) #subscriptionView .sub-kpi-badge{margin-left:50px}
+
+/* Dark mode and common interactive polish for subscription search circle buttons */
+html.dark #subscriptionView #subSearchBtn:hover,
+[data-theme="dark"] #subscriptionView #subSearchBtn:hover,
+body.dark #subscriptionView #subSearchBtn:hover {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+#subscriptionView #subSearchAdminBtn:hover {
+  background: rgba(8, 117, 209, 0.16) !important;
+  color: #0875d1 !important;
+  border-color: #0875d1 !important;
+}
+
+html.dark #subscriptionView #subSearchAdminBtn,
+[data-theme="dark"] #subscriptionView #subSearchAdminBtn,
+body.dark #subscriptionView #subSearchAdminBtn {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #94a3b8 !important;
+}
+
+html.dark #subscriptionView #subSearchAdminBtn:hover,
+[data-theme="dark"] #subscriptionView #subSearchAdminBtn:hover,
+body.dark #subscriptionView #subSearchAdminBtn:hover {
+  background: rgba(56, 189, 248, 0.2) !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+}
+
+html.dark #subscriptionView #subSearchAdminBtn.active,
+[data-theme="dark"] #subscriptionView #subSearchAdminBtn.active,
+body.dark #subscriptionView #subSearchAdminBtn.active {
+  background: rgba(56, 189, 248, 0.25) !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+}
+

@@ -36,9 +36,13 @@ function createTasksRouter(client, secret) {
     const isOwnerOrAdmin = u => {
         if (!u) return false;
         const role = u.role || u.userRole || u.user_role || '';
-        if (normalizeRole(role) === 'employee') return false;
         if (isOwnerRoleStr(role) || isAdminRoleStr(role)) return true;
         if (Boolean(u.is_owner || u.isOwner || u.isAdmin || u.is_admin || u.is_organization_owner)) return true;
+        if (normalizeRole(role) === 'employee') {
+            if (Number(u.perm_add_employees) === 1 || Number(u.perm_manage_projects) === 1 || Number(u.perm_create_projects) === 1 || Number(u.perm_delete_project) === 1) return true;
+            if (u.permissions && (u.permissions.addEmployees || u.permissions.manageProjects || u.permissions.createProjects || u.permissions.deleteProject)) return true;
+            return false;
+        }
         if (Number(u.perm_make_admin) === 1 || Number(u.perm_add_employees) === 1 || Number(u.perm_manage_projects) === 1 || Number(u.perm_create_projects) === 1 || Number(u.perm_delete_project) === 1) return true;
         if (u.permissions && (u.permissions.makeAdmin || u.permissions.addEmployees || u.permissions.manageProjects || u.permissions.createProjects || u.permissions.deleteProject)) return true;
         return false;

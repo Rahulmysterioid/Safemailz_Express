@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
+import { saveAccountSession } from '../utils/accountSession';
 import LandingHeader from '../components/layout/LandingHeader';
 import LandingFooter from '../components/layout/LandingFooter';
 import '../styles.css';
@@ -54,6 +55,10 @@ export default function SignUp() {
         bio: '',
         terms: true
     });
+    const [invitePassword, setInvitePassword] = useState('');
+    const [inviteConfirmPassword, setInviteConfirmPassword] = useState('');
+    const [showInvitePassword, setShowInvitePassword] = useState(false);
+    const [showInviteConfirmPassword, setShowInviteConfirmPassword] = useState(false);
     const [onboardingErrors, setOnboardingErrors] = useState({});
     const [onboardingGlobalError, setOnboardingGlobalError] = useState('');
 
@@ -94,6 +99,15 @@ export default function SignUp() {
                     if (data.success) {
                         setInviteOrgName(data.organization_name || 'Safemailz');
                         if (data.email) setInviteEmail(data.email);
+                        const inviteFullName = `${data.firstName || ''} ${data.lastName || ''}`.trim() || data.fullName || '';
+                        setOnboardingForm(prev => ({
+                            ...prev,
+                            fullName: prev.fullName || inviteFullName,
+                            dob: prev.dob || data.dob || '',
+                            workMode: prev.workMode && prev.workMode !== 'Remote' ? prev.workMode : (data.workMode || 'Remote'),
+                            workLocation: prev.workLocation && prev.workLocation !== 'Gilgit Baltistan, Pakistan' ? prev.workLocation : (data.workLocation || 'Gilgit Baltistan, Pakistan'),
+                            bio: prev.bio || data.bio || ''
+                        }));
                     } else {
                         setInviteError(data.error || 'Invalid or expired invitation link.');
                     }
@@ -119,8 +133,8 @@ export default function SignUp() {
                     setOnboardingForm(prev => ({
                         ...prev,
                         fullName: name || prev.fullName || '',
-                        workLocation: 'Gilgit Baltistan, Pakistan',
-                        workMode: 'Remote'
+                        workLocation: prev.workLocation || 'Gilgit Baltistan, Pakistan',
+                        workMode: prev.workMode || 'Remote'
                     }));
                     setShowOnboardingModal(true);
                 } else {
@@ -207,7 +221,12 @@ export default function SignUp() {
             });
             const data = await response.json();
             if (response.ok && data.user) {
+                const token = data.token || data.user?.token || 'authenticated';
+                localStorage.setItem('token', token);
+                saveAccountSession(data.user, token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
+                window.dispatchEvent(new Event('storage'));
+                window.dispatchEvent(new Event('employeeStateUpdate'));
                 navigate('/dashboard');
             } else {
                 setGlobalError(data.error || 'Failed to create account.');
@@ -246,13 +265,126 @@ export default function SignUp() {
             });
             const data = await response.json();
             if (response.ok && data.user) {
+                const token = data.token || data.user?.token || 'authenticated';
+                localStorage.setItem('token', token);
+                saveAccountSession(data.user, token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
+                window.dispatchEvent(new Event('storage'));
+                window.dispatchEvent(new Event('employeeStateUpdate'));
                 navigate('/dashboard');
             } else {
                 setOauthGlobalError(data.error || 'Failed to create account.');
             }
         } catch (error) {
             setOauthGlobalError('An error occurred.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Direct Invitation Signup with Password & Onboarding Details
+    const handleInviteDirectSubmit = async (e) => {
+        e.preventDefault();
+        setOnboardingErrors({});
+        setOnboardingGlobalError('');
+
+        let hasError = false;
+        let errors = {};
+
+        if (!onboardingForm.fullName.trim()) {
+            errors.fullName = 'Full Name is required';
+            hasError = true;
+        }
+        if (!invitePassword) {
+            errors.password = 'Password is required';
+            hasError = true;
+        } else if (invitePassword.length < 8) {
+            errors.password = 'Password must be at least 8 characters';
+            hasError = true;
+        }
+        if (invitePassword !== inviteConfirmPassword) {
+            errors.confirmPassword = 'Passwords do not match';
+            hasError = true;
+        }
+        if (!onboardingForm.dob) {
+            errors.dob = 'Date of Birth is required';
+            hasError = true;
+        }
+        if (!onboardingForm.terms) {
+            errors.terms = 'You must agree to the Terms & Conditions';
+            hasError = true;
+        }
+
+        if (hasError) {
+            setOnboardingErrors(errors);
+            return;
+        }
+
+        setIsLoading(true);
+        const tokenToUse = inviteToken || sessionStorage.getItem('pending_invite_token');
+        const emailToUse = inviteEmail || sessionStorage.getItem('pending_invite_email');
+
+        try {
+            const res = await fetch('/api/invite/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: tokenToUse,
+                    fullName: onboardingForm.fullName.trim(),
+                    email: emailToUse,
+                    password: invitePassword,
+                    dob: onboardingForm.dob,
+                    workMode: onboardingForm.workMode,
+                    workLocation: onboardingForm.workLocation,
+                    bio: onboardingForm.bio,
+                    isGoogleAuth: false
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.user) {
+                sessionStorage.removeItem('pending_invite_token');
+                sessionStorage.removeItem('pending_invite_email');
+
+                try {
+                    const storedSeats = localStorage.getItem('purchasedSeats');
+                    if (storedSeats) {
+                        const seats = JSON.parse(storedSeats);
+                        const updatedSeats = seats.map(s => {
+                            if (s.email && s.email.toLowerCase() === emailToUse.toLowerCase()) {
+                                return {
+                                    ...s,
+                                    status: 'filled',
+                                    isPending: false,
+                                    firstName: data.user.firstName || data.user.first_name || onboardingForm.fullName.trim(),
+                                    lastName: data.user.lastName || data.user.last_name || '',
+                                    dob: onboardingForm.dob,
+                                    workMode: onboardingForm.workMode,
+                                    workLocation: onboardingForm.workLocation,
+                                    bio: onboardingForm.bio
+                                };
+                            }
+                            return s;
+                        });
+                        localStorage.setItem('purchasedSeats', JSON.stringify(updatedSeats));
+                    }
+                } catch (err) {
+                    console.error('Error updating purchasedSeats:', err);
+                }
+
+                const token = data.token || data.user?.token || 'authenticated';
+                localStorage.setItem('token', token);
+                saveAccountSession(data.user, token);
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                window.dispatchEvent(new Event('storage'));
+                window.dispatchEvent(new Event('employeeStateUpdate'));
+                navigate('/dashboard');
+            } else {
+                setOnboardingGlobalError(data.error || 'Failed to complete profile signup.');
+            }
+        } catch (error) {
+            console.error('Direct signup error:', error);
+            setOnboardingGlobalError('An error occurred during signup.');
         } finally {
             setIsLoading(false);
         }
@@ -337,8 +469,12 @@ export default function SignUp() {
                     console.error('Error updating purchasedSeats:', err);
                 }
 
+                const token = data.token || data.user?.token || 'authenticated';
+                localStorage.setItem('token', token);
+                saveAccountSession(data.user, token);
                 localStorage.setItem('currentUser', JSON.stringify(data.user));
                 window.dispatchEvent(new Event('storage'));
+                window.dispatchEvent(new Event('employeeStateUpdate'));
                 navigate('/dashboard');
             } else {
                 setOnboardingGlobalError(data.error || 'Failed to complete profile onboarding.');
@@ -456,6 +592,168 @@ export default function SignUp() {
                                             </span>
                                         </div>
                                     )}
+
+                                    {/* Option A: Direct Password Registration Form */}
+                                    <form noValidate onSubmit={handleInviteDirectSubmit} style={{ marginTop: '0.5rem' }}>
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="inviteFullName">Full Name *</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="inviteFullName"
+                                                required
+                                                value={onboardingForm.fullName}
+                                                onChange={(e) => {
+                                                    setOnboardingForm(prev => ({ ...prev, fullName: e.target.value }));
+                                                    if (onboardingErrors.fullName) setOnboardingErrors(prev => ({ ...prev, fullName: '' }));
+                                                }}
+                                                placeholder="e.g. John Doe"
+                                            />
+                                            {onboardingErrors.fullName && (
+                                                <div className="form-error" style={{ display: 'block' }}>{onboardingErrors.fullName}</div>
+                                            )}
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="invitePasswordInput">Create Password *</label>
+                                            <div className="password-input-wrapper">
+                                                <input
+                                                    type={showInvitePassword ? "text" : "password"}
+                                                    className="form-control"
+                                                    id="invitePasswordInput"
+                                                    required
+                                                    value={invitePassword}
+                                                    onChange={(e) => {
+                                                        setInvitePassword(e.target.value);
+                                                        if (onboardingErrors.password) setOnboardingErrors(prev => ({ ...prev, password: '' }));
+                                                    }}
+                                                    placeholder="At least 8 characters"
+                                                />
+                                                <button type="button" className="password-toggle" onClick={() => setShowInvitePassword(!showInvitePassword)}>
+                                                    {showInvitePassword ? '👁️‍🗨️' : '👁️'}
+                                                </button>
+                                            </div>
+                                            {onboardingErrors.password && (
+                                                <div className="form-error" style={{ display: 'block' }}>{onboardingErrors.password}</div>
+                                            )}
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="inviteConfirmPasswordInput">Confirm Password *</label>
+                                            <div className="password-input-wrapper">
+                                                <input
+                                                    type={showInviteConfirmPassword ? "text" : "password"}
+                                                    className="form-control"
+                                                    id="inviteConfirmPasswordInput"
+                                                    required
+                                                    value={inviteConfirmPassword}
+                                                    onChange={(e) => {
+                                                        setInviteConfirmPassword(e.target.value);
+                                                        if (onboardingErrors.confirmPassword) setOnboardingErrors(prev => ({ ...prev, confirmPassword: '' }));
+                                                    }}
+                                                    placeholder="Re-enter password"
+                                                />
+                                                <button type="button" className="password-toggle" onClick={() => setShowInviteConfirmPassword(!showInviteConfirmPassword)}>
+                                                    {showInviteConfirmPassword ? '👁️‍🗨️' : '👁️'}
+                                                </button>
+                                            </div>
+                                            {onboardingErrors.confirmPassword && (
+                                                <div className="form-error" style={{ display: 'block' }}>{onboardingErrors.confirmPassword}</div>
+                                            )}
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="inviteDob">Date of Birth *</label>
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                id="inviteDob"
+                                                required
+                                                value={onboardingForm.dob}
+                                                onChange={(e) => {
+                                                    setOnboardingForm(prev => ({ ...prev, dob: e.target.value }));
+                                                    if (onboardingErrors.dob) setOnboardingErrors(prev => ({ ...prev, dob: '' }));
+                                                }}
+                                            />
+                                            {onboardingErrors.dob && (
+                                                <div className="form-error" style={{ display: 'block' }}>{onboardingErrors.dob}</div>
+                                            )}
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="inviteWorkMode">Work Mode</label>
+                                            <div className="select-wrapper">
+                                                <select
+                                                    className="form-control"
+                                                    id="inviteWorkMode"
+                                                    value={onboardingForm.workMode}
+                                                    onChange={(e) => setOnboardingForm(prev => ({ ...prev, workMode: e.target.value }))}
+                                                >
+                                                    <option value="Remote">Remote</option>
+                                                    <option value="Hybrid">Hybrid</option>
+                                                    <option value="On-site">On-site</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="inviteWorkLocation">Work Location</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="inviteWorkLocation"
+                                                value={onboardingForm.workLocation}
+                                                onChange={(e) => setOnboardingForm(prev => ({ ...prev, workLocation: e.target.value }))}
+                                                placeholder="City, Country"
+                                            />
+                                        </div>
+
+                                        <div className="form-group" style={{ marginBottom: "1rem" }}>
+                                            <label className="form-label" htmlFor="inviteBio">Short Bio (Optional)</label>
+                                            <textarea
+                                                className="form-control"
+                                                id="inviteBio"
+                                                rows="2"
+                                                value={onboardingForm.bio}
+                                                onChange={(e) => setOnboardingForm(prev => ({ ...prev, bio: e.target.value }))}
+                                                placeholder="Tell your team a little about yourself"
+                                                style={{ resize: "none" }}
+                                            />
+                                        </div>
+
+                                        <div className="checkbox-group" style={{ marginBottom: "1.25rem" }}>
+                                            <input
+                                                type="checkbox"
+                                                id="inviteTerms"
+                                                required
+                                                checked={onboardingForm.terms}
+                                                onChange={(e) => setOnboardingForm(prev => ({ ...prev, terms: e.target.checked }))}
+                                            />
+                                            <label htmlFor="inviteTerms" style={{ fontSize: "0.85rem", color: "#475569" }}>
+                                                I agree to the Terms of Service & Privacy Policy
+                                            </label>
+                                        </div>
+                                        {onboardingErrors.terms && (
+                                            <div className="form-error" style={{ display: 'block', marginBottom: '1rem' }}>{onboardingErrors.terms}</div>
+                                        )}
+
+                                        {onboardingGlobalError && (
+                                            <div className="global-error" style={{ display: 'block', marginBottom: '1rem' }}>
+                                                {onboardingGlobalError}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            style={{ width: "100%", padding: "0.85rem", fontSize: "1rem", fontWeight: "600", borderRadius: "8px" }}
+                                            disabled={isLoading}
+                                        >
+                                            {isLoading ? 'Setting Up Your Workspace...' : 'Complete Registration & Enter Workspace'}
+                                        </button>
+                                    </form>
+
+                                    <div className="auth-divider" style={{ margin: '1.5rem 0' }}>or sign up with google</div>
 
                                     {/* Google Sign-Up button matching exact requirements */}
                                     <button 

@@ -1,7 +1,10 @@
 const { db } = require('../db');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'safemailz-jwt-secret-key';
 
 let transporter;
 
@@ -36,7 +39,7 @@ if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
 }
 
 const sendInvite = async (req, res) => {
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, dob, workMode, workLocation, bio, workDays } = req.body;
     
     // User must be logged in as admin
     const userId = req.headers['x-user-id'];
@@ -80,10 +83,11 @@ const sendInvite = async (req, res) => {
         // Otherwise, generate a new invite token and send the email
         const token = crypto.randomBytes(32).toString('hex');
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+        const savedWorkDays = workDays ? (typeof workDays === 'string' ? workDays : JSON.stringify(workDays)) : '["M","T","W","T","F","S"]';
 
         db.run(
-            `INSERT INTO invitations (organization_id, email, token, expires_at, status) VALUES (?, ?, ?, ?, 'pending')`,
-            [orgId, email, token, expiresAt.toISOString()],
+            `INSERT INTO invitations (organization_id, email, token, expires_at, status, first_name, last_name, dob, work_mode, work_location, bio, work_days) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)`,
+            [orgId, email, token, expiresAt.toISOString(), firstName || '', lastName || '', dob || null, workMode || 'Remote', workLocation || 'Gilgit Baltistan, Pakistan', bio || '', savedWorkDays],
             async function (err) {
                 if (err) {
                     console.error('[sendInvite] Invite insert error:', err);
@@ -143,9 +147,23 @@ const verifyInvite = (req, res) => {
         // Return invite info
         db.get('SELECT organization_name FROM organizations WHERE id = ?', [invite.organization_id], (err, org) => {
             if (err) return res.status(500).json({ error: 'Database error' });
+            let parsedWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+            if (invite.work_days) {
+                try {
+                    parsedWorkDays = typeof invite.work_days === 'string' ? JSON.parse(invite.work_days) : invite.work_days;
+                } catch (e) {}
+            }
             res.json({
                 success: true,
                 email: invite.email,
+                firstName: invite.first_name || '',
+                lastName: invite.last_name || '',
+                fullName: `${invite.first_name || ''} ${invite.last_name || ''}`.trim(),
+                dob: invite.dob || '',
+                workMode: invite.work_mode || 'Remote',
+                workLocation: invite.work_location || 'Gilgit Baltistan, Pakistan',
+                bio: invite.bio || '',
+                workDays: parsedWorkDays,
                 organization_name: org ? org.organization_name : 'the organization'
             });
         });
@@ -153,9 +171,10 @@ const verifyInvite = (req, res) => {
 };
 
 const signupInvited = async (req, res) => {
-    const { token, firstName, password, dob, workMode, workLocation, bio, isGoogleAuth } = req.body;
+    const { token, firstName, lastName, fullName, password, dob, workMode, workLocation, bio, workDays, isGoogleAuth } = req.body;
+    const resolvedName = (fullName || `${firstName || ''} ${lastName || ''}`.trim() || firstName || '').trim();
 
-    if (!token || !firstName || (!password && !isGoogleAuth)) {
+    if (!token || !resolvedName || (!password && !isGoogleAuth)) {
         return res.status(400).json({ error: 'Please fill in all required fields.' });
     }
 
@@ -193,6 +212,21 @@ const signupInvited = async (req, res) => {
                     syncController.pendingAuth.delete(invite.email);
                 }
 
+                const names = resolvedName.split(' ');
+                const fName = names[0] || (invite.first_name || '');
+                const lName = names.slice(1).join(' ') || (invite.last_name || '');
+                const mode = workMode || invite.work_mode || 'Remote';
+                const location = workLocation || invite.work_location || 'Gilgit Baltistan, Pakistan';
+                const biography = bio || invite.bio || '';
+                const dobVal = dob || invite.dob || null;
+                const userWorkDays = workDays 
+                    ? (typeof workDays === 'string' ? workDays : JSON.stringify(workDays)) 
+                    : (invite.work_days || '["M","T","W","T","F","S"]');
+                let parsedWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+                try {
+                    parsedWorkDays = typeof userWorkDays === 'string' ? JSON.parse(userWorkDays) : userWorkDays;
+                } catch (e) {}
+
                 const completeSignup = (userId) => {
                     db.run(`UPDATE invitations SET status = 'used' WHERE id = ?`, [invite.id], (err) => {
                         if (err) {
@@ -200,16 +234,37 @@ const signupInvited = async (req, res) => {
                             return res.status(500).json({ error: 'Failed to update invite status.' });
                         }
 
+                        const token = jwt.sign(
+                            {
+                                id: userId,
+                                email: invite.email,
+                                role: 'employee',
+                                organization_id: invite.organization_id,
+                                tokenVersion: 0
+                            },
+                            JWT_SECRET,
+                            { expiresIn: '7d' }
+                        );
+
                         const userObj = {
                             id: userId,
                             organization_id: invite.organization_id,
                             email: invite.email,
-                            admin_name: firstName,
+                            admin_name: resolvedName,
+                            name: resolvedName,
+                            first_name: fName,
+                            last_name: lName,
+                            firstName: fName,
+                            lastName: lName,
                             role: 'employee',
-                            dob: dob || null,
-                            workMode: workMode || 'Remote',
-                            workLocation: workLocation || 'Gilgit Baltistan, Pakistan',
-                            bio: bio || '',
+                            dob: dobVal,
+                            workMode: mode,
+                            work_mode: mode,
+                            workLocation: location,
+                            work_location: location,
+                            bio: biography,
+                            workDays: parsedWorkDays,
+                            work_days: parsedWorkDays,
                             subscription_status: 'active',
                             permissions: {
                                 addEmployees: false,
@@ -223,6 +278,7 @@ const signupInvited = async (req, res) => {
                         return res.status(201).json({
                             success: true,
                             message: 'Account created successfully.',
+                            token,
                             user: userObj,
                             redirectUrl: '/dashboard'
                         });
@@ -233,15 +289,19 @@ const signupInvited = async (req, res) => {
                     // Update existing record
                     db.run(
                         `UPDATE users SET 
-                            organization_id = ?, admin_name = ?, password_hash = COALESCE(NULLIF(?, ''), password_hash), 
+                            organization_id = ?, admin_name = ?, first_name = ?, last_name = ?,
+                            password_hash = COALESCE(NULLIF(?, ''), password_hash), 
                             terms_accepted = 1, role = 'employee', dob = ?,
+                            work_mode = ?, work_location = ?, bio = ?, work_days = ?,
                             sync_provider = COALESCE(?, sync_provider),
                             sync_access_token = COALESCE(?, sync_access_token),
                             sync_refresh_token = COALESCE(?, sync_refresh_token),
                             sync_token_expires_at = COALESCE(?, sync_token_expires_at)
                          WHERE id = ?`,
                         [
-                            invite.organization_id, firstName, password_hash, dob || null,
+                            invite.organization_id, resolvedName, fName, lName,
+                            password_hash, dobVal,
+                            mode, location, biography, typeof parsedWorkDays === 'object' ? JSON.stringify(parsedWorkDays) : parsedWorkDays,
                             sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at,
                             existingUser.id
                         ],
@@ -257,13 +317,14 @@ const signupInvited = async (req, res) => {
                     // Insert new user
                     db.run(
                         `INSERT INTO users (
-                            organization_id, admin_name, email, password_hash, 
-                            marketing_opt_in, terms_accepted, role, dob,
+                            organization_id, admin_name, first_name, last_name, email, password_hash, 
+                            marketing_opt_in, terms_accepted, role, dob, work_mode, work_location, bio, work_days,
                             sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at
-                        ) VALUES (?, ?, ?, ?, 0, 1, 'employee', ?, ?, ?, ?, ?)`,
+                        ) VALUES (?, ?, ?, ?, ?, ?, 0, 1, 'employee', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                         [
-                            invite.organization_id, firstName, invite.email, password_hash,
-                            dob || null, sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at
+                            invite.organization_id, resolvedName, fName, lName, invite.email, password_hash,
+                            dobVal, mode, location, biography, typeof parsedWorkDays === 'object' ? JSON.stringify(parsedWorkDays) : parsedWorkDays,
+                            sync_provider, sync_access_token, sync_refresh_token, sync_token_expires_at
                         ],
                         function (err) {
                             if (err) {

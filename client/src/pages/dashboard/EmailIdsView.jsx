@@ -479,7 +479,7 @@ export default function EmailIdsView() {
                                     return (
                                         <tr key={rec.id} className="email-ids-row">
                                             {/* 1. Real Email ID */}
-                                            <td className="cell-real-email">
+                                            <td className="cell-real-email" data-label="Real Email ID">
                                                 <div className="real-email-content">
                                                     <span className="real-email-icon-box" aria-hidden="true">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -514,7 +514,7 @@ export default function EmailIdsView() {
                                             </td>
 
                                             {/* 2. Client ID */}
-                                            <td className="cell-secondary cell-client-id">
+                                            <td className="cell-secondary cell-client-id" data-label="Client ID">
                                                 <div className="client-id-chip-wrap">
                                                     <span className="client-id-chip" title={rec.clientId}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-75">
@@ -547,7 +547,7 @@ export default function EmailIdsView() {
                                             </td>
 
                                             {/* 3. Project Leader */}
-                                            <td className="cell-secondary cell-project-leader">
+                                            <td className="cell-secondary cell-project-leader" data-label="Project Leader">
                                                 <div className="leader-cell-content">
                                                     <span
                                                         className="leader-avatar-badge"
@@ -568,7 +568,7 @@ export default function EmailIdsView() {
                                             </td>
 
                                             {/* 4. Project Name */}
-                                            <td className="cell-secondary cell-project-name">
+                                            <td className="cell-secondary cell-project-name" data-label="Project Name">
                                                 <div className="project-name-cell">
                                                     <span className="project-folder-icon" aria-hidden="true">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -580,14 +580,14 @@ export default function EmailIdsView() {
                                             </td>
 
                                             {/* 5. Email No */}
-                                            <td className="cell-center">
+                                            <td className="cell-center" data-label="Email No">
                                                 <span className="email-no-badge">
                                                     {rec.emailNo}
                                                 </span>
                                             </td>
 
                                             {/* 6. Signature */}
-                                            <td className="cell-signature">
+                                            <td className="cell-signature" data-label="Signature">
                                                 <div className="signature-chip" title={rec.signature}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="signature-chip-icon shrink-0">
                                                         <path d="M12 20h9"></path>
@@ -598,7 +598,7 @@ export default function EmailIdsView() {
                                             </td>
 
                                             {/* 7. Status */}
-                                            <td className="cell-status">
+                                            <td className="cell-status" data-label="Status">
                                                 <span className={`email-id-status-pill status-${statusSlug}`}>
                                                     <span className="email-id-status-dot" aria-hidden="true" />
                                                     <span>{rec.status || 'Active'}</span>

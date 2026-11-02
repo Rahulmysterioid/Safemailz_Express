@@ -192,30 +192,51 @@ export default function AddAdminModal() {
                 <div style={{ padding: '1.25rem 1.5rem' }}>
                     {/* Search Input */}
                     <div style={{ position: 'relative', marginBottom: '1rem' }}>
-                        <svg
+                        <button
+                            type="button"
+                            id="addAdminSearchBtn"
+                            aria-label="Search employees"
+                            title="Search employees"
+                            onClick={() => {
+                                const input = document.getElementById('addAdminSearchInput');
+                                input?.focus();
+                            }}
                             style={{
                                 position: 'absolute',
-                                left: '12px',
+                                left: '8px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                width: '15px',
-                                height: '15px',
+                                width: '26px',
+                                height: '26px',
+                                borderRadius: '9999px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: 'none',
+                                background: 'transparent',
                                 color: '#94A3B8',
-                                pointerEvents: 'none'
+                                cursor: 'pointer',
+                                padding: 0,
+                                zIndex: 2
                             }}
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
                         >
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+                            <svg
+                                style={{ width: '15px', height: '15px' }}
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
                         <input
                             type="text"
+                            id="addAdminSearchInput"
                             className="form-input admin-modal-input"
                             placeholder="Search employees by name or email..."
                             value={search}

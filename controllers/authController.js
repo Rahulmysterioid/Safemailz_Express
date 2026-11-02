@@ -4,6 +4,48 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'safemailz-jwt-secret-key';
 
+const buildUserPayload = (user, mustChangePassword, tokenVersion) => {
+    const names = (user.admin_name || '').split(' ');
+    let parsedWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+    if (user.work_days) {
+        try {
+            parsedWorkDays = typeof user.work_days === 'string' ? JSON.parse(user.work_days) : user.work_days;
+        } catch (e) {}
+    }
+    return {
+        id: user.id,
+        organization_id: user.organization_id,
+        email: user.email,
+        admin_name: user.admin_name,
+        name: user.admin_name,
+        first_name: user.first_name || names[0] || '',
+        last_name: user.last_name || names.slice(1).join(' ') || '',
+        firstName: user.first_name || names[0] || '',
+        lastName: user.last_name || names.slice(1).join(' ') || '',
+        role: user.role,
+        dob: user.dob || null,
+        workMode: user.work_mode || 'Remote',
+        work_mode: user.work_mode || 'Remote',
+        workLocation: user.work_location || 'Gilgit Baltistan, Pakistan',
+        work_location: user.work_location || 'Gilgit Baltistan, Pakistan',
+        bio: user.bio || '',
+        workDays: parsedWorkDays,
+        work_days: parsedWorkDays,
+        mustChangePassword: mustChangePassword,
+        tokenVersion: tokenVersion,
+        subscription_status: user.subscription_status || 'active',
+        permissions: {
+            addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
+            createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
+            manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
+            makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
+            deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true',
+            canSendEmails: user.canSendEmails === null ? true : (user.canSendEmails == 1 || user.canSendEmails === true || String(user.canSendEmails).toLowerCase() === 'true'),
+            canReplyToEmails: user.canReplyToEmails === null ? true : (user.canReplyToEmails == 1 || user.canReplyToEmails === true || String(user.canReplyToEmails).toLowerCase() === 'true')
+        }
+    };
+};
+
 const signup = async (req, res) => {
     const {
         organization_name,
@@ -146,25 +188,7 @@ const signin = async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        const userPayload = {
-            id: user.id,
-            organization_id: user.organization_id,
-            email: user.email,
-            admin_name: user.admin_name,
-            role: user.role,
-            mustChangePassword: mustChangePassword,
-            tokenVersion: tokenVersion,
-            subscription_status: user.subscription_status || 'active',
-            permissions: {
-                addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
-                createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
-                manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
-                makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
-                deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true',
-                canSendEmails: user.canSendEmails === null ? true : (user.canSendEmails == 1 || user.canSendEmails === true || String(user.canSendEmails).toLowerCase() === 'true'),
-                canReplyToEmails: user.canReplyToEmails === null ? true : (user.canReplyToEmails == 1 || user.canReplyToEmails === true || String(user.canReplyToEmails).toLowerCase() === 'true')
-            }
-        };
+        const userPayload = buildUserPayload(user, mustChangePassword, tokenVersion);
 
         if (mustChangePassword) {
             return res.status(200).json({
@@ -245,25 +269,7 @@ const signinGoogle = async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        const userPayload = {
-            id: user.id,
-            organization_id: user.organization_id,
-            email: user.email,
-            admin_name: user.admin_name,
-            role: user.role,
-            mustChangePassword: mustChangePassword,
-            tokenVersion: tokenVersion,
-            subscription_status: user.subscription_status || 'active',
-            permissions: {
-                addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
-                createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
-                manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
-                makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
-                deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true',
-                canSendEmails: user.canSendEmails === null ? true : (user.canSendEmails == 1 || user.canSendEmails === true || String(user.canSendEmails).toLowerCase() === 'true'),
-                canReplyToEmails: user.canReplyToEmails === null ? true : (user.canReplyToEmails == 1 || user.canReplyToEmails === true || String(user.canReplyToEmails).toLowerCase() === 'true')
-            }
-        };
+        const userPayload = buildUserPayload(user, mustChangePassword, tokenVersion);
 
         if (mustChangePassword) {
             return res.status(200).json({
@@ -343,25 +349,7 @@ const signinMicrosoft = async (req, res) => {
             { expiresIn: '7d' }
         );
 
-        const userPayload = {
-            id: user.id,
-            organization_id: user.organization_id,
-            email: user.email,
-            admin_name: user.admin_name,
-            role: user.role,
-            mustChangePassword: mustChangePassword,
-            tokenVersion: tokenVersion,
-            subscription_status: user.subscription_status || 'active',
-            permissions: {
-                addEmployees: user.perm_add_employees == 1 || user.perm_add_employees === true || String(user.perm_add_employees).toLowerCase() === 'true',
-                createProjects: user.perm_create_projects == 1 || user.perm_create_projects === true || String(user.perm_create_projects).toLowerCase() === 'true',
-                manageProjects: user.perm_manage_projects == 1 || user.perm_manage_projects === true || String(user.perm_manage_projects).toLowerCase() === 'true',
-                makeAdmin: user.perm_make_admin == 1 || user.perm_make_admin === true || String(user.perm_make_admin).toLowerCase() === 'true',
-                deleteProject: user.perm_delete_project == 1 || user.perm_delete_project === true || String(user.perm_delete_project).toLowerCase() === 'true',
-                canSendEmails: user.canSendEmails === null ? true : (user.canSendEmails == 1 || user.canSendEmails === true || String(user.canSendEmails).toLowerCase() === 'true'),
-                canReplyToEmails: user.canReplyToEmails === null ? true : (user.canReplyToEmails == 1 || user.canReplyToEmails === true || String(user.canReplyToEmails).toLowerCase() === 'true')
-            }
-        };
+        const userPayload = buildUserPayload(user, mustChangePassword, tokenVersion);
 
         if (mustChangePassword) {
             return res.status(200).json({

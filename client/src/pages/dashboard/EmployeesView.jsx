@@ -359,7 +359,17 @@ export default function EmployeesView() {
     };
 
     const handleCopyInviteLink = async () => {
-        const link = generatedInviteUrl || `http://${window.location.host}/signup-invite.html?invite=${encodeURIComponent(newEmail || 'employee')}`;
+        let link = generatedInviteUrl;
+        if (!link && newEmail.trim() && newFirstName.trim()) {
+            const res = await addEmployee(newFirstName.trim(), newLastName.trim(), newEmail.trim(), sendInviteEmail);
+            if (res?.inviteUrl) {
+                link = res.inviteUrl;
+                setGeneratedInviteUrl(res.inviteUrl);
+            }
+        }
+        if (!link) {
+            link = `${window.location.origin}/signup?email=${encodeURIComponent(newEmail.trim() || 'employee')}`;
+        }
         try {
             await navigator.clipboard.writeText(link);
             alert('✅ Invite link copied to clipboard:\n' + link);
@@ -1462,7 +1472,7 @@ export default function EmployeesView() {
                                                     <input
                                                         type="text"
                                                         id="profDob"
-                                                        value={emp.dob && emp.dob !== 'Pending Signup' ? new Date(emp.dob).toLocaleDateString('en-GB').replace(/\//g, ' - ') : (emp.isPending ? 'Pending Signup' : '')}
+                                                        value={emp.dob && emp.dob !== 'Pending Signup' && !isNaN(new Date(emp.dob).getTime()) ? new Date(emp.dob).toLocaleDateString('en-GB').replace(/\//g, ' - ') : (emp.isPending ? 'Pending Signup' : (emp.dob || ''))}
                                                         readOnly
                                                     />
                                                 </div>
@@ -1489,7 +1499,7 @@ export default function EmployeesView() {
                                                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                                                 </svg>
-                                                <input type="text" defaultValue={emp.workMode || 'Remote'} readOnly />
+                                                <input type="text" value={emp.workMode || 'Remote'} readOnly />
                                             </div>
                                         </div>
 
@@ -1500,30 +1510,46 @@ export default function EmployeesView() {
                                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                                     <circle cx="12" cy="10" r="3"></circle>
                                                 </svg>
-                                                <input type="text" defaultValue={emp.workLocation || 'Gilgit Baltistan, Pakistan'} readOnly />
+                                                <input type="text" value={emp.workLocation || 'Gilgit Baltistan, Pakistan'} readOnly />
                                             </div>
                                         </div>
 
                                         <div className="form-row form-row-full">
                                             <label>Work Days</label>
                                             <div className="work-days">
-                                                {[
-                                                    { short: 'M', full: 'Mon' },
-                                                    { short: 'T', full: 'Tue' },
-                                                    { short: 'W', full: 'Wed' },
-                                                    { short: 'T', full: 'Thu' },
-                                                    { short: 'F', full: 'Fri' },
-                                                    { short: 'S', full: 'Sat' },
-                                                    { short: 'S', full: 'Sun' }
-                                                ].map((day, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className={`work-day ${idx < 6 ? 'active' : ''}`}
-                                                        title={day.full}
-                                                    >
-                                                        {day.short}
-                                                    </div>
-                                                ))}
+                                                {(() => {
+                                                    let activeWorkDays = ['M', 'T', 'W', 'T', 'F', 'S'];
+                                                    if (emp.workDays) {
+                                                        try {
+                                                            activeWorkDays = Array.isArray(emp.workDays) ? emp.workDays : JSON.parse(emp.workDays || '[]');
+                                                        } catch (e) {}
+                                                    } else if (emp.work_days) {
+                                                        try {
+                                                            activeWorkDays = Array.isArray(emp.work_days) ? emp.work_days : JSON.parse(emp.work_days || '[]');
+                                                        } catch (e) {}
+                                                    }
+                                                    const daysList = [
+                                                        { short: 'M', full: 'Mon' },
+                                                        { short: 'T', full: 'Tue' },
+                                                        { short: 'W', full: 'Wed' },
+                                                        { short: 'T', full: 'Thu' },
+                                                        { short: 'F', full: 'Fri' },
+                                                        { short: 'S', full: 'Sat' },
+                                                        { short: 'S', full: 'Sun' }
+                                                    ];
+                                                    return daysList.map((day, idx) => {
+                                                        const isActive = activeWorkDays.includes(day.short) || (activeWorkDays.length > idx && activeWorkDays[idx] === day.short);
+                                                        return (
+                                                            <div
+                                                                key={idx}
+                                                                className={`work-day ${isActive ? 'active' : ''}`}
+                                                                title={day.full}
+                                                            >
+                                                                {day.short}
+                                                            </div>
+                                                        );
+                                                    });
+                                                })()}
                                             </div>
                                         </div>
 
@@ -1531,12 +1557,13 @@ export default function EmployeesView() {
                                             <label>Short bio</label>
                                             <textarea
                                                 className="bio-textarea"
-                                                defaultValue={emp.bio || 'Untoward person'}
+                                                value={emp.bio !== undefined && emp.bio !== null ? emp.bio : ''}
+                                                placeholder="Tell your team a little about yourself"
                                                 maxLength={280}
                                                 onChange={(e) => updateProfile(selectedEmployeeIndex, 'bio', e.target.value)}
                                             />
                                             <div className="char-count">
-                                                {String(emp.bio || 'Untoward person').length} / 280 characters
+                                                {String(emp.bio || '').length} / 280 characters
                                             </div>
                                         </div>
                                     </div>

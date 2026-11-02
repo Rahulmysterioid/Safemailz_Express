@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAdmin } from '../../context/AdminContext';
 import SidebarActionHeader from './SidebarActionHeader';
 
@@ -23,6 +23,7 @@ export default function AdminsSidebar({ user, effectivePermissions, handleImport
     } = useAdmin();
 
     const [openMenuId, setOpenMenuId] = useState(null);
+    const searchInputRef = useRef(null);
     const [copiedId, setCopiedId] = useState(null);
 
     useEffect(() => {
@@ -118,9 +119,10 @@ export default function AdminsSidebar({ user, effectivePermissions, handleImport
                     <button
                         type="button"
                         id="adminsExportBtn"
-                        className="sidebar-action-btn h-8 px-2.5 rounded-lg border border-slate-200 dark:border-[#222938] bg-white dark:bg-[#141821] hover:bg-slate-50 dark:hover:bg-[#1c2230] text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                        disabled={admins.length === 0}
+                        className="sidebar-action-btn h-8 px-2.5 rounded-lg border border-slate-200 dark:border-[#222938] bg-white dark:bg-[#141821] hover:bg-slate-50 dark:hover:bg-[#1c2230] text-slate-700 dark:text-slate-200 text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                         aria-label="Export admins"
-                        onClick={() => handleExport && handleExport('admins')}
+                        onClick={() => admins.length > 0 && handleExport && handleExport('admins')}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -133,21 +135,57 @@ export default function AdminsSidebar({ user, effectivePermissions, handleImport
 
                 {/* Sidebar Search Input */}
                 <div className="relative w-full flex items-center">
-                    <svg
-                        style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: '#94a3b8', pointerEvents: 'none' }}
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                        aria-hidden="true"
+                    <button
+                        type="button"
+                        id="adminsSidebarSearchBtn"
+                        aria-label="Search admin"
+                        title="Search admin"
+                        onClick={() => {
+                            if (searchInputRef.current) {
+                                searchInputRef.current.focus();
+                            } else {
+                                document.getElementById('adminsSidebarSearch')?.focus();
+                            }
+                        }}
+                        style={{
+                            position: 'absolute',
+                            left: '6px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '9999px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            background: 'transparent',
+                            color: '#94a3b8',
+                            cursor: 'pointer',
+                            padding: 0,
+                            zIndex: 2
+                        }}
                     >
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
+                        <svg
+                            style={{ width: '13px', height: '13px' }}
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                            aria-hidden="true"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
                     <input
+                        ref={searchInputRef}
                         type="text"
                         placeholder="Search admin..."
                         id="adminsSidebarSearch"
                         aria-label="Search admin"
                         value={adminSearch}
                         onChange={(e) => setAdminSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') setAdminSearch('');
+                        }}
                         className="w-full h-8 pl-8 pr-7 text-xs rounded-lg border border-slate-200 dark:border-[#222938] bg-slate-50/50 dark:bg-[#141821] dark:text-slate-100 dark:placeholder:text-slate-400 focus:bg-white dark:focus:bg-[#181d28] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-none transition-all"
                         style={{ paddingLeft: '32px', paddingRight: adminSearch ? '28px' : '12px', boxSizing: 'border-box' }}
                     />
@@ -156,6 +194,7 @@ export default function AdminsSidebar({ user, effectivePermissions, handleImport
                             type="button"
                             onClick={() => setAdminSearch('')}
                             aria-label="Clear search"
+                            title="Clear search"
                             className="sidebar-search-clear-btn"
                             style={{
                                 position: 'absolute',
@@ -164,15 +203,16 @@ export default function AdminsSidebar({ user, effectivePermissions, handleImport
                                 transform: 'translateY(-50%)',
                                 width: '18px',
                                 height: '18px',
-                                borderRadius: '4px',
+                                borderRadius: '9999px',
                                 border: 'none',
-                                background: 'transparent',
+                                background: 'rgba(148, 163, 184, 0.2)',
                                 color: '#94a3b8',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
-                                padding: 0
+                                padding: 0,
+                                zIndex: 2
                             }}
                         >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -198,9 +238,25 @@ export default function AdminsSidebar({ user, effectivePermissions, handleImport
                     )}
                 </div>
 
-                {filteredAdmins.length === 0 ? (
-                    <div className="text-center py-8 px-4 text-slate-500 dark:text-slate-400 text-xs rounded-xl border border-dashed border-slate-200 dark:border-[#222938]">
-                        <p className="m-0 font-medium">No admins found.</p>
+                {admins.length === 0 ? (
+                    <div
+                        className="sidebar-empty-box mt-2 py-8 px-4 text-center text-xs text-slate-400 dark:text-slate-500 bg-slate-50/60 dark:bg-[#141821]/60 rounded-xl border border-dashed border-slate-200 dark:border-[#222938] flex flex-col items-center justify-center gap-1.5"
+                        style={{ padding: '32px 16px', borderStyle: 'dashed', minHeight: '96px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>No admins in directory</span>
+                    </div>
+                ) : filteredAdmins.length === 0 ? (
+                    <div
+                        className="sidebar-empty-box text-center py-8 px-4 text-slate-500 dark:text-slate-400 text-xs rounded-xl border border-dashed border-slate-200 dark:border-[#222938]"
+                        style={{ padding: '32px 16px', borderStyle: 'dashed', minHeight: '96px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                    >
+                        <p className="m-0 font-medium">No admins found</p>
                         {adminSearch && (
                             <button
                                 type="button"
